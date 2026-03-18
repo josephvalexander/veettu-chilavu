@@ -78,59 +78,47 @@ jobs:
         run: |
           pip install Pillow --quiet
           mkdir -p dist/icons
-          python3 - << 'PYEOF'
-from PIL import Image, ImageDraw
-import os
-
-BG=(24,16,20); PAPER=(44,28,38); PAPER_L=(54,38,48)
-CORAL=(232,114,90); GOLD=(245,200,66); MUTED=(120,110,130); TEAL=(95,196,184)
-
-def make_icon(size):
-    img=Image.new("RGBA",(size,size),(0,0,0,0))
-    draw=ImageDraw.Draw(img)
-    pad=max(2,int(size*0.045)); cr=int(size*0.22)
-    draw.rounded_rectangle([pad,pad,size-pad,size-pad],radius=cr,fill=BG)
-    rx1,rx2=int(size*0.28),int(size*0.72); ry1=int(size*0.16)
-    zy=int(size*0.82); zn=8; zh=int(size*0.035); zs=(rx2-rx1)/zn
-    pts=[(rx1,ry1),(rx2,ry1),(rx2,zy)]
-    for i in range(zn):
-        x=rx2-i*zs; pts.append((x,zy)); pts.append((x-zs/2,zy+zh))
-    pts.append((rx1,zy))
-    draw.polygon(pts,fill=PAPER)
-    draw.rounded_rectangle([rx1+2,ry1+2,rx2-2,zy-2],radius=max(1,int(size*0.015)),fill=PAPER_L)
-    lx1=rx1+int(size*0.06); lx2=rx2-int(size*0.06); ax=rx2-int(size*0.07)
-    lh=int(size*0.055); lr=max(1,int(size*0.018))
-    draw.rounded_rectangle([lx1,ry1+int(size*0.055),lx2,ry1+int(size*0.055)+lh],radius=lr,fill=(*CORAL,200))
-    rows=[(int(size*0.14),(*MUTED,140),(*GOLD,220)),(int(size*0.10),(*MUTED,110),(*GOLD,200)),(int(size*0.12),(*MUTED,130),(*GOLD,210)),(int(size*0.09),(*MUTED,100),(*GOLD,190))]
-    sy=ry1+int(size*0.15)
-    for i,(dw,dc,ac) in enumerate(rows):
-        y=sy+i*int(size*0.115); lt=max(2,int(size*0.028))
-        draw.rounded_rectangle([lx1,y,lx1+dw,y+lt],radius=lt//2,fill=dc)
-        aw=int(size*0.09)
-        draw.rounded_rectangle([ax-aw,y,ax,y+lt],radius=lt//2,fill=ac)
-    dy=sy+4*int(size*0.115)+int(size*0.015)
-    draw.rounded_rectangle([lx1,dy,lx2,dy+max(1,int(size*0.012))],radius=1,fill=(*MUTED,60))
-    ty=dy+int(size*0.03); th=max(3,int(size*0.038)); tw=int(size*0.11)
-    draw.rounded_rectangle([lx1,ty,lx1+tw,ty+th],radius=th//2,fill=(*TEAL,230))
-    aw2=int(size*0.12)
-    draw.rounded_rectangle([ax-aw2,ty-int(size*0.005),ax,ty+th+int(size*0.005)],radius=th//2,fill=GOLD)
-    bx=rx2+int(size*0.04); by=ry1-int(size*0.04); bs=int(size*0.18)
-    bolt=[(bx+bs*0.18,by-bs*0.5),(bx-bs*0.05,by+bs*0.05),(bx+bs*0.12,by+bs*0.05),(bx-bs*0.18,by+bs*0.5),(bx+bs*0.02,by),(bx-bs*0.1,by)]
-    draw.polygon(bolt,fill=GOLD)
-    draw.ellipse([bx+bs*0.12-size*0.025,by-bs*0.5-size*0.025,bx+bs*0.12+size*0.025,by-bs*0.5+size*0.025],fill=CORAL)
-    draw.rounded_rectangle([pad,pad,size-pad,size-pad],radius=cr,outline=(*CORAL,45),width=max(1,int(size*0.013)))
-    return img
-
-for sz in [16,32,48,64,128,192,512]:
-    make_icon(sz).save(f"dist/icons/icon-{sz}.png")
-    print(f"Generated icon-{sz}.png")
-
-imgs=[make_icon(s) for s in [16,32,48]]
-imgs[0].save("dist/favicon.ico",format="ICO",sizes=[(16,16),(32,32),(48,48)],append_images=imgs[1:])
-make_icon(32).save("dist/icons/favicon.png")
-make_icon(32).save("dist/favicon.png")
-print("All icons generated")
-PYEOF
+          python3 -c "
+          from PIL import Image, ImageDraw
+          BG=(24,16,20);P=(44,28,38);PL=(54,38,48);C=(232,114,90);G=(245,200,66);M=(120,110,130);T=(95,196,184)
+          def ic(sz):
+            im=Image.new('RGBA',(sz,sz),(0,0,0,0));d=ImageDraw.Draw(im)
+            p=max(2,int(sz*.045));cr=int(sz*.22)
+            d.rounded_rectangle([p,p,sz-p,sz-p],radius=cr,fill=BG)
+            x1,x2,y1=int(sz*.28),int(sz*.72),int(sz*.16)
+            zy=int(sz*.82);zs=(x2-x1)/8;zh=int(sz*.035)
+            pts=[(x1,y1),(x2,y1),(x2,zy)]
+            for i in range(8):
+              x=x2-i*zs;pts+=[(x,zy),(x-zs/2,zy+zh)]
+            pts.append((x1,zy));d.polygon(pts,fill=P)
+            d.rounded_rectangle([x1+2,y1+2,x2-2,zy-2],radius=max(1,int(sz*.015)),fill=PL)
+            lx=x1+int(sz*.06);lx2=x2-int(sz*.06);ax=x2-int(sz*.07)
+            lh=int(sz*.055);lr=max(1,int(sz*.018))
+            d.rounded_rectangle([lx,y1+int(sz*.055),lx2,y1+int(sz*.055)+lh],radius=lr,fill=(*C,200))
+            rows=[(int(sz*.14),(*M,140),(*G,220)),(int(sz*.10),(*M,110),(*G,200)),(int(sz*.12),(*M,130),(*G,210)),(int(sz*.09),(*M,100),(*G,190))]
+            sy=y1+int(sz*.15)
+            for i,(dw,dc,ac) in enumerate(rows):
+              y=sy+i*int(sz*.115);lt=max(2,int(sz*.028))
+              d.rounded_rectangle([lx,y,lx+dw,y+lt],radius=lt//2,fill=dc)
+              d.rounded_rectangle([ax-int(sz*.09),y,ax,y+lt],radius=lt//2,fill=ac)
+            dy=sy+4*int(sz*.115)+int(sz*.015)
+            d.rounded_rectangle([lx,dy,lx2,dy+max(1,int(sz*.012))],radius=1,fill=(*M,60))
+            ty=dy+int(sz*.03);th=max(3,int(sz*.038))
+            d.rounded_rectangle([lx,ty,lx+int(sz*.11),ty+th],radius=th//2,fill=(*T,230))
+            d.rounded_rectangle([ax-int(sz*.12),ty-int(sz*.005),ax,ty+th+int(sz*.005)],radius=th//2,fill=G)
+            bx=x2+int(sz*.04);by=y1-int(sz*.04);bs=int(sz*.18)
+            bolt=[(bx+bs*.18,by-bs*.5),(bx-bs*.05,by+bs*.05),(bx+bs*.12,by+bs*.05),(bx-bs*.18,by+bs*.5),(bx+bs*.02,by),(bx-bs*.1,by)]
+            d.polygon(bolt,fill=G)
+            d.ellipse([bx+bs*.12-sz*.025,by-bs*.5-sz*.025,bx+bs*.12+sz*.025,by-bs*.5+sz*.025],fill=C)
+            d.rounded_rectangle([p,p,sz-p,sz-p],radius=cr,outline=(*C,45),width=max(1,int(sz*.013)))
+            return im
+          for s in [16,32,48,64,128,192,512]:
+            ic(s).save(f'dist/icons/icon-{s}.png');print(f'icon-{s}.png ok')
+          imgs=[ic(s) for s in [16,32,48]]
+          imgs[0].save('dist/favicon.ico',format='ICO',sizes=[(16,16),(32,32),(48,48)],append_images=imgs[1:])
+          ic(32).save('dist/icons/favicon.png');ic(32).save('dist/favicon.png')
+          print('all icons done')
+          "
           echo "✅ PWA icons generated"
 
       # ── 4. Inject Google Client ID ────────────────────────
