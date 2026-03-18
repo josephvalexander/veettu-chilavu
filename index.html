@@ -701,25 +701,83 @@ function signInWithGoogle() {
       <button class="btn btn-primary btn-full" onclick="demoMode()">▶ Try Demo Mode Instead</button>`);
     return;
   }
-  google.accounts.oauth2.initTokenClient({
-    client_id: CONFIG.CLIENT_ID, scope: CONFIG.SCOPES,
-    callback: r => { if (r.error) { showToast('Sign-in failed: '+r.error,'error'); return; } state.token=r.access_token; fetchUserInfo(); },
-  }).requestAccessToken();
-}
-function fetchUserInfo() {
-  fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers:{ Authorization:`Bearer ${state.token}` } })
-    .then(r=>r.json()).then(i=>{
-      state.user=i;
-      // If sheet ID is already known (injected at build or saved locally),
-      // skip the sheet entry screen and go straight into the app
-      if (state.sheetId) {
-        // Sheet ID already known (injected at build or saved locally) — go straight in
-        initApp();
-      } else {
-        // No sheet ID found — show manual entry screen
-        showStep2();
+  // Restore cached user info immediately so UI shows the right name/avatar
+  // while the token request is in flight
+  const cached = localStorage.getItem('fl_user');
+  if (cached) {
+    try { state.user = JSON.parse(cached); } catch(_) {}
+  }
+  _tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CONFIG.CLIENT_ID,
+    scope: CONFIG.SCOPES,
+    // hint = pre-selects the last used account so user does not have to pick again
+    login_hint: state.user?.email || '',
+    callback: r => {
+      if (r.error) {
+        // access_denied or popup_closed_by_user — don't show error for popup close
+        if (r.error !== 'popup_closed_by_user') {
+          showToast('Sign-in failed: ' + r.error, 'error');
+        }
+        return;
       }
-    });
+      state.token = r.access_token;
+      fetchUserInfo();
+    },
+  });
+  _tokenClient.requestAccessToken({ prompt: '' });
+}
+
+// Holds the token client so refreshToken() can reuse it
+let _tokenClient = null;
+
+function fetchUserInfo() {
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: { Authorization: `Bearer ${state.token}` }
+  })
+  .then(r => {
+    if (r.status === 401) {
+      // Token was rejected immediately — request a fresh one with prompt
+      console.warn('[Auth] userinfo 401 — requesting fresh token');
+      _tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CONFIG.CLIENT_ID,
+        scope: CONFIG.SCOPES,
+        callback: r2 => {
+          if (r2.error) { showToast('Sign-in failed: ' + r2.error, 'error'); return; }
+          state.token = r2.access_token;
+          fetchUserInfo(); // retry once with new token
+        },
+      });
+      _tokenClient.requestAccessToken({ prompt: 'consent' });
+      return null;
+    }
+    if (!r.ok) throw new Error('userinfo ' + r.status);
+    return r.json();
+  })
+  .then(i => {
+    if (!i) return; // null = we triggered a re-auth above
+    // Validate we got a real user object (not an error response)
+    if (!i.sub && !i.email) {
+      console.error('[Auth] Invalid userinfo response:', i);
+      showToast('Sign-in failed — please try again', 'error');
+      return;
+    }
+    state.user = i;
+    // Cache user info in localStorage so name/avatar survive page reloads
+    localStorage.setItem('fl_user', JSON.stringify({
+      name: i.name, given_name: i.given_name,
+      email: i.email, picture: i.picture, sub: i.sub
+    }));
+    // Sheet ID already known → go straight in; otherwise ask for it
+    if (state.sheetId) {
+      initApp();
+    } else {
+      showStep2();
+    }
+  })
+  .catch(err => {
+    console.error('[Auth] fetchUserInfo error:', err);
+    showToast('Connection error — please try again', 'error');
+  });
 }
 function showStep2() {
   document.getElementById('login-step-1').style.display='none';
@@ -747,7 +805,16 @@ function createNewSheet() {
     <button class="btn btn-secondary btn-full" onclick="closeModal()">Got my Sheet ID</button>`);
 }
 function signOut() {
+  // Revoke the token so Google clears the session
+  if (state.token && state.token !== 'DEMO') {
+    google.accounts.oauth2.revoke(state.token, () => {
+      console.log('[Auth] Token revoked');
+    });
+  }
   state.user=null; state.token=null; state.expenses=[];
+  _tokenClient=null;
+  // Clear cached user so login_hint doesn't auto-select on next sign-in
+  localStorage.removeItem('fl_user');
   showScreen('login');
   document.getElementById('login-step-1').style.display='block';
   document.getElementById('login-step-2').style.display='none';
@@ -796,22 +863,31 @@ function demoMode() {
 //  SHEETS API
 // ════════════════════════════════════════════
 async function refreshToken() {
-  // Silently get a fresh access token without showing a popup
+  // Silently get a fresh access token without showing a popup.
+  // Reuses _tokenClient if available (avoids creating multiple clients).
   return new Promise((resolve, reject) => {
     if (!CONFIG.CLIENT_ID || CONFIG.CLIENT_ID.includes('__GOOGLE') || CONFIG.CLIENT_ID.includes('YOUR_GOOGLE')) {
       reject(new Error('No Client ID configured')); return;
     }
-    google.accounts.oauth2.initTokenClient({
+    const hint = state.user?.email || localStorage.getItem('fl_user')
+      ? JSON.parse(localStorage.getItem('fl_user') || '{}').email : '';
+    const client = google.accounts.oauth2.initTokenClient({
       client_id: CONFIG.CLIENT_ID,
       scope: CONFIG.SCOPES,
-      prompt: '',   // empty = silent refresh, no popup
+      login_hint: hint,
+      prompt: '',   // empty string = silent, no popup if session is alive
       callback: r => {
-        if (r.error) { reject(new Error(r.error)); return; }
+        if (r.error) {
+          console.warn('[Auth] Silent refresh failed:', r.error);
+          reject(new Error(r.error));
+          return;
+        }
         state.token = r.access_token;
         console.log('[App] Token refreshed silently');
         resolve(r.access_token);
       },
-    }).requestAccessToken();
+    });
+    client.requestAccessToken({ prompt: '' });
   });
 }
 
