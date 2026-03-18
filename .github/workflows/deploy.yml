@@ -68,9 +68,46 @@ jobs:
           cp "${APP_DIR}/sw.js"        dist/
           cp "${APP_DIR}/manifest.json" dist/
 
-          # Optional files — skip gracefully if missing
-          [ -d "${APP_DIR}/icons" ] && cp -r "${APP_DIR}/icons" dist/ \
-            || echo "⚠️  icons/ folder not found — PWA icons will be missing but app will still work"
+          # Copy favicon if present
+          [ -f "${APP_DIR}/favicon.ico" ] && cp "${APP_DIR}/favicon.ico" dist/ || true
+          # Copy icons folder if present, otherwise generate below
+          [ -d "${APP_DIR}/icons" ] && cp -r "${APP_DIR}/icons" dist/ || true
+
+      # ── 3b. Generate PWA icons (runs only if icons are missing) ──
+      - name: Generate PWA icons
+        run: |
+          if [ ! -f "dist/icons/icon-192.png" ] || [ ! -f "dist/icons/icon-512.png" ]; then
+            echo "⚙️  Generating PWA icons with Node.js..."
+            mkdir -p dist/icons
+            node -e "
+              const fs=require('fs'),zlib=require('zlib');
+              function png(size){
+                const BG=[26,26,46],ACC=[245,200,66];
+                const px=new Uint8Array(size*size*4);
+                const pad=Math.floor(size*0.2);
+                for(let y=0;y<size;y++) for(let x=0;x<size;x++){
+                  const i=(y*size+x)*4;
+                  const c=(x>=pad&&x<size-pad&&y>=pad&&y<size-pad)?ACC:BG;
+                  px[i]=c[0];px[i+1]=c[1];px[i+2]=c[2];px[i+3]=255;
+                }
+                function crc(b){const t=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=(c&1)?0xEDB88320^(c>>>1):c>>>1;t[i]=c;}let c=0xFFFFFFFF;for(const b2 of b)c=t[(c^b2)&0xFF]^(c>>>8);return(c^0xFFFFFFFF)>>>0;}
+                function chunk(t,d){const tb=Buffer.from(t);const lb=Buffer.alloc(4);lb.writeUInt32BE(d.length);const cv=Buffer.alloc(4);cv.writeUInt32BE(crc(Buffer.concat([tb,d])));return Buffer.concat([lb,tb,d,cv]);}
+                const hdr=Buffer.alloc(13);hdr.writeUInt32BE(size,0);hdr.writeUInt32BE(size,4);hdr[8]=8;hdr[9]=2;
+                const rs=size*3;const rr=Buffer.alloc(size*(rs+1));
+                for(let y=0;y<size;y++){rr[y*(rs+1)]=0;for(let x=0;x<size;x++){const s=(y*size+x)*4;const d2=y*(rs+1)+1+x*3;rr[d2]=px[s];rr[d2+1]=px[s+1];rr[d2+2]=px[s+2];}}
+                const cmp=zlib.deflateSync(rr,{level:6});
+                return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',hdr),chunk('IDAT',cmp),chunk('IEND',Buffer.alloc(0))]);
+              }
+              fs.writeFileSync('dist/icons/icon-192.png',png(192));
+              fs.writeFileSync('dist/icons/icon-512.png',png(512));
+              fs.writeFileSync('dist/favicon.ico',png(32));
+              console.log('Icons generated OK');
+            "
+          else
+            echo "✅ Icons already present"
+          fi
+          # Copy favicon to dist root if not already there
+          [ -f "dist/favicon.ico" ] || ([ -f "favicon.ico" ] && cp favicon.ico dist/) || true
 
       # ── 4. Inject Google Client ID ────────────────────────
       #    Add secret: repo → Settings → Secrets → Actions
