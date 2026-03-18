@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <meta id="theme-color-meta" name="theme-color" content="#0f0f1a"/>
   <meta name="description" content="Veettu Chilavu — family expense tracker"/>
-  <title>Veettu Chilavu</title>
+  <title>വീട്ടു ചിലവ് — Veettu Chilavu</title>
   <link rel="manifest" href="manifest.json"/>
   <link rel="apple-touch-icon" href="icons/icon-192.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=DM+Sans:wght@300;400;500;600&family=Manjari:wght@400;700&display=swap" rel="stylesheet"/>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     /* ══════════════════════════════════════
@@ -81,7 +81,7 @@
        LOGIN
     ══════════════════════════════════════ */
     #screen-login{align-items:center;justify-content:center;padding:2rem 1.5rem;background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--banner-g1) 0%,var(--bg) 70%);text-align:center;}
-    .login-logo{font-family:'Fraunces',Georgia,serif;font-size:3rem;font-weight:700;color:var(--accent);letter-spacing:-.02em;line-height:1;margin-bottom:.25rem;}
+    .login-logo{font-family:'Manjari','Fraunces',Georgia,serif;font-size:2.6rem;font-weight:700;color:var(--accent);letter-spacing:.01em;line-height:1.15;margin-bottom:.25rem;}
     .login-logo span{color:var(--accent3);font-style:italic;font-weight:300;}
     .login-tagline{color:var(--muted);font-size:.95rem;margin-bottom:2.5rem;}
     .login-illustration{width:220px;height:160px;margin:0 auto 2rem;position:relative;}
@@ -104,7 +104,7 @@
        HEADER
     ══════════════════════════════════════ */
     .app-header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.25rem .8rem;background:var(--hdr-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:background .25s;}
-    .header-logo{font-family:'Fraunces',Georgia,serif;font-size:1.3rem;font-weight:700;color:var(--accent);}
+    .header-logo{font-family:'Manjari','Fraunces',Georgia,serif;font-size:1.25rem;font-weight:700;color:var(--accent);letter-spacing:.01em;}
     .header-logo span{font-style:italic;font-weight:300;color:var(--accent3);}
     .header-right{display:flex;align-items:center;gap:.6rem;}
     /* Theme toggle */
@@ -140,14 +140,14 @@
     .month-banner{background:linear-gradient(135deg,var(--banner-g1) 0%,var(--banner-g2) 100%);border:1px solid var(--border);border-radius:14px;padding:1.35rem;position:relative;overflow:hidden;transition:background .25s;}
     .month-banner::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(245,200,66,.18) 0%,transparent 70%);pointer-events:none;}
     .banner-sublabel{font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem;}
-    .banner-total{font-family:'Fraunces',Georgia,serif;font-size:2.5rem;font-weight:700;color:var(--accent);line-height:1.1;word-break:break-all;}
+    .banner-total{font-family:'Fraunces',Georgia,serif;font-size:clamp(1.4rem,7vw,2.5rem);font-weight:700;color:var(--accent);line-height:1.15;word-break:break-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
     .banner-sub{font-size:.8rem;color:var(--muted);margin-top:.3rem;}
 
     /* Stats */
     .stat-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
     .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:.9rem 1rem;}
     .stat-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.25rem;}
-    .stat-value{font-family:'Fraunces',Georgia,serif;font-size:1.4rem;font-weight:700;word-break:break-all;}
+    .stat-value{font-family:'Fraunces',Georgia,serif;font-size:clamp(.95rem,4vw,1.4rem);font-weight:700;word-break:break-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .stat-value.green{color:var(--success);}
     .stat-value.orange{color:var(--accent2);}
     .section-title{font-family:'Fraunces',Georgia,serif;font-size:1rem;font-weight:500;color:var(--text);margin-bottom:.75rem;}
@@ -157,14 +157,14 @@
     .pie-svg-wrap{flex-shrink:0;position:relative;width:130px;height:130px;}
     .pie-svg-wrap svg{width:130px;height:130px;transform:rotate(-90deg);}
     .pie-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
-    .pie-center-val{font-family:'Fraunces',Georgia,serif;font-size:.95rem;font-weight:700;color:var(--text);line-height:1;}
+    .pie-center-val{font-family:'Fraunces',Georgia,serif;font-size:clamp(.62rem,2.2vw,.92rem);font-weight:700;color:var(--text);line-height:1.1;word-break:break-all;text-align:center;}
     .pie-center-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem;}
     .pie-legend{flex:1;display:flex;flex-direction:column;gap:.45rem;min-width:0;}
     .pie-leg-row{display:flex;align-items:center;gap:.45rem;cursor:pointer;}
     .pie-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
     .pie-leg-name{font-size:.8rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .pie-leg-pct{font-size:.75rem;color:var(--muted);flex-shrink:0;min-width:30px;text-align:right;}
-    .pie-leg-amt{font-size:.78rem;font-weight:600;flex-shrink:0;min-width:52px;text-align:right;}
+    .pie-leg-amt{font-size:.74rem;font-weight:600;flex-shrink:0;min-width:64px;max-width:90px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
     /* Transactions */
     .txn-list{display:flex;flex-direction:column;gap:.5rem;}
@@ -174,7 +174,7 @@
     .txn-info{flex:1;min-width:0;overflow:hidden;}
     .txn-desc{font-size:.86rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .txn-meta{font-size:.7rem;color:var(--muted);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .txn-amount{font-family:'Fraunces',Georgia,serif;font-size:.95rem;font-weight:700;color:var(--accent2);flex-shrink:0;white-space:nowrap;padding-left:.2rem;max-width:90px;overflow:hidden;text-overflow:ellipsis;text-align:right;}
+    .txn-amount{font-family:'Fraunces',Georgia,serif;font-size:clamp(.78rem,2.5vw,.95rem);font-weight:700;color:var(--accent2);flex-shrink:0;white-space:nowrap;padding-left:.2rem;max-width:110px;overflow:hidden;text-overflow:ellipsis;text-align:right;}
     .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--muted);}
     .empty-state .icon{font-size:2.5rem;margin-bottom:.6rem;}
     .empty-state p{font-size:.88rem;line-height:1.6;}
@@ -185,8 +185,8 @@
     .add-content{padding:1.25rem;display:flex;flex-direction:column;gap:.9rem;}
     .amount-display{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.35rem;text-align:center;}
     .amount-input-row{display:flex;align-items:center;justify-content:center;gap:.2rem;}
-    .currency-sym{font-family:'Fraunces',Georgia,serif;font-size:2rem;color:var(--muted);flex-shrink:0;}
-    .amount-input{font-family:'Fraunces',Georgia,serif;font-size:3.2rem;font-weight:700;color:var(--accent);background:none;border:none;text-align:center;width:200px;caret-color:var(--accent);}
+    .currency-sym{font-family:'Fraunces',Georgia,serif;font-size:clamp(1.1rem,6vw,2rem);color:var(--muted);flex-shrink:0;}
+    .amount-input{font-family:'Fraunces',Georgia,serif;font-size:clamp(1.6rem,9vw,3.2rem);font-weight:700;color:var(--accent);background:none;border:none;text-align:center;width:100%;max-width:280px;caret-color:var(--accent);}
     .amount-input:focus{outline:none;}
     .amount-input::placeholder{color:var(--border);}
     .form-group{display:flex;flex-direction:column;gap:.4rem;}
@@ -233,7 +233,7 @@
     .filter-chip.active{background:var(--accent);color:var(--text-inv);border-color:var(--accent);font-weight:600;}
     .month-group{margin-bottom:1rem;}
     .month-group-label{font-size:.69rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.45rem;padding:0 .1rem;display:flex;justify-content:space-between;align-items:center;}
-    .month-group-total{font-weight:600;color:var(--text);font-size:.77rem;text-transform:none;letter-spacing:0;}
+    .month-group-total{font-weight:600;color:var(--text);font-size:.75rem;text-transform:none;letter-spacing:0;white-space:nowrap;}
 
     /* ══════════════════════════════════════
        SETTINGS
@@ -321,7 +321,7 @@
 
   <!-- ══ LOGIN ══ -->
   <div id="screen-login" class="screen active">
-    <div class="login-logo">Veettu <span>Chilavu</span></div>
+    <div class="login-logo" lang="ml">വീട്ടു <span>ചിലവ്</span></div>
     <p class="login-tagline">Shared expenses, zero friction</p>
     <div class="login-illustration" aria-hidden="true">
       <div class="coin coin-1"></div><div class="coin coin-2"></div><div class="coin coin-3"></div>
@@ -351,7 +351,7 @@
   <!-- ══ MAIN APP ══ -->
   <div id="screen-app" class="screen">
     <header class="app-header">
-      <div class="header-logo">Veettu <span>Chilavu</span></div>
+      <div class="header-logo" lang="ml">വീട്ടു <span>ചിലവ്</span></div>
       <div class="header-right">
         <button class="theme-toggle" id="theme-toggle-btn" onclick="cycleTheme()" aria-label="Toggle theme" title="Toggle light/dark theme">🌙</button>
         <div id="user-avatar-wrap"></div>
@@ -500,7 +500,7 @@
             <span class="settings-arrow">›</span>
           </div>
         </div>
-        <p style="font-size:.73rem;color:var(--muted);text-align:center;padding:.5rem">Veettu Chilavu v1.2 · Data stored in your Google Drive</p>
+        <p style="font-size:.73rem;color:var(--muted);text-align:center;padding:.5rem">വീട്ടു ചിലവ് v1.2 · Data stored in your Google Drive</p>
       </div>
     </div>
 
@@ -646,7 +646,19 @@ function getCurrObj() { return CURRENCIES.find(c => c.code === state.currency) |
 function sym() { return getCurrObj().sym; }
 function fmt(n) {
   const s = sym();
-  if (state.currency === 'JPY') return s + Math.round(n).toLocaleString();
+  const num = Number(n);
+  if (state.currency === 'JPY') return s + Math.round(num).toLocaleString('en-IN');
+  // For INR use Indian locale (shows 1,00,000 not 1,000,000)
+  if (state.currency === 'INR') {
+    if (num >= 10000000) return s + (num/10000000).toFixed(2) + 'Cr';  // ≥1 crore
+    if (num >= 100000)   return s + (num/100000).toFixed(2) + 'L';     // ≥1 lakh
+    return s + num.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  return s + num.toFixed(2);
+}
+/** Full precision format — used for input validation display, never truncated */
+function fmtFull(n) {
+  const s = sym();
   return s + Number(n).toFixed(2);
 }
 function syncCurrencySymbols() {
@@ -1418,16 +1430,67 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 // Apply theme immediately to avoid flash
 applyTheme(state.theme);
 
-// Restore cached user info immediately on load
-// so avatar/name are ready without waiting for a token
-(function restoreCachedUser() {
-  try {
-    const cached = localStorage.getItem('fl_user');
-    if (cached) {
+// ── AUTO-LOGIN ON PAGE LOAD ──────────────────────────────────────────────
+// If we have a cached user AND a valid Google session in the browser,
+// request a Sheets token silently (no popup) and skip the login screen.
+// This means returning users never see the sign-in button again.
+(function tryAutoLogin() {
+  // Must wait for Google's script to load
+  const attemptSilentLogin = () => {
+    try {
+      const cached = localStorage.getItem('fl_user');
+      if (!cached) return; // No cached user — show login screen normally
       const u = JSON.parse(cached);
-      if (u.email) state.user = u;
+      if (!u.email) return;
+      state.user = u; // Restore user info immediately
+
+      const clientIdMissing = !CONFIG.CLIENT_ID
+        || CONFIG.CLIENT_ID.includes('YOUR_GOOGLE')
+        || CONFIG.CLIENT_ID.includes('__GOOGLE');
+      if (clientIdMissing) return; // Demo/unconfigured — skip
+
+      console.log('[Auth] Trying silent auto-login for:', u.email);
+
+      // Request a Sheets token silently — prompt:'' means no popup
+      // This works if the user's Google session is still active in the browser
+      google.accounts.oauth2.initTokenClient({
+        client_id: CONFIG.CLIENT_ID,
+        scope: CONFIG.SCOPES,
+        login_hint: u.email,
+        callback: r => {
+          if (r.error) {
+            // Silent login failed — session gone, need to sign in manually
+            console.log('[Auth] Silent login failed (' + r.error + ') — showing login screen');
+            return; // login screen stays visible, user clicks the button
+          }
+          // Got a token silently — go straight into the app
+          state.token = r.access_token;
+          console.log('[Auth] Silent auto-login successful');
+          if (state.sheetId) {
+            initApp();
+          } else {
+            // Show just step 2 (sheet entry) skipping step 1 (sign in button)
+            document.getElementById('login-step-1').style.display = 'none';
+            document.getElementById('login-step-2').style.display = 'block';
+          }
+        },
+      }).requestAccessToken({ prompt: '' });
+
+    } catch(e) {
+      console.warn('[Auth] Auto-login error:', e);
     }
-  } catch(_) {}
+  };
+
+  // Wait for Google's GIS script to be ready
+  if (typeof google !== 'undefined' && google.accounts) {
+    attemptSilentLogin();
+  } else {
+    // Script not loaded yet — wait for it
+    window.addEventListener('load', () => {
+      // Small delay to ensure GIS is fully initialised
+      setTimeout(attemptSilentLogin, 300);
+    });
+  }
 })();
 
 // ════════════════════════════════════════════
