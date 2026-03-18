@@ -66,172 +66,201 @@
     }
 
     /* ── MOBILE: single column, bottom nav ── */
-    #app{position:relative;z-index:1;width:100%;max-width:480px;margin:0 auto;padding:0 0 90px;min-height:100vh;}
+    #app{position:relative;z-index:1;width:100%;max-width:480px;margin:0 auto;padding:0 0 90px;min-height:100vh;box-sizing:border-box;}
     .screen{display:none;flex-direction:column;min-height:100vh;width:100%;}
     .tab-content{width:100%;display:block;}
     .screen.active{display:flex;}
     /* screen-app is flex by default; desktop overrides to grid */
     #screen-app.active{display:flex;flex-direction:column;}
 
-    /* ── DESKTOP: sidebar layout at ≥900px ── */
+    /* ── DESKTOP: sidebar layout at ≥900px ─────────────────────────────────
+       Strategy: sidebar is position:fixed on the left.
+       #app and all tab content get margin-left:220px.
+       This is the most reliable approach — no nested grid complexity.
+    ── */
     @media(min-width:900px){
-      body{display:grid;grid-template-columns:1fr;background:var(--bg);overflow-x:hidden;}
 
+      /* ── App container — leave room for fixed sidebar ── */
       #app{
-        max-width:1200px;width:100%;margin:0 auto;
-        padding:0;
-        display:grid;
-        grid-template-rows:auto 1fr;
+        max-width:100%;
+        padding:0 0 0 220px;  /* push content right of sidebar */
         min-height:100vh;
       }
 
-      /* Header spans full width */
-      .app-header{
-        grid-column:1/-1;
-        max-width:1200px;width:100%;
-        padding:.9rem 2rem .8rem;
+      /* ── Mobile header — hidden on desktop ── */
+      .app-header{ display:none !important; }
+
+      /* ── Active screen fills remaining space ── */
+      .screen.active{
+        display:block;
+        min-height:100vh;
+      }
+      #screen-app.active{
+        display:block;
       }
 
-      /* Screen = sidebar + content side by side */
-      #screen-app{
-        display:grid !important;
-        grid-template-columns:220px 1fr;
-        grid-template-rows:auto 1fr;
-        min-height:calc(100vh - 57px);
-        align-items:start;
-      }
-
-      /* Header inside screen-app spans both columns */
-      #screen-app > .app-header{
-        grid-column:1/-1;
-        position:sticky;top:0;z-index:100;
-      }
-
-      /* Sidebar nav replaces bottom nav */
+      /* ── Sidebar: fixed left column ── */
       .bottom-nav{
-        position:sticky;top:57px;
-        left:0;
-        width:220px;height:calc(100vh - 57px);
+        position:fixed;
+        top:0; left:0;
+        width:220px;
+        height:100vh;
         transform:none;
         flex-direction:column;
         justify-content:flex-start;
-        padding:1.5rem 0;
-        gap:.25rem;
+        align-items:stretch;
+        padding:0;
+        gap:0;
         border-top:none;
         border-right:1px solid var(--border);
+        border-radius:0;
         backdrop-filter:none;
         background:var(--surface);
-        align-self:start;
+        overflow-y:auto;
+        z-index:50;
       }
       .nav-item{
-        flex-direction:row;justify-content:flex-start;
-        gap:.75rem;padding:.7rem 1.5rem;
-        font-size:.88rem;border-radius:0;
+        flex:none;
+        flex-direction:row;
+        justify-content:flex-start;
+        gap:.85rem;
+        padding:.75rem 1.5rem;
+        font-size:.88rem;
+        border-radius:0;
         width:100%;
+        border-right:3px solid transparent;
+        transition:background .12s, color .12s, border-color .12s;
       }
-      .nav-item svg{width:20px;height:20px;flex-shrink:0;}
+      .nav-item svg{ width:19px; height:19px; flex-shrink:0; }
+      .nav-item:hover{ background:rgba(255,255,255,.04); color:var(--text); }
       .nav-item.active{
         background:rgba(245,200,66,.1);
-        border-right:3px solid var(--accent);
+        border-right-color:var(--accent);
         color:var(--accent);
       }
-      /* Sidebar logo area */
+
+      /* Sidebar brand — logo at top of sidebar */
       .sidebar-brand{
-        display:flex;align-items:center;gap:.75rem;
-        padding:.5rem 1.5rem 1.25rem;
+        display:flex !important;
+        align-items:center;
+        padding:1.4rem 1.5rem 1rem;
         border-bottom:1px solid var(--border);
-        margin-bottom:.5rem;
+        margin-bottom:.35rem;
+        flex-shrink:0;
       }
-      .sidebar-brand-logo{
-        font-family:'Manjari','Fraunces',Georgia,serif;
-        font-size:1.2rem;font-weight:700;color:var(--accent);
-      }
-      .sidebar-brand-logo span{color:var(--accent3);font-weight:300;}
 
-      /* Content area */
+      /* Sidebar footer — pushes to bottom */
+      .sidebar-footer{
+        display:flex !important;
+        margin-top:auto;
+        padding:.85rem 1.25rem;
+        border-top:1px solid var(--border);
+        gap:.6rem;
+        align-items:center;
+        flex-shrink:0;
+      }
+
+      /* ── Tab content — full width of remaining space ── */
       .tab-content{
-        padding:0;
-        min-height:calc(100vh - 57px);
-        overflow-y:auto;
+        display:block !important;
+        width:100%;
       }
+      /* Only the active tab is visible on desktop */
+      .tab-content{ display:none; }
+      .tab-content.tab-active{ display:block !important; }
 
-      /* Hide mobile header — desktop uses sidebar brand */
-      .app-header{ display:none; }
-
-      /* Dashboard two-column grid */
+      /* ── Dashboard: top section + two-column body ── */
       .dash-content{
-        padding:1.75rem 2rem;
+        padding:1.75rem 2.5rem;
+        max-width:1100px;
         display:grid;
         grid-template-columns:1fr 1fr;
-        grid-template-rows:auto;
         gap:1.25rem;
         align-items:start;
       }
-      /* Period nav — full width */
-      .dash-content > .period-nav{ grid-column:1/-1; }
-      /* Banner — full width */
+      .dash-content > .period-nav  { grid-column:1/-1; }
       .dash-content > .month-banner{ grid-column:1/-1; }
-      /* Stats row — full width */
-      .dash-content > .stat-row{ grid-column:1/-1; }
-      /* Category chart — left column */
+      .dash-content > .stat-row    { grid-column:1/-1; }
+      /* 5th child = By Category section */
       .dash-content > div:nth-child(5){ grid-column:1; }
-      /* Recent transactions — right column */
+      /* 6th child = Recent Transactions */
       .dash-content > div:nth-child(6){ grid-column:2; }
 
-      /* Banner bigger on desktop */
-      .banner-total{font-size:clamp(2rem,3vw,3rem);}
-      .stat-value{font-size:clamp(1.2rem,2vw,1.8rem);}
+      /* Larger numbers on desktop */
+      .banner-total{ font-size:clamp(2rem,3vw,3.2rem); }
+      .stat-value  { font-size:clamp(1.2rem,2vw,1.8rem); }
 
-      /* Add form — constrained width centered */
+      /* ── Add expense form ── */
       .add-content{
-        max-width:600px;margin:0 auto;
-        padding:2rem;
+        max-width:640px;
+        margin:0 auto;
+        padding:2rem 2.5rem;
       }
-      /* Add form two-col for desc+date */
-      .add-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+      .add-two-col{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:1rem;
+      }
+      .add-two-col > .form-group[style*="grid-column"]{ grid-column:1/-1; }
 
-      /* History — wider content */
-      .history-content{padding:1.5rem 2rem 0;}
-      .filter-row{flex-wrap:wrap;overflow-x:visible;}
+      /* ── History ── */
+      .history-content{
+        padding:1.5rem 2.5rem 0;
+        max-width:1100px;
+      }
+      .filter-row{ flex-wrap:wrap; overflow-x:visible; }
 
-      /* Settings — constrained width */
-      .settings-content{max-width:680px;margin:0 auto;padding:2rem;}
+      /* ── Settings ── */
+      .settings-content{
+        max-width:700px;
+        margin:0 auto;
+        padding:2rem 2.5rem;
+      }
 
-      /* Modal — centered dialog on desktop instead of bottom sheet */
-      .modal-overlay{align-items:center;}
+      /* ── Modal: centered dialog, not bottom sheet ── */
+      .modal-overlay{ align-items:center; }
       .modal-sheet{
-        border-radius:14px;border-top:none;
-        max-width:520px;width:90%;
+        border-radius:14px;
+        border-top:none;
+        max-width:520px;
+        width:90%;
         max-height:80vh;
         box-shadow:0 24px 80px rgba(0,0,0,.5);
+        animation:fadeIn .2s ease;
       }
-      .modal-handle{display:none;}
+      @keyframes fadeIn{ from{opacity:0;transform:scale(.97)} to{opacity:1;transform:scale(1)} }
+      .modal-handle{ display:none; }
 
-      /* Toast — top right on desktop */
+      /* ── Toast: top-right corner ── */
       .toast{
-        bottom:auto;top:1.5rem;
-        left:auto;right:1.5rem;
-        transform:translateX(20px) translateY(0);
+        bottom:auto; top:1.25rem;
+        left:auto; right:1.5rem;
+        transform:translateX(10px);
+        max-width:320px;
       }
-      .toast.show{transform:translateX(0) translateY(0);}
+      .toast.show{ transform:translateX(0); }
 
-      /* Scrollbar nicer on desktop */
-      ::-webkit-scrollbar{width:6px;}
+      ::-webkit-scrollbar{ width:6px; }
     }
 
-    /* ── TABLET: narrow sidebar at 660–899px ── */
-    @media(min-width:660px) and (max-width:899px){
-      #app{max-width:100%;padding:0 0 80px;}
+    /* ── TABLET: wider single-column at 600–899px ── */
+    @media(min-width:600px) and (max-width:899px){
+      #app{ max-width:680px; margin:0 auto; }
       .dash-content{
         padding:1.25rem 1.5rem;
-        display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:1rem;
       }
       .dash-content > .period-nav,
       .dash-content > .month-banner,
       .dash-content > .stat-row{ grid-column:1/-1; }
-      .history-content{padding:1rem 1.5rem 0;}
-      .settings-content{padding:1rem 1.5rem;}
-      .add-content{max-width:520px;margin:0 auto;padding:1.5rem;}
+      .dash-content > div:nth-child(5){ grid-column:1; }
+      .dash-content > div:nth-child(6){ grid-column:2; }
+      .history-content{ padding:1rem 1.5rem 0; }
+      .settings-content{ padding:1rem 1.5rem; }
+      .add-content{ max-width:100%; padding:1.25rem 1.5rem; }
+      .add-two-col{ display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
     }
 
     /* ══════════════════════════════════════
@@ -279,10 +308,7 @@
     }
     .sidebar-theme{width:32px;height:32px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
     .sidebar-theme:hover{background:var(--border);}
-    @media(min-width:900px){
-      .sidebar-brand{display:flex;}
-      .sidebar-footer{display:flex;}
-    }
+    /* sidebar-brand and sidebar-footer shown via main 900px media query */
 
     /* ══════════════════════════════════════
        BOTTOM NAV (mobile) / SIDEBAR (desktop)
@@ -1302,11 +1328,12 @@ function initApp() {
   applyTheme(state.theme);
   buildCategoryGrid(); buildFilterRow(); renderSettingsUser();
   syncCurrencySymbols();
-  document.getElementById('date-input').value=todayIso();
-  // Render empty states immediately so "Loading…" never stays on screen
-  renderDashboard();
+  document.getElementById('date-input').value = todayIso();
+  // switchTab sets the tab-active class (needed for desktop CSS) and renders
+  switchTab('dashboard');
+  // Pre-render history empty state too
   renderHistory();
-  // Then fetch real data
+  // Fetch real data from sheet
   loadExpenses();
 }
 function showScreen(id) {
@@ -1318,14 +1345,22 @@ function showScreen(id) {
 //  TABS
 // ════════════════════════════════════════════
 function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('tab-'+tab).style.display='block';
+  // Use class toggle instead of inline styles so CSS media queries
+  // can reliably control display without specificity conflicts
+  document.querySelectorAll('.tab-content').forEach(t => {
+    t.classList.remove('tab-active');
+    t.style.display = 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const tabEl = document.getElementById('tab-'+tab);
+  tabEl.classList.add('tab-active');
+  tabEl.style.display = 'block';
   document.getElementById('nav-'+tab).classList.add('active');
+
   if (tab==='dashboard') renderDashboard();
   if (tab==='history')   renderHistory();
   if (tab==='settings')  { syncThemeButtons(); updateCatCount(); }
-  // If user taps Add tab manually (not via editExpense), clear any edit state
   if (tab==='add' && !state.editingId) resetAddForm();
 }
 function syncThemeButtons() {
