@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
   <meta id="theme-color-meta" name="theme-color" content="#0f0f1a"/>
-  <meta name="description" content="Veettu Chilavu — family expense tracker"/>
+  <meta name="description" content="വീട്ടു ചിലവ് — Track your family expenses together"/>
   <title>വീട്ടു ചിലവ് — Veettu Chilavu</title>
   <link rel="manifest" href="manifest.json"/>
   <link rel="apple-touch-icon" href="icons/icon-192.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=DM+Sans:wght@300;400;500;600&family=Manjari:wght@400;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=DM+Sans:wght@300;400;500;600&family=Manjari:wght@400;700&family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet"/>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     /* ══════════════════════════════════════
@@ -319,6 +319,116 @@
     :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
     /* ══════════════════════════════════════
+       LOGIN SCREEN
+    ══════════════════════════════════════ */
+    #screen-login{
+      align-items:center;justify-content:center;
+      padding:2rem 1.5rem 3rem;
+      background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--banner-g1) 0%,var(--bg) 70%);
+      text-align:center;
+      overflow-y:auto;-webkit-overflow-scrolling:touch;
+    }
+
+    /* ── Malayalam logo — refined display ── */
+    .login-logo{
+      font-family:'Manjari','Noto Sans Malayalam',Georgia,serif;
+      font-size:3rem;
+      font-weight:700;
+      color:var(--accent);
+      line-height:1.25;
+      letter-spacing:.04em;   /* slight open-tracking helps Malayalam glyphs breathe */
+      margin-bottom:.3rem;
+      /* Subtle text shadow for depth */
+      text-shadow:0 2px 24px rgba(245,200,66,.22);
+    }
+    .login-logo span{
+      color:var(--accent3);
+      font-weight:400;       /* lighter weight for ചിലവ് makes it feel like a subtitle */
+    }
+
+    .login-tagline{
+      color:var(--muted);
+      font-size:.95rem;
+      margin-bottom:2rem;
+      letter-spacing:.01em;
+      line-height:1.5;
+    }
+
+    /* coin illustration */
+    .login-illustration{width:180px;height:130px;margin:0 auto 1.5rem;position:relative;}
+    .coin{position:absolute;border-radius:50%;}
+    .coin-1{width:80px;height:80px;background:linear-gradient(135deg,#f5c842,#c9952b);top:20px;left:20px;box-shadow:0 8px 24px rgba(245,200,66,.3);}
+    .coin-2{width:60px;height:60px;background:linear-gradient(135deg,#5fc4b8,#3a9e94);top:50px;right:30px;box-shadow:0 8px 24px rgba(95,196,184,.25);}
+    .coin-3{width:44px;height:44px;background:linear-gradient(135deg,#e07b5f,#b85a3e);bottom:10px;left:60px;box-shadow:0 6px 18px rgba(224,123,95,.25);}
+
+    /* setup boxes */
+    .setup-box{width:100%;max-width:340px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem 1.5rem;margin-bottom:1.25rem;}
+    .setup-box h2{font-family:'Fraunces',Georgia,serif;font-size:1.25rem;margin-bottom:.35rem;}
+    .setup-box p{font-size:.82rem;color:var(--muted);line-height:1.5;margin-bottom:1.25rem;}
+
+    /* Google sign-in button */
+    .btn-google{display:flex;align-items:center;justify-content:center;gap:.65rem;width:100%;padding:.85rem 1.25rem;background:#fff;color:#1f1f1f;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 10px rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+    .btn-google:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(0,0,0,.4);}
+
+    /* sheet form */
+    .login-note{font-size:.75rem;color:var(--muted);max-width:280px;line-height:1.5;}
+    .sheet-form{display:flex;flex-direction:column;gap:.75rem;}
+    .sheet-form input{padding:.75rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;}
+    .sheet-form input:focus{outline:none;border-color:var(--accent);}
+    .sheet-form input::placeholder{color:var(--muted);}
+
+    /* Desktop login: full-screen overlay above sidebar */
+    @media(min-width:900px){
+      #screen-login.active{
+        position:fixed;inset:0;z-index:300;
+        display:flex !important;
+        flex-direction:column;
+        align-items:center;justify-content:center;
+        padding:3rem 2rem;
+      }
+      #screen-login .login-logo{ font-size:4rem; margin-bottom:.5rem; }
+      #screen-login .setup-box{ max-width:400px; }
+      #screen-login .login-illustration{ display:none; }
+    }
+
+    /* ══════════════════════════════════════
+       HEADER (mobile) + SIDEBAR BRAND
+    ══════════════════════════════════════ */
+    .app-header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.25rem .8rem;background:var(--hdr-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:background .25s;}
+    .header-logo{
+      font-family:'Manjari','Noto Sans Malayalam',Georgia,serif;
+      font-size:1.25rem;font-weight:700;color:var(--accent);
+      letter-spacing:.03em;
+    }
+    .header-logo span{font-weight:400;color:var(--accent3);}
+    .header-right{display:flex;align-items:center;gap:.6rem;}
+    .theme-toggle{width:34px;height:34px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+    .theme-toggle:hover{background:var(--border);}
+    .avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);cursor:pointer;}
+    .avatar-placeholder{width:34px;height:34px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;color:var(--accent);cursor:pointer;}
+
+    /* Sidebar brand — Malayalam logo in sidebar */
+    .sidebar-brand{display:none;}
+    .sidebar-brand-logo{
+      font-family:'Manjari','Noto Sans Malayalam',Georgia,serif;
+      font-size:1.3rem;font-weight:700;color:var(--accent);
+      letter-spacing:.03em;line-height:1.3;
+    }
+    .sidebar-brand-logo span{font-weight:400;color:var(--accent3);}
+    .sidebar-footer{
+      display:none;
+      margin-top:auto;padding:1rem 1.25rem;
+      border-top:1px solid var(--border);
+      gap:.6rem;align-items:center;
+    }
+    .sidebar-theme{width:32px;height:32px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+    .sidebar-theme:hover{background:var(--border);}
+    @media(min-width:900px){
+      .sidebar-brand{display:flex;}
+      .sidebar-footer{display:flex;}
+    }
+
+    /* ══════════════════════════════════════
        DASHBOARD COMPONENTS
     ══════════════════════════════════════ */
     .dash-content{padding:1.1rem;display:flex;flex-direction:column;gap:1.1rem;width:100%;}
@@ -616,7 +726,7 @@
   <!-- ══ LOGIN ══ -->
   <div id="screen-login" class="screen active">
     <div class="login-logo" lang="ml">വീട്ടു <span>ചിലവ്</span></div>
-    <p class="login-tagline">Shared expenses, zero friction</p>
+    <p class="login-tagline">കുടുംബ ചിലവുകൾ, ഒരു നോട്ടത്തിൽ</p>
     <div class="login-illustration" aria-hidden="true">
       <div class="coin coin-1"></div><div class="coin coin-2"></div><div class="coin coin-3"></div>
     </div>
@@ -1218,24 +1328,51 @@ function signInWithGoogle() {
     + ' https://www.googleapis.com/auth/userinfo.email'
     + ' https://www.googleapis.com/auth/userinfo.profile';
 
+  // Use silent (prompt:'') if we have a cached user — no picker shown.
+  // Fall back to prompt:'select_account' only for first-time / explicit re-auth.
+  const cachedEmail = (() => {
+    try { return JSON.parse(localStorage.getItem('fl_user') || '{}').email || ''; } catch(_) { return ''; }
+  })();
+  const authPrompt = cachedEmail ? '' : 'select_account';
+
   google.accounts.oauth2.initTokenClient({
     client_id: CONFIG.CLIENT_ID,
     scope: FULL_SCOPE,
+    login_hint: cachedEmail,  // pre-selects the account when silent
     callback: r => {
       _authInProgress = false;
       if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = ''; }
 
       if (r.error) {
-        if (r.error !== 'popup_closed_by_user' && r.error !== 'access_denied') {
+        // Silent auth failed (session expired) — retry with explicit picker
+        if (r.error === 'interaction_required' || r.error === 'access_denied') {
+          console.log('[Auth] Silent auth failed, showing account picker');
+          _authInProgress = true;
+          google.accounts.oauth2.initTokenClient({
+            client_id: CONFIG.CLIENT_ID,
+            scope: FULL_SCOPE,
+            callback: r2 => {
+              _authInProgress = false;
+              if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = ''; }
+              if (r2.error) {
+                showToast('Sign-in failed: ' + r2.error, 'error');
+                return;
+              }
+              state.token = r2.access_token;
+              fetchUserInfo();
+            },
+          }).requestAccessToken({ prompt: 'select_account' });
+          return;
+        }
+        if (r.error !== 'popup_closed_by_user') {
           showToast('Sign-in failed: ' + r.error, 'error');
         }
         return;
       }
       state.token = r.access_token;
-      // Fetch user identity using the token we now have
       fetchUserInfo();
     },
-  }).requestAccessToken({ prompt: 'select_account' });
+  }).requestAccessToken({ prompt: authPrompt });
 }
 
 // Fetch user profile using the access token
@@ -1598,6 +1735,14 @@ function renderDashboard() {
   const active=CATEGORIES.filter(c=>catTotals[c.id]>0).sort((a,b)=>catTotals[b.id]-catTotals[a.id]);
   const el=document.getElementById('dash-categories');
 
+  // Budget bar must be rendered BEFORE the early-return below,
+  // so empty months correctly show 0% instead of the last filled month.
+  if (state.periodMode === 'month') {
+    renderBudgetBar(total, state.budgetLimit);
+  } else {
+    hideBudgetBar();
+  }
+
   if (active.length===0) {
     el.innerHTML=`<div class="empty-state"><div class="icon">📊</div><p>No expenses this period</p></div>`;
     return;
@@ -1642,14 +1787,6 @@ function renderDashboard() {
       </div>
       <div class="pie-legend">${legend}</div>
     </div>`;
-
-  // Budget health bar — only for monthly view, always pass current total
-  // (even if 0) so empty months show as zero, not the last filled month
-  if (state.periodMode === 'month') {
-    renderBudgetBar(total, state.budgetLimit);  // total = 0 when no expenses
-  } else {
-    hideBudgetBar();
-  }
 
   // Recent 5 — always show empty state (never "Loading") when array is empty
   const recent=[...state.expenses].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
