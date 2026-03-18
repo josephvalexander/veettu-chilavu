@@ -333,6 +333,8 @@
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.566 2.684-3.875 2.684-6.615Z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/></svg>
         Continue with Google
       </button>
+      <!-- Hidden div Google renders its sign-in button into (required by GIS API) -->
+      <div id="g-signin-btn-div" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden;" aria-hidden="true"></div>
     </div>
     <div class="setup-box" id="login-step-2" style="display:none">
       <h2>Connect your Sheet</h2>
@@ -705,22 +707,97 @@ function signInWithGoogle() {
     return;
   }
 
-  // Restore cached user immediately so avatar/name show while token loads
-  try {
-    const cached = localStorage.getItem('fl_user');
-    if (cached) state.user = JSON.parse(cached);
-  } catch(_) {}
+  // ── Step 1: Use google.accounts.id to get user identity ──────────────────
+  // This gives us name/email/picture from a JWT — no userinfo API call needed.
+  google.accounts.id.initialize({
+    client_id: CONFIG.CLIENT_ID,
+    callback: onIdentityReceived,
+    // auto_select tries One Tap silently if user has an active session
+    auto_select: true,
+  });
 
-  // Request a token — always use prompt:'select_account' on explicit sign-in
-  // so the user can choose their account. No silent tricks here.
+  // Show Google's account picker button rendered in a hidden div,
+  // then programmatically click it so the flow is triggered by our button.
+  // If One Tap auto_select fires, onIdentityReceived is called without a click.
+  const btnDiv = document.getElementById('g-signin-btn-div');
+  google.accounts.id.renderButton(btnDiv, {
+    type: 'standard', theme: 'outline', size: 'large', text: 'signin_with',
+  });
+  // Attempt One Tap prompt first — if the user has an active session this
+  // completes silently and onIdentityReceived is called.
+  google.accounts.id.prompt(notification => {
+    // If One Tap is not displayed (dismissed, not eligible, etc.)
+    // fall back to clicking the rendered button
+    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+      const renderedBtn = btnDiv.querySelector('[role="button"], button, div[tabindex]');
+      if (renderedBtn) renderedBtn.click();
+    }
+  });
+}
+
+// ── Step 1 callback: Google tells us who the user is ─────────────────────
+// credential is a JWT — we decode it client-side (no verification needed
+// here since we just need display info; the Sheets API handles real auth).
+function onIdentityReceived(response) {
+  if (!response.credential) {
+    showToast('Sign-in cancelled', '');
+    return;
+  }
+  // Decode JWT payload (base64url middle section) — no crypto needed
+  try {
+    const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    state.user = {
+      sub:        payload.sub,
+      name:       payload.name,
+      given_name: payload.given_name,
+      email:      payload.email,
+      picture:    payload.picture,
+    };
+    localStorage.setItem('fl_user', JSON.stringify(state.user));
+    console.log('[Auth] Identity received for:', state.user.email);
+  } catch(e) {
+    console.error('[Auth] JWT decode failed:', e);
+    showToast('Sign-in error — please try again', 'error');
+    return;
+  }
+
+  // ── Step 2: Now request an OAuth access token for the Sheets API ─────────
+  // We know who the user is, now get permission to read/write their sheet.
+  requestSheetsToken();
+}
+
+// ── Step 2: Request access token for Google Sheets ───────────────────────
+function requestSheetsToken(onSuccess) {
   google.accounts.oauth2.initTokenClient({
     client_id: CONFIG.CLIENT_ID,
     scope: CONFIG.SCOPES,
-    callback: onTokenReceived,
-  }).requestAccessToken({ prompt: 'select_account' });
+    // hint the email so Google pre-selects the right account
+    login_hint: state.user ? state.user.email : '',
+    callback: r => {
+      if (r.error) {
+        if (r.error !== 'popup_closed_by_user') {
+          showToast('Sheets access failed: ' + r.error, 'error');
+        }
+        return;
+      }
+      state.token = r.access_token;
+      console.log('[Auth] Sheets token received');
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        // Initial sign-in: go into app
+        if (state.sheetId) {
+          initApp();
+        } else {
+          showStep2();
+        }
+      }
+    },
+  // prompt:'' = silent if Google session exists; shows consent only if needed
+  }).requestAccessToken({ prompt: '' });
 }
 
-// Called when Google returns a token (initial sign-in or manual refresh)
+// Called by older code paths — kept for compatibility
 function onTokenReceived(response) {
   if (response.error) {
     if (response.error !== 'popup_closed_by_user') {
@@ -729,52 +806,14 @@ function onTokenReceived(response) {
     return;
   }
   state.token = response.access_token;
-  fetchUserInfo();
 }
 
-// Fetch the signed-in user's profile using the access token.
-// No retry logic — if this fails the user signs in again manually.
+// No longer used — identity comes from JWT now, not userinfo API
 function fetchUserInfo() {
-  fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-    headers: { Authorization: 'Bearer ' + state.token }
-  })
-  .then(r => {
-    if (r.status === 401) {
-      // Token was already expired when we got it (rare but possible).
-      // Show the sign-in button again — do NOT loop.
-      console.warn('[Auth] userinfo 401 — token expired on arrival');
-      showToast('Session expired — please sign in again', 'error');
-      state.token = null;
-      return null;
-    }
-    return r.json();
-  })
-  .then(info => {
-    if (!info) return;
-    // Guard: make sure we got a real user object
-    if (!info.sub && !info.email) {
-      console.error('[Auth] Bad userinfo:', info);
-      showToast('Sign-in error — please try again', 'error');
-      return;
-    }
-    state.user = info;
-    // Cache name/email/picture so they survive page reloads
-    localStorage.setItem('fl_user', JSON.stringify({
-      sub: info.sub, name: info.name,
-      given_name: info.given_name,
-      email: info.email, picture: info.picture,
-    }));
-    // Go straight into the app if sheet ID is known, otherwise ask for it
-    if (state.sheetId) {
-      initApp();
-    } else {
-      showStep2();
-    }
-  })
-  .catch(err => {
-    console.error('[Auth] fetchUserInfo network error:', err);
-    showToast('Network error — check your connection', 'error');
-  });
+  console.log('[Auth] fetchUserInfo: using cached identity');
+  if (state.user && state.sheetId) { initApp(); return; }
+  if (state.user) { showStep2(); return; }
+  signInWithGoogle();
 }
 
 function showStep2() {
@@ -855,15 +894,12 @@ function demoMode() {
 // ════════════════════════════════════════════
 //  SHEETS API
 // ════════════════════════════════════════════
-// Re-request a token silently when the Sheets API returns 401.
-// Uses an existing Google session — shows no popup if the session is alive.
-// If it fails (session gone), signs the user out cleanly.
+// Re-request a Sheets access token silently when it expires mid-session.
+// Uses login_hint so no popup appears if the browser has an active Google session.
 async function refreshToken() {
   return new Promise((resolve, reject) => {
-    const hint = (() => {
-      try { return JSON.parse(localStorage.getItem('fl_user') || '{}').email || ''; }
-      catch(_) { return ''; }
-    })();
+    const hint = state.user?.email
+      || (() => { try { return JSON.parse(localStorage.getItem('fl_user')||'{}').email||''; } catch(_){return '';} })();
     google.accounts.oauth2.initTokenClient({
       client_id: CONFIG.CLIENT_ID,
       scope: CONFIG.SCOPES,
@@ -871,6 +907,7 @@ async function refreshToken() {
       callback: r => {
         if (r.error) { reject(new Error(r.error)); return; }
         state.token = r.access_token;
+        console.log('[Auth] Token silently refreshed');
         resolve(r.access_token);
       },
     }).requestAccessToken({ prompt: '' });
@@ -1366,6 +1403,18 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 // ════════════════════════════════════════════
 // Apply theme immediately to avoid flash
 applyTheme(state.theme);
+
+// Restore cached user info immediately on load
+// so avatar/name are ready without waiting for a token
+(function restoreCachedUser() {
+  try {
+    const cached = localStorage.getItem('fl_user');
+    if (cached) {
+      const u = JSON.parse(cached);
+      if (u.email) state.user = u;
+    }
+  } catch(_) {}
+})();
 
 // ════════════════════════════════════════════
 //  SERVICE WORKER + AUTO-UPDATE
