@@ -4,8 +4,8 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <meta id="theme-color-meta" name="theme-color" content="#0f0f1a"/>
-  <meta name="description" content="FamilyLedger — shared expense tracker"/>
-  <title>FamilyLedger</title>
+  <meta name="description" content="Veettu Chilavu — family expense tracker"/>
+  <title>Veettu Chilavu</title>
   <link rel="manifest" href="manifest.json"/>
   <link rel="apple-touch-icon" href="icons/icon-192.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -65,7 +65,16 @@
       opacity:.5;
     }
     #app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 0 90px;min-height:100vh;}
-    .screen{display:none;flex-direction:column;min-height:100vh;}
+    /* On desktop, show app as a centered phone-like panel */
+    @media(min-width:520px){
+      body{display:flex;flex-direction:column;align-items:center;background:var(--bg);}
+      body::after{content:'';position:fixed;inset:0;z-index:0;
+        background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(245,200,66,.04) 0%,transparent 70%);}
+      #app{box-shadow:0 0 0 1px var(--border),0 24px 80px rgba(0,0,0,.4);min-height:100vh;}
+      .bottom-nav{border-radius:0;}
+    }
+    .screen{display:none;flex-direction:column;min-height:100vh;width:100%;}
+    .tab-content{width:100%;display:block;}
     .screen.active{display:flex;}
 
     /* ══════════════════════════════════════
@@ -312,7 +321,7 @@
 
   <!-- ══ LOGIN ══ -->
   <div id="screen-login" class="screen active">
-    <div class="login-logo">Family<span>Ledger</span></div>
+    <div class="login-logo">Veettu <span>Chilavu</span></div>
     <p class="login-tagline">Shared expenses, zero friction</p>
     <div class="login-illustration" aria-hidden="true">
       <div class="coin coin-1"></div><div class="coin coin-2"></div><div class="coin coin-3"></div>
@@ -340,9 +349,9 @@
   <!-- ══ MAIN APP ══ -->
   <div id="screen-app" class="screen">
     <header class="app-header">
-      <div class="header-logo">Family<span>Ledger</span></div>
+      <div class="header-logo">Veettu <span>Chilavu</span></div>
       <div class="header-right">
-        <button class="theme-toggle" id="theme-toggle-btn" onclick="cycleTheme()" aria-label="Toggle theme">🌙</button>
+        <button class="theme-toggle" id="theme-toggle-btn" onclick="cycleTheme()" aria-label="Toggle theme" title="Toggle light/dark theme">🌙</button>
         <div id="user-avatar-wrap"></div>
       </div>
     </header>
@@ -372,11 +381,11 @@
         </div>
         <div>
           <div class="section-title">By Category</div>
-          <div id="dash-categories"><div class="loading-spinner"><div class="spinner"></div> Loading…</div></div>
+          <div id="dash-categories"></div>
         </div>
         <div>
           <div class="section-title">Recent 5 Transactions</div>
-          <div class="txn-list" id="dash-recent"><div class="loading-spinner"><div class="spinner"></div> Loading…</div></div>
+          <div class="txn-list" id="dash-recent"></div>
         </div>
       </div>
     </div>
@@ -450,7 +459,7 @@
           <div class="settings-row" onclick="showCurrencyModal()">
             <span class="settings-icon">💱</span>
             <span class="settings-label">Currency</span>
-            <span class="settings-value" id="settings-currency-val">USD ($)</span>
+            <span class="settings-value" id="settings-currency-val">INR (₹)</span>
             <span class="settings-arrow">›</span>
           </div>
           <div class="settings-row" onclick="showCategoriesModal()">
@@ -489,7 +498,7 @@
             <span class="settings-arrow">›</span>
           </div>
         </div>
-        <p style="font-size:.73rem;color:var(--muted);text-align:center;padding:.5rem">FamilyLedger v1.2 · Data stored in your Google Drive</p>
+        <p style="font-size:.73rem;color:var(--muted);text-align:center;padding:.5rem">Veettu Chilavu v1.2 · Data stored in your Google Drive</p>
       </div>
     </div>
 
@@ -599,7 +608,7 @@ let state = {
     }
     return localStorage.getItem('fl_sheet_id') || '';
   })(),
-  currency: localStorage.getItem('fl_currency') || 'USD',
+  currency: localStorage.getItem('fl_currency') || 'INR',
   theme: localStorage.getItem('fl_theme') || 'dark',
   expenses: [],
   selectedCategory: 'other',
@@ -878,6 +887,10 @@ function initApp() {
   buildCategoryGrid(); buildFilterRow(); renderSettingsUser();
   syncCurrencySymbols();
   document.getElementById('date-input').value=todayIso();
+  // Render empty states immediately so "Loading…" never stays on screen
+  renderDashboard();
+  renderHistory();
+  // Then fetch real data
   loadExpenses();
 }
 function showScreen(id) {
@@ -891,7 +904,7 @@ function showScreen(id) {
 function switchTab(tab) {
   document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('tab-'+tab).style.display='flex';
+  document.getElementById('tab-'+tab).style.display='block';
   document.getElementById('nav-'+tab).classList.add('active');
   if (tab==='dashboard') renderDashboard();
   if (tab==='history')   renderHistory();
@@ -1018,9 +1031,11 @@ function renderDashboard() {
       <div class="pie-legend">${legend}</div>
     </div>`;
 
-  // Recent 5
+  // Recent 5 — always show empty state (never "Loading") when array is empty
   const recent=[...state.expenses].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
-  document.getElementById('dash-recent').innerHTML=recent.length===0
+  const recentEl=document.getElementById('dash-recent');
+  if (!recentEl) return;
+  recentEl.innerHTML=recent.length===0
     ?`<div class="empty-state"><div class="icon">🧾</div><p>Add your first expense!</p></div>`
     :recent.map(e=>txnCard(e)).join('');
 }

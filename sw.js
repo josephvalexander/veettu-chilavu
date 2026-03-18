@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────
 const VERSION    = '__SW_VERSION__';   // replaced by CI → e.g. "v1.0.0-20250318T1430"
 const BUILD_TIME = '__BUILD_TIME__';   // replaced by CI → ISO timestamp
-const CACHE_NAME = `familyledger-${VERSION}`;
+const CACHE_NAME = `veettu-chilavu-${VERSION}`;
 
 const CORE_ASSETS = [
   '/',
@@ -41,7 +41,7 @@ self.addEventListener('activate', event => {
     caches.keys()
       .then(keys => Promise.all(
         keys
-          .filter(k => k.startsWith('familyledger-') && k !== CACHE_NAME)
+          .filter(k => (k.startsWith('veettu-chilavu-') || k.startsWith('familyledger-')) && k !== CACHE_NAME)
           .map(k => {
             console.log(`[SW] Deleting old cache: ${k}`);
             return caches.delete(k);

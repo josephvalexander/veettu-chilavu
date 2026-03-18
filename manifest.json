@@ -1,11 +1,11 @@
 {
-  "name": "FamilyLedger",
-  "short_name": "FamilyLedger",
-  "description": "Shared family expense tracker powered by Google Sheets",
-  "start_url": "/",
+  "name": "Veettu Chilavu",
+  "short_name": "VeettuChilavu",
+  "description": "Veettu Chilavu \u2014 family expense tracker",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0f0f1a",
-  "theme_color": "#1a1a2e",
+  "theme_color": "#0f0f1a",
   "orientation": "portrait",
   "icons": [
     {
@@ -21,6 +21,8 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["finance", "productivity"],
-  "screenshots": []
+  "categories": [
+    "finance",
+    "productivity"
+  ]
 }
