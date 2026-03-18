@@ -684,7 +684,10 @@ function todayIso() { return new Date().toISOString().split('T')[0]; }
 //  AUTH
 // ════════════════════════════════════════════
 function signInWithGoogle() {
-  const clientIdMissing = !CONFIG.CLIENT_ID || CONFIG.CLIENT_ID.includes('YOUR_GOOGLE') || CONFIG.CLIENT_ID.includes('__GOOGLE');
+  const clientIdMissing = !CONFIG.CLIENT_ID
+    || CONFIG.CLIENT_ID.includes('YOUR_GOOGLE')
+    || CONFIG.CLIENT_ID.includes('__GOOGLE');
+
   if (clientIdMissing) {
     showModal(`
       <div class="modal-title">Setup Required</div>
@@ -701,73 +704,67 @@ function signInWithGoogle() {
       <button class="btn btn-primary btn-full" onclick="demoMode()">▶ Try Demo Mode Instead</button>`);
     return;
   }
-  // Restore cached user info immediately so UI shows the right name/avatar
-  // while the token request is in flight
-  const cached = localStorage.getItem('fl_user');
-  if (cached) {
-    try { state.user = JSON.parse(cached); } catch(_) {}
-  }
-  _tokenClient = google.accounts.oauth2.initTokenClient({
+
+  // Restore cached user immediately so avatar/name show while token loads
+  try {
+    const cached = localStorage.getItem('fl_user');
+    if (cached) state.user = JSON.parse(cached);
+  } catch(_) {}
+
+  // Request a token — always use prompt:'select_account' on explicit sign-in
+  // so the user can choose their account. No silent tricks here.
+  google.accounts.oauth2.initTokenClient({
     client_id: CONFIG.CLIENT_ID,
     scope: CONFIG.SCOPES,
-    // hint = pre-selects the last used account so user does not have to pick again
-    login_hint: state.user?.email || '',
-    callback: r => {
-      if (r.error) {
-        // access_denied or popup_closed_by_user — don't show error for popup close
-        if (r.error !== 'popup_closed_by_user') {
-          showToast('Sign-in failed: ' + r.error, 'error');
-        }
-        return;
-      }
-      state.token = r.access_token;
-      fetchUserInfo();
-    },
-  });
-  _tokenClient.requestAccessToken({ prompt: '' });
+    callback: onTokenReceived,
+  }).requestAccessToken({ prompt: 'select_account' });
 }
 
-// Holds the token client so refreshToken() can reuse it
-let _tokenClient = null;
+// Called when Google returns a token (initial sign-in or manual refresh)
+function onTokenReceived(response) {
+  if (response.error) {
+    if (response.error !== 'popup_closed_by_user') {
+      showToast('Sign-in failed: ' + response.error, 'error');
+    }
+    return;
+  }
+  state.token = response.access_token;
+  fetchUserInfo();
+}
 
+// Fetch the signed-in user's profile using the access token.
+// No retry logic — if this fails the user signs in again manually.
 function fetchUserInfo() {
   fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-    headers: { Authorization: `Bearer ${state.token}` }
+    headers: { Authorization: 'Bearer ' + state.token }
   })
   .then(r => {
     if (r.status === 401) {
-      // Token was rejected immediately — request a fresh one with prompt
-      console.warn('[Auth] userinfo 401 — requesting fresh token');
-      _tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CONFIG.CLIENT_ID,
-        scope: CONFIG.SCOPES,
-        callback: r2 => {
-          if (r2.error) { showToast('Sign-in failed: ' + r2.error, 'error'); return; }
-          state.token = r2.access_token;
-          fetchUserInfo(); // retry once with new token
-        },
-      });
-      _tokenClient.requestAccessToken({ prompt: 'consent' });
+      // Token was already expired when we got it (rare but possible).
+      // Show the sign-in button again — do NOT loop.
+      console.warn('[Auth] userinfo 401 — token expired on arrival');
+      showToast('Session expired — please sign in again', 'error');
+      state.token = null;
       return null;
     }
-    if (!r.ok) throw new Error('userinfo ' + r.status);
     return r.json();
   })
-  .then(i => {
-    if (!i) return; // null = we triggered a re-auth above
-    // Validate we got a real user object (not an error response)
-    if (!i.sub && !i.email) {
-      console.error('[Auth] Invalid userinfo response:', i);
-      showToast('Sign-in failed — please try again', 'error');
+  .then(info => {
+    if (!info) return;
+    // Guard: make sure we got a real user object
+    if (!info.sub && !info.email) {
+      console.error('[Auth] Bad userinfo:', info);
+      showToast('Sign-in error — please try again', 'error');
       return;
     }
-    state.user = i;
-    // Cache user info in localStorage so name/avatar survive page reloads
+    state.user = info;
+    // Cache name/email/picture so they survive page reloads
     localStorage.setItem('fl_user', JSON.stringify({
-      name: i.name, given_name: i.given_name,
-      email: i.email, picture: i.picture, sub: i.sub
+      sub: info.sub, name: info.name,
+      given_name: info.given_name,
+      email: info.email, picture: info.picture,
     }));
-    // Sheet ID already known → go straight in; otherwise ask for it
+    // Go straight into the app if sheet ID is known, otherwise ask for it
     if (state.sheetId) {
       initApp();
     } else {
@@ -775,10 +772,11 @@ function fetchUserInfo() {
     }
   })
   .catch(err => {
-    console.error('[Auth] fetchUserInfo error:', err);
-    showToast('Connection error — please try again', 'error');
+    console.error('[Auth] fetchUserInfo network error:', err);
+    showToast('Network error — check your connection', 'error');
   });
 }
+
 function showStep2() {
   document.getElementById('login-step-1').style.display='none';
   document.getElementById('login-step-2').style.display='block';
@@ -805,19 +803,14 @@ function createNewSheet() {
     <button class="btn btn-secondary btn-full" onclick="closeModal()">Got my Sheet ID</button>`);
 }
 function signOut() {
-  // Revoke the token so Google clears the session
   if (state.token && state.token !== 'DEMO') {
-    google.accounts.oauth2.revoke(state.token, () => {
-      console.log('[Auth] Token revoked');
-    });
+    try { google.accounts.oauth2.revoke(state.token, ()=>{}); } catch(_){}
   }
-  state.user=null; state.token=null; state.expenses=[];
-  _tokenClient=null;
-  // Clear cached user so login_hint doesn't auto-select on next sign-in
+  state.user = null; state.token = null; state.expenses = [];
   localStorage.removeItem('fl_user');
   showScreen('login');
-  document.getElementById('login-step-1').style.display='block';
-  document.getElementById('login-step-2').style.display='none';
+  document.getElementById('login-step-1').style.display = 'block';
+  document.getElementById('login-step-2').style.display = 'none';
   showToast('Signed out');
 }
 
@@ -862,57 +855,57 @@ function demoMode() {
 // ════════════════════════════════════════════
 //  SHEETS API
 // ════════════════════════════════════════════
+// Re-request a token silently when the Sheets API returns 401.
+// Uses an existing Google session — shows no popup if the session is alive.
+// If it fails (session gone), signs the user out cleanly.
 async function refreshToken() {
-  // Silently get a fresh access token without showing a popup.
-  // Reuses _tokenClient if available (avoids creating multiple clients).
   return new Promise((resolve, reject) => {
-    if (!CONFIG.CLIENT_ID || CONFIG.CLIENT_ID.includes('__GOOGLE') || CONFIG.CLIENT_ID.includes('YOUR_GOOGLE')) {
-      reject(new Error('No Client ID configured')); return;
-    }
-    const hint = state.user?.email || localStorage.getItem('fl_user')
-      ? JSON.parse(localStorage.getItem('fl_user') || '{}').email : '';
-    const client = google.accounts.oauth2.initTokenClient({
+    const hint = (() => {
+      try { return JSON.parse(localStorage.getItem('fl_user') || '{}').email || ''; }
+      catch(_) { return ''; }
+    })();
+    google.accounts.oauth2.initTokenClient({
       client_id: CONFIG.CLIENT_ID,
       scope: CONFIG.SCOPES,
       login_hint: hint,
-      prompt: '',   // empty string = silent, no popup if session is alive
       callback: r => {
-        if (r.error) {
-          console.warn('[Auth] Silent refresh failed:', r.error);
-          reject(new Error(r.error));
-          return;
-        }
+        if (r.error) { reject(new Error(r.error)); return; }
         state.token = r.access_token;
-        console.log('[App] Token refreshed silently');
         resolve(r.access_token);
       },
-    });
-    client.requestAccessToken({ prompt: '' });
+    }).requestAccessToken({ prompt: '' });
   });
 }
 
+
 async function sheetsGet(range) {
-  if (state.token==='DEMO') return {values:[]};
-  let r = await fetch(
+  if (state.token === 'DEMO') return { values: [] };
+
+  const doFetch = () => fetch(
     `https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}/values/${encodeURIComponent(range)}`,
-    {headers:{Authorization:`Bearer ${state.token}`}}
+    { headers: { Authorization: 'Bearer ' + state.token } }
   );
-  // 401 = token expired — try a silent refresh once, then retry
+
+  let r = await doFetch();
+
+  // 401 = token expired — attempt ONE silent refresh, then retry once
   if (r.status === 401) {
-    console.warn('[App] Token expired, refreshing…');
+    console.warn('[App] Sheets 401 — attempting silent token refresh');
     try {
-      await refreshToken();
-      r = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}/values/${encodeURIComponent(range)}`,
-        {headers:{Authorization:`Bearer ${state.token}`}}
-      );
+      await refreshToken();      // get a new token silently
+      r = await doFetch();       // retry the request exactly once
     } catch(e) {
+      // Silent refresh failed (session ended) — sign out cleanly, no loop
       showToast('Session expired — please sign in again', 'error');
-      setTimeout(() => signOut(), 2000);
-      throw e;
+      setTimeout(signOut, 1500);
+      throw new Error('Session expired');
     }
   }
-  if (!r.ok) throw new Error('Sheets API ' + r.status + ': ' + await r.text());
+
+  if (!r.ok) {
+    const body = await r.text().catch(() => '');
+    throw new Error(`Sheets API ${r.status}: ${body}`);
+  }
   return r.json();
 }
 async function sheetsAppend(values) {
