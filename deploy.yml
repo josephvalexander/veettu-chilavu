@@ -1,0 +1,97 @@
+name: Deploy FamilyLedger to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:   # allow manual trigger from GitHub UI
+
+# Allow writing to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deployment at a time
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ─────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Generate version strings ─────────────────────
+      - name: Generate version and build time
+        id: version
+        run: |
+          # Use git tag if available, otherwise short SHA
+          GIT_TAG=$(git describe --tags --exact-match 2>/dev/null || echo "")
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%MZ")
+
+          if [ -n "$GIT_TAG" ]; then
+            VERSION="${GIT_TAG}-${BUILD_TIME}"
+          else
+            VERSION="${SHORT_SHA}-${BUILD_TIME}"
+          fi
+
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "build_time=${BUILD_TIME}" >> $GITHUB_OUTPUT
+          echo "✅ Version: ${VERSION}"
+          echo "✅ Build time: ${BUILD_TIME}"
+
+      # ── 3. Copy files to dist/ folder ───────────────────
+      - name: Prepare dist folder
+        run: |
+          mkdir -p dist
+          cp index.html dist/
+          cp sw.js dist/
+          cp manifest.json dist/
+          # Copy icons folder if it exists
+          if [ -d "icons" ]; then cp -r icons dist/; fi
+
+      # ── 4. Inject Google Client ID from GitHub Secret ───
+      #    Secret name: GOOGLE_CLIENT_ID
+      #    Set it at: repo → Settings → Secrets → Actions → New secret
+      - name: Inject Google Client ID
+        run: |
+          CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
+          if [ -z "$CLIENT_ID" ]; then
+            echo "⚠️  WARNING: GOOGLE_CLIENT_ID secret is not set."
+            echo "   The app will show the setup modal instead of real OAuth."
+            CLIENT_ID="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+          fi
+          # Replace placeholder in index.html
+          sed -i "s|__GOOGLE_CLIENT_ID__|${CLIENT_ID}|g" dist/index.html
+          echo "✅ Client ID injected (first 12 chars): ${CLIENT_ID:0:12}..."
+
+      # ── 5. Inject SW version + build time ───────────────
+      - name: Inject SW version and build time
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          BUILD_TIME="${{ steps.version.outputs.build_time }}"
+          # Replace placeholders in sw.js
+          sed -i "s|__SW_VERSION__|${VERSION}|g"    dist/sw.js
+          sed -i "s|__BUILD_TIME__|${BUILD_TIME}|g" dist/sw.js
+          echo "✅ SW version injected: ${VERSION}"
+          # Also write a version.json so the app can check for updates
+          echo "{\"version\":\"${VERSION}\",\"buildTime\":\"${BUILD_TIME}\"}" > dist/version.json
+
+      # ── 6. Upload to GitHub Pages ────────────────────────
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+      # ── 7. Deploy ────────────────────────────────────────
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Print deployed URL
+        run: echo "🚀 Deployed to ${{ steps.deployment.outputs.page_url }}"

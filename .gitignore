@@ -1,0 +1,14 @@
+# Local development config — contains real Google Client ID
+# NEVER commit this file
+config.local.js
+
+# Build output
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
