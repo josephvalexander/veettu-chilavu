@@ -525,8 +525,8 @@
 //  CONFIG
 // ════════════════════════════════════════════
 const CONFIG = {
-  // ⚠️  This value is injected at build time by GitHub Actions from the
-  //     GOOGLE_CLIENT_ID repository secret.  Never put a real ID here.
+  // ⚠️  These values are injected at build time by GitHub Actions from
+  //     repository secrets. Never put real values here.
   CLIENT_ID: '__GOOGLE_CLIENT_ID__',
   SCOPES: 'https://www.googleapis.com/auth/spreadsheets',
   SHEET_RANGE_DATA: 'Expenses!A2:I',
@@ -582,7 +582,23 @@ const PAYMENT_METHODS = [
 const _now = new Date();
 let state = {
   user: null, token: null,
-  sheetId: localStorage.getItem('fl_sheet_id') || '',
+  // Sheet ID priority:
+  //   1. Build-time injected value (from GOOGLE_SHEET_ID GitHub Secret) — cleanest, zero config for users
+  //   2. localStorage fallback — lets "Connect Different Sheet" in settings still work
+  sheetId: (() => {
+    const injected = '__GOOGLE_SHEET_ID__';
+    if (injected && !injected.startsWith('__')) {
+      localStorage.setItem('fl_sheet_id', injected);
+      return injected;
+    }
+    // Also check URL param as a convenience for local dev / testing
+    const urlParam = new URLSearchParams(window.location.search).get('sheet');
+    if (urlParam) {
+      localStorage.setItem('fl_sheet_id', urlParam);
+      return urlParam;
+    }
+    return localStorage.getItem('fl_sheet_id') || '';
+  })(),
   currency: localStorage.getItem('fl_currency') || 'USD',
   theme: localStorage.getItem('fl_theme') || 'dark',
   expenses: [],
@@ -659,7 +675,8 @@ function todayIso() { return new Date().toISOString().split('T')[0]; }
 //  AUTH
 // ════════════════════════════════════════════
 function signInWithGoogle() {
-  if (!CONFIG.CLIENT_ID || CONFIG.CLIENT_ID.includes('YOUR_GOOGLE') || CONFIG.CLIENT_ID.includes('__GOOGLE')) {
+  const clientIdMissing = !CONFIG.CLIENT_ID || CONFIG.CLIENT_ID.includes('YOUR_GOOGLE') || CONFIG.CLIENT_ID.includes('__GOOGLE');
+  if (clientIdMissing) {
     showModal(`
       <div class="modal-title">Setup Required</div>
       <p style="font-size:.88rem;color:var(--muted);margin-bottom:1rem;line-height:1.65">
@@ -682,7 +699,18 @@ function signInWithGoogle() {
 }
 function fetchUserInfo() {
   fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers:{ Authorization:`Bearer ${state.token}` } })
-    .then(r=>r.json()).then(i=>{ state.user=i; showStep2(); });
+    .then(r=>r.json()).then(i=>{
+      state.user=i;
+      // If sheet ID is already known (injected at build or saved locally),
+      // skip the sheet entry screen and go straight into the app
+      if (state.sheetId) {
+        // Sheet ID already known (injected at build or saved locally) — go straight in
+        initApp();
+      } else {
+        // No sheet ID found — show manual entry screen
+        showStep2();
+      }
+    });
 }
 function showStep2() {
   document.getElementById('login-step-1').style.display='none';
@@ -1143,6 +1171,9 @@ function showSheetModal() {
     </div>`);
 }
 function changeSheet() {
+  // Clear localStorage so the manual entry screen appears
+  // Note: the build-time injected ID will re-apply on next hard reload,
+  // so this is mainly useful for admins testing a different sheet locally.
   state.sheetId=''; localStorage.removeItem('fl_sheet_id');
   closeModal(); showScreen('login');
   document.getElementById('login-step-1').style.display='none';
