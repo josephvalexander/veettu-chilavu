@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
   <meta id="theme-color-meta" name="theme-color" content="#0f0f1a"/>
   <meta name="description" content="Veettu Chilavu — family expense tracker"/>
   <title>വീട്ടു ചിലവ് — Veettu Chilavu</title>
@@ -57,8 +57,8 @@
        BASE
     ══════════════════════════════════════ */
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    html{font-size:16px;scroll-behavior:smooth;}
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;transition:background .25s,color .25s;}
+    html{font-size:16px;scroll-behavior:smooth;height:-webkit-fill-available;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:-webkit-fill-available;overscroll-behavior:none;transition:background .25s,color .25s;}
     body::before{
       content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
@@ -76,15 +76,53 @@
       position:relative;z-index:1;
       width:100%;max-width:480px;
       margin:0 auto;
-      padding-bottom:80px; /* clear bottom nav */
+      padding-bottom:calc(80px + env(safe-area-inset-bottom)); /* clear bottom nav + iOS home bar */
       min-height:100vh;
     }
-    .screen{display:none;flex-direction:column;width:100%;min-height:calc(100vh - 80px);}
+    .screen{display:none;flex-direction:column;width:100%;min-height:calc(100vh - 80px);min-height:calc(-webkit-fill-available - 80px);}
     .screen.active{display:flex;}
     #screen-app.active{display:block;}
     /* Tab visibility — controlled ONLY by .tab-active class, never inline styles */
     .tab-content        { display:none; width:100%; }
     .tab-content.tab-active { display:block; }
+
+
+    /* ══════════════════════════════════════
+       BOTTOM NAV — mobile base styles
+    ══════════════════════════════════════ */
+    .bottom-nav{
+      position:fixed;
+      bottom:0;left:50%;
+      transform:translateX(-50%);
+      width:100%;max-width:480px;
+      background:var(--nav-bg);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      border-top:1px solid var(--border);
+      display:flex;
+      /* iOS safe area: pad bottom for home indicator */
+      padding:.45rem 0 max(.45rem, env(safe-area-inset-bottom));
+      z-index:100;
+      transition:background .25s;
+    }
+    .nav-item{
+      flex:1;
+      display:flex;flex-direction:column;
+      align-items:center;gap:.2rem;
+      padding:.38rem 0;
+      background:none;border:none;
+      cursor:pointer;
+      color:var(--muted);
+      font-family:'DM Sans',sans-serif;font-size:.7rem;
+      transition:color .15s;
+      /* Ensure tappable on iOS */
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+    }
+    .nav-item.active{color:var(--accent);}
+    .nav-item svg{width:22px;height:22px;}
+    /* Hide sidebar-only elements on mobile */
+    .bottom-nav .sidebar-brand,
+    .bottom-nav .sidebar-footer{display:none;}
 
     /* ════════════════════════════════════════
        DESKTOP ≥ 900px — fixed left sidebar
@@ -365,12 +403,12 @@
     .amount-display{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.35rem;text-align:center;}
     .amount-input-row{display:flex;align-items:center;justify-content:center;gap:.2rem;}
     .currency-sym{font-family:'Fraunces',Georgia,serif;font-size:clamp(1.1rem,6vw,2rem);color:var(--muted);flex-shrink:0;}
-    .amount-input{font-family:'Fraunces',Georgia,serif;font-size:clamp(1.6rem,9vw,3.2rem);font-weight:700;color:var(--accent);background:none;border:none;text-align:center;width:100%;max-width:280px;caret-color:var(--accent);}
+    .amount-input{font-family:'Fraunces',Georgia,serif;font-size:clamp(1.6rem,9vw,3.2rem);font-weight:700;color:var(--accent);background:none;border:none;text-align:center;width:100%;max-width:280px;caret-color:var(--accent);font-size:max(16px,clamp(1.6rem,9vw,3.2rem));}
     .amount-input:focus{outline:none;}
     .amount-input::placeholder{color:var(--border);}
     .form-group{display:flex;flex-direction:column;gap:.4rem;}
     .form-label{font-size:.76rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
-    .form-input,.form-select,.form-textarea{padding:.82rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.93rem;transition:border-color .15s;width:100%;}
+    .form-input,.form-select,.form-textarea{padding:.82rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;transition:border-color .15s;width:100%;}
     .form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent);}
     .form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238888aa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;}
     .form-textarea{resize:vertical;min-height:72px;}
@@ -472,6 +510,85 @@
     .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg)}}
 
+
+    /* ══════════════════════════════════════
+       BUDGET HEALTH BAR
+    ══════════════════════════════════════ */
+    .budget-bar-wrap{
+      margin-top:.85rem;
+    }
+    .budget-bar-header{
+      display:flex;justify-content:space-between;align-items:baseline;
+      margin-bottom:.45rem;
+      font-size:.75rem;
+    }
+    .budget-bar-label{ color:var(--muted); text-transform:uppercase; letter-spacing:.07em; }
+    .budget-bar-amounts{ color:var(--text); font-weight:600; }
+    .budget-bar-pct{
+      font-family:'Fraunces',Georgia,serif;
+      font-size:.88rem; font-weight:700;
+    }
+    .budget-track{
+      width:100%; height:10px; border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden; position:relative;
+    }
+    [data-theme="light"] .budget-track{ background:rgba(0,0,0,.08); }
+    .budget-fill{
+      height:100%; border-radius:999px;
+      transition:width .6s cubic-bezier(.4,0,.2,1), background .3s;
+      position:relative;
+    }
+    /* Shimmer effect on the bar */
+    .budget-fill::after{
+      content:'';
+      position:absolute;inset:0;
+      background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.25) 50%,transparent 100%);
+      background-size:200% 100%;
+      animation:shimmer 2s infinite;
+    }
+    @keyframes shimmer{ 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    /* Status colours */
+    .budget-fill.safe    { background:linear-gradient(90deg,var(--success),#4dd9a0); }
+    .budget-fill.warning { background:linear-gradient(90deg,#f0a830,#f5c842); }
+    .budget-fill.danger  { background:linear-gradient(90deg,var(--danger),#ff6b6b); }
+    .budget-fill.over    { background:linear-gradient(90deg,#c0392b,var(--danger)); }
+    .budget-status-msg{
+      font-size:.73rem; margin-top:.4rem;
+      display:flex; align-items:center; gap:.3rem;
+    }
+    .budget-status-msg.safe    { color:var(--success); }
+    .budget-status-msg.warning { color:#f0a830; }
+    .budget-status-msg.danger  { color:var(--danger); }
+    .budget-status-msg.over    { color:#ff6b6b; font-weight:600; }
+
+    /* Inline budget input inside settings */
+    .budget-inline-row{
+      display:flex;align-items:center;gap:.85rem;
+      padding:.9rem 1rem;
+      border-bottom:1px solid var(--border);
+    }
+    .budget-inline-row:last-child{ border-bottom:none; }
+    .budget-input-wrap{
+      display:flex;align-items:center;gap:.35rem;
+      margin-left:auto;
+    }
+    .budget-curr-sym{ font-size:.9rem;color:var(--muted); }
+    .budget-input{
+      width:110px;padding:.38rem .6rem;
+      background:var(--surface);border:1px solid var(--border);border-radius:8px;
+      color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;
+      text-align:right;transition:border-color .15s;
+    }
+    .budget-input:focus{ outline:none;border-color:var(--accent); }
+    .budget-save-btn{
+      padding:.38rem .75rem;background:var(--accent);color:var(--text-inv);
+      border:none;border-radius:8px;font-family:'DM Sans',sans-serif;
+      font-size:.8rem;font-weight:600;cursor:pointer;transition:filter .15s;
+      white-space:nowrap;
+    }
+    .budget-save-btn:hover{ filter:brightness(1.1); }
+
   </style>
 </head>
 <body>
@@ -491,8 +608,6 @@
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.566 2.684-3.875 2.684-6.615Z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/></svg>
         Continue with Google
       </button>
-      <!-- Hidden div Google renders its sign-in button into (required by GIS API) -->
-      <div id="g-signin-btn-div" style="position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;width:200px;height:40px;overflow:hidden;" aria-hidden="true"></div>
     </div>
     <div class="setup-box" id="login-step-2" style="display:none">
       <h2>Connect your Sheet</h2>
@@ -534,6 +649,18 @@
           <div class="banner-sublabel" id="dash-period-sublabel">Total Spent</div>
           <div class="banner-total" id="dash-total-display">—</div>
           <div class="banner-sub" id="dash-sub">Loading…</div>
+          <!-- Budget health bar — hidden when no budget set -->
+          <div class="budget-bar-wrap" id="budget-bar-wrap" style="display:none">
+            <div class="budget-bar-header">
+              <span class="budget-bar-label">Monthly Budget</span>
+              <span class="budget-bar-amounts" id="budget-bar-amounts"></span>
+              <span class="budget-bar-pct" id="budget-bar-pct"></span>
+            </div>
+            <div class="budget-track">
+              <div class="budget-fill safe" id="budget-fill"></div>
+            </div>
+            <div class="budget-status-msg safe" id="budget-status-msg"></div>
+          </div>
         </div>
         <div class="stat-row">
           <div class="stat-card"><div class="stat-label">Transactions</div><div class="stat-value green" id="dash-count">—</div></div>
@@ -631,6 +758,19 @@
             <span class="settings-label">Currency</span>
             <span class="settings-value" id="settings-currency-val">INR (₹)</span>
             <span class="settings-arrow">›</span>
+          </div>
+          <!-- Budget limit — inline input, no modal needed -->
+          <div class="budget-inline-row">
+            <span class="settings-icon">🎯</span>
+            <span class="settings-label">Monthly Budget</span>
+            <div class="budget-input-wrap">
+              <span class="budget-curr-sym" id="budget-curr-sym">₹</span>
+              <input type="number" id="budget-limit-input" class="budget-input"
+                placeholder="No limit" min="0" step="100"
+                oninput="onBudgetInput()"
+                onkeydown="if(event.key==='Enter')saveBudgetLimit()"/>
+              <button class="budget-save-btn" onclick="saveBudgetLimit()">Save</button>
+            </div>
           </div>
           <div class="settings-row" onclick="showCategoriesModal()">
             <span class="settings-icon">🏷️</span>
@@ -793,6 +933,7 @@ let state = {
   })(),
   currency: localStorage.getItem('fl_currency') || 'INR',
   theme: localStorage.getItem('fl_theme') || 'dark',
+  budgetLimit: parseFloat(localStorage.getItem('fl_budget') || '0') || 0,
   expenses: [],
   selectedCategory: 'other',
   selectedPayment: 'Credit Card',
@@ -883,6 +1024,16 @@ function todayIso() { return new Date().toISOString().split('T')[0]; }
 // ════════════════════════════════════════════
 //  AUTH
 // ════════════════════════════════════════════
+// ── AUTH: Single-step OAuth2 token flow ──────────────────────────────────
+// Strategy: request Sheets + profile scopes in ONE token request.
+// The user's button tap IS the user gesture — we pass it directly to
+// google.accounts.oauth2.initTokenClient().requestAccessToken().
+// No popup tricks, no programmatic clicks, no google.accounts.id loops.
+// Works on iOS Safari, Android Chrome, desktop — all browsers.
+
+// Guard against multiple simultaneous auth attempts
+let _authInProgress = false;
+
 function signInWithGoogle() {
   const clientIdMissing = !CONFIG.CLIENT_ID
     || CONFIG.CLIENT_ID.includes('YOUR_GOOGLE')
@@ -905,127 +1056,109 @@ function signInWithGoogle() {
     return;
   }
 
-  // Restore cached user immediately so avatar/name show while token loads
-  try {
-    const cached = localStorage.getItem('fl_user');
-    if (cached) state.user = JSON.parse(cached);
-  } catch(_) {}
-
-  // Use google.accounts.id to get user identity via JWT.
-  // ux_mode:'popup' avoids the COOP postMessage warning on GitHub Pages.
-  // We do NOT call google.accounts.id.prompt() — that causes the
-  // "only one navigator.credentials.get at a time" FedCM error.
-  // Instead we let the rendered button handle the full flow.
-  google.accounts.id.initialize({
-    client_id: CONFIG.CLIENT_ID,
-    callback: onIdentityReceived,
-    auto_select: false,    // no silent One Tap — avoids FedCM conflict
-    ux_mode: 'popup',      // explicit popup mode — suppresses COOP warning
-    cancel_on_tap_outside: false,
-  });
-
-  // Render the Google button into the hidden div and immediately click it.
-  // This gives us Google's official sign-in flow triggered by our own button.
-  const btnDiv = document.getElementById('g-signin-btn-div');
-  btnDiv.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:200px;height:40px;overflow:hidden;';
-  google.accounts.id.renderButton(btnDiv, {
-    type: 'standard',
-    theme: 'outline',
-    size: 'large',
-    width: 200,
-  });
-  // Small delay to let the button render before clicking
-  setTimeout(() => {
-    const btn = btnDiv.querySelector('[role="button"], button, div[tabindex="0"]');
-    if (btn) {
-      btn.click();
-    } else {
-      // Fallback: button not rendered yet — show toast and let user retry
-      console.warn('[Auth] Google sign-in button not ready, please try again');
-      showToast('Please try signing in again', '');
-    }
-  }, 100);
-}
-
-// ── Step 1 callback: Google tells us who the user is ─────────────────────
-// credential is a JWT — we decode it client-side (no verification needed
-// here since we just need display info; the Sheets API handles real auth).
-function onIdentityReceived(response) {
-  if (!response.credential) {
-    showToast('Sign-in cancelled', '');
+  if (_authInProgress) {
+    console.log('[Auth] Auth already in progress, ignoring duplicate tap');
     return;
   }
-  // Decode JWT payload (base64url middle section) — no crypto needed
-  try {
-    const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-    state.user = {
-      sub:        payload.sub,
-      name:       payload.name,
-      given_name: payload.given_name,
-      email:      payload.email,
-      picture:    payload.picture,
-    };
-    localStorage.setItem('fl_user', JSON.stringify(state.user));
-    console.log('[Auth] Identity received for:', state.user.email);
-  } catch(e) {
-    console.error('[Auth] JWT decode failed:', e);
-    showToast('Sign-in error — please try again', 'error');
-    return;
-  }
+  _authInProgress = true;
 
-  // ── Step 2: Now request an OAuth access token for the Sheets API ─────────
-  // We know who the user is, now get permission to read/write their sheet.
-  requestSheetsToken();
-}
+  // Show loading state on button
+  const loginBtn = document.querySelector('.btn-google');
+  if (loginBtn) { loginBtn.disabled = true; loginBtn.style.opacity = '.6'; }
 
-// ── Step 2: Request access token for Google Sheets ───────────────────────
-function requestSheetsToken(onSuccess) {
+  // Request token with both Sheets AND profile scopes in one go.
+  // This means ONE consent screen that covers everything.
+  // The user's actual button tap initiates this — Safari is happy.
+  const FULL_SCOPE = CONFIG.SCOPES
+    + ' https://www.googleapis.com/auth/userinfo.email'
+    + ' https://www.googleapis.com/auth/userinfo.profile';
+
   google.accounts.oauth2.initTokenClient({
     client_id: CONFIG.CLIENT_ID,
-    scope: CONFIG.SCOPES,
-    // hint the email so Google pre-selects the right account
-    login_hint: state.user ? state.user.email : '',
+    scope: FULL_SCOPE,
     callback: r => {
+      _authInProgress = false;
+      if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = ''; }
+
       if (r.error) {
-        if (r.error !== 'popup_closed_by_user') {
-          showToast('Sheets access failed: ' + r.error, 'error');
+        if (r.error !== 'popup_closed_by_user' && r.error !== 'access_denied') {
+          showToast('Sign-in failed: ' + r.error, 'error');
         }
         return;
       }
       state.token = r.access_token;
-      console.log('[Auth] Sheets token received');
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        // Initial sign-in: go into app
-        if (state.sheetId) {
-          initApp();
-        } else {
-          showStep2();
-        }
-      }
+      // Fetch user identity using the token we now have
+      fetchUserInfo();
     },
-  // prompt:'' = silent if Google session exists; shows consent only if needed
+  }).requestAccessToken({ prompt: 'select_account' });
+}
+
+// Fetch user profile using the access token
+// This works because we requested userinfo scopes above
+function fetchUserInfo() {
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: { Authorization: 'Bearer ' + state.token }
+  })
+  .then(r => {
+    if (!r.ok) throw new Error('userinfo ' + r.status);
+    return r.json();
+  })
+  .then(info => {
+    if (!info.sub && !info.email) throw new Error('Invalid user info');
+    state.user = {
+      sub: info.sub, name: info.name,
+      given_name: info.given_name,
+      email: info.email, picture: info.picture,
+    };
+    localStorage.setItem('fl_user', JSON.stringify(state.user));
+    console.log('[Auth] Signed in as:', state.user.email);
+    if (state.sheetId) {
+      initApp();
+    } else {
+      showStep2();
+    }
+  })
+  .catch(err => {
+    console.error('[Auth] fetchUserInfo failed:', err);
+    // Even if userinfo fails, we have a token — try to proceed
+    // with cached user info if available
+    const cached = localStorage.getItem('fl_user');
+    if (cached) {
+      try { state.user = JSON.parse(cached); } catch(_) {}
+    }
+    if (state.user) {
+      console.log('[Auth] Using cached user info');
+      if (state.sheetId) initApp(); else showStep2();
+    } else {
+      showToast('Could not get profile — please try again', 'error');
+    }
+  });
+}
+
+// Request a Sheets token for a specific callback (used internally)
+function requestSheetsToken(onSuccess) {
+  google.accounts.oauth2.initTokenClient({
+    client_id: CONFIG.CLIENT_ID,
+    scope: CONFIG.SCOPES,
+    login_hint: state.user ? state.user.email : '',
+    callback: r => {
+      if (r.error) {
+        if (r.error !== 'popup_closed_by_user') {
+          showToast('Auth failed: ' + r.error, 'error');
+        }
+        return;
+      }
+      state.token = r.access_token;
+      if (onSuccess) onSuccess();
+      else { if (state.sheetId) initApp(); else showStep2(); }
+    },
   }).requestAccessToken({ prompt: '' });
 }
 
-// Called by older code paths — kept for compatibility
-function onTokenReceived(response) {
-  if (response.error) {
-    if (response.error !== 'popup_closed_by_user') {
-      showToast('Sign-in failed: ' + response.error, 'error');
-    }
-    return;
-  }
-  state.token = response.access_token;
-}
-
-// No longer used — identity comes from JWT now, not userinfo API
-function fetchUserInfo() {
-  console.log('[Auth] fetchUserInfo: using cached identity');
-  if (state.user && state.sheetId) { initApp(); return; }
-  if (state.user) { showStep2(); return; }
-  signInWithGoogle();
+// Compatibility stub
+function onTokenReceived(r) {
+  if (r.error) { showToast('Sign-in failed: ' + r.error, 'error'); return; }
+  state.token = r.access_token;
 }
 
 function showStep2() {
@@ -1207,6 +1340,8 @@ function initApp() {
   document.getElementById('date-input').value = todayIso();
   // switchTab sets the tab-active class (needed for desktop CSS) and renders
   switchTab('dashboard');
+  // Sync budget input with saved state
+  syncBudgetInputUI();
   // Pre-render history empty state too
   renderHistory();
   // Fetch real data from sheet
@@ -1230,7 +1365,7 @@ function switchTab(tab) {
   document.getElementById('nav-'+tab).classList.add('active');
   if (tab==='dashboard') renderDashboard();
   if (tab==='history')   renderHistory();
-  if (tab==='settings')  { syncThemeButtons(); updateCatCount(); }
+  if (tab==='settings')  { syncThemeButtons(); updateCatCount(); syncBudgetInputUI(); }
   if (tab==='add' && !state.editingId) resetAddForm();
 }
 function syncThemeButtons() {
@@ -1353,6 +1488,13 @@ function renderDashboard() {
       </div>
       <div class="pie-legend">${legend}</div>
     </div>`;
+
+  // Budget health bar — only for monthly view
+  if (state.periodMode === 'month') {
+    renderBudgetBar(total, state.budgetLimit);
+  } else {
+    hideBudgetBar();
+  }
 
   // Recent 5 — always show empty state (never "Loading") when array is empty
   const recent=[...state.expenses].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
@@ -1583,7 +1725,9 @@ function showCurrencyModal() {
 }
 function setCurrency(code) {
   state.currency=code; localStorage.setItem('fl_currency',code);
-  syncCurrencySymbols(); renderAll(); closeModal();
+  syncCurrencySymbols();
+  syncBudgetInputUI();  // update ₹ symbol next to budget input
+  renderAll(); closeModal();
   showToast('Currency: '+getCurrObj().label);
 }
 
@@ -1898,6 +2042,91 @@ async function sheetsUpdateRow(rowIndex, values) {
 }
 
 // ════════════════════════════════════════════
+//  BUDGET
+// ════════════════════════════════════════════
+
+function saveBudgetLimit() {
+  const val = parseFloat(document.getElementById('budget-limit-input').value);
+  state.budgetLimit = (isNaN(val) || val <= 0) ? 0 : val;
+  localStorage.setItem('fl_budget', state.budgetLimit);
+  renderDashboard();
+  showToast(state.budgetLimit > 0
+    ? '🎯 Budget set to ' + fmt(state.budgetLimit)
+    : '🎯 Budget limit cleared', 'success');
+}
+
+function onBudgetInput() {
+  // Live preview — re-render bar as user types
+  const val = parseFloat(document.getElementById('budget-limit-input').value);
+  const preview = (isNaN(val) || val <= 0) ? 0 : val;
+  if (preview > 0) renderBudgetBar(
+    getPeriodExpenses().reduce((s,e)=>s+e.amount,0),
+    preview
+  );
+  else hideBudgetBar();
+}
+
+function renderBudgetBar(total, limit) {
+  if (!limit || limit <= 0 || state.periodMode !== 'month') {
+    hideBudgetBar(); return;
+  }
+  const wrap  = document.getElementById('budget-bar-wrap');
+  const fill  = document.getElementById('budget-fill');
+  const pct   = document.getElementById('budget-bar-pct');
+  const amts  = document.getElementById('budget-bar-amounts');
+  const msg   = document.getElementById('budget-status-msg');
+  if (!wrap) return;
+
+  const ratio   = total / limit;
+  const pctNum  = Math.round(ratio * 100);
+  const fillPct = Math.min(ratio * 100, 100);
+  const remaining = limit - total;
+
+  // Determine status
+  let status = 'safe';
+  if (ratio >= 1)       status = 'over';
+  else if (ratio >= .9) status = 'danger';
+  else if (ratio >= .7) status = 'warning';
+
+  // Status messages
+  const msgs = {
+    safe:    '✦ On track — ' + fmt(remaining) + ' remaining',
+    warning: '⚠ Approaching limit — ' + fmt(remaining) + ' left',
+    danger:  '🔴 Almost at limit — only ' + fmt(remaining) + ' left',
+    over:    '🚨 Over budget by ' + fmt(Math.abs(remaining)),
+  };
+
+  wrap.style.display  = '';
+  fill.style.width    = fillPct.toFixed(1) + '%';
+  fill.className      = 'budget-fill ' + status;
+  pct.textContent     = pctNum + '%';
+  pct.style.color     = status === 'safe'    ? 'var(--success)'
+                      : status === 'warning' ? '#f0a830'
+                      : 'var(--danger)';
+  amts.textContent    = fmt(total) + ' / ' + fmt(limit);
+  msg.textContent     = msgs[status];
+  msg.className       = 'budget-status-msg ' + status;
+}
+
+function hideBudgetBar() {
+  const wrap = document.getElementById('budget-bar-wrap');
+  if (wrap) wrap.style.display = 'none';
+}
+
+function syncBudgetInputUI() {
+  // Keep the settings input in sync with state
+  const inp = document.getElementById('budget-limit-input');
+  const sym = document.getElementById('budget-curr-sym');
+  if (inp) inp.value = state.budgetLimit > 0 ? state.budgetLimit : '';
+  if (sym) sym.textContent = sym_budget();
+}
+
+function sym_budget() {
+  // Just the currency symbol for the budget input label
+  return getCurrObj ? getCurrObj().sym : '₹';
+}
+
+// ════════════════════════════════════════════
 //  MODAL & TOAST
 // ════════════════════════════════════════════
 function showModal(html){document.getElementById('modal-content').innerHTML=html;document.getElementById('modal-overlay').classList.add('open');}
@@ -1941,30 +2170,32 @@ applyTheme(state.theme);
 
       console.log('[Auth] Trying silent auto-login for:', u.email);
 
-      // Request a Sheets token silently — prompt:'' means no popup
-      // This works if the user's Google session is still active in the browser
-      google.accounts.oauth2.initTokenClient({
-        client_id: CONFIG.CLIENT_ID,
-        scope: CONFIG.SCOPES,
-        login_hint: u.email,
-        callback: r => {
-          if (r.error) {
-            // Silent login failed — session gone, need to sign in manually
-            console.log('[Auth] Silent login failed (' + r.error + ') — showing login screen');
-            return; // login screen stays visible, user clicks the button
-          }
-          // Got a token silently — go straight into the app
-          state.token = r.access_token;
-          console.log('[Auth] Silent auto-login successful');
-          if (state.sheetId) {
-            initApp();
-          } else {
-            // Show just step 2 (sheet entry) skipping step 1 (sign in button)
-            document.getElementById('login-step-1').style.display = 'none';
-            document.getElementById('login-step-2').style.display = 'block';
-          }
-        },
-      }).requestAccessToken({ prompt: '' });
+      // Silent token refresh — prompt:'' = no popup if Google session alive
+      // On iOS Safari this may not work (Safari blocks 3rd-party cookies in
+      // some configs) but it's fine — user just taps the sign-in button.
+      try {
+        google.accounts.oauth2.initTokenClient({
+          client_id: CONFIG.CLIENT_ID,
+          scope: CONFIG.SCOPES,
+          login_hint: u.email,
+          callback: r => {
+            if (r.error) {
+              console.log('[Auth] Silent login failed (' + r.error + ')');
+              return; // fall through to login screen
+            }
+            state.token = r.access_token;
+            console.log('[Auth] Silent auto-login OK');
+            if (state.sheetId) {
+              initApp();
+            } else {
+              document.getElementById('login-step-1').style.display = 'none';
+              document.getElementById('login-step-2').style.display = 'block';
+            }
+          },
+        }).requestAccessToken({ prompt: '' });
+      } catch(e) {
+        console.warn('[Auth] Silent login error:', e);
+      }
 
     } catch(e) {
       console.warn('[Auth] Auto-login error:', e);
