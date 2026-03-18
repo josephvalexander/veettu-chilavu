@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Veettu Chilavu — Data Importer</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{--bg:#0f0f1a;--card:#1f1f35;--surface:#181828;--border:#2e2e4a;--text:#f0eee8;
+        --muted:#8888aa;--accent:#f5c842;--success:#5fc4b8;--danger:#e07b5f;}
+  html,body{min-height:100vh;font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);}
+  body{display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem;}
+  .wrap{max-width:600px;width:100%;margin-top:1rem;}
+  h1{font-size:1.5rem;font-weight:700;color:var(--accent);margin-bottom:.3rem;}
+  .subtitle{font-size:.85rem;color:var(--muted);margin-bottom:2rem;line-height:1.55;}
+  .section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1rem;}
+  .section-title{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem;}
+  .section-title .num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#1a1100;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  label{font-size:.8rem;color:var(--muted);display:block;margin-bottom:.4rem;}
+  input[type=text]{width:100%;padding:.82rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;font-family:inherit;transition:border-color .15s;}
+  input[type=text]:focus{outline:none;border-color:var(--accent);}
+  input::placeholder{color:#4a4a6a;}
+  .hint{font-size:.72rem;color:var(--muted);margin-top:.4rem;}
+  .hint span{color:var(--accent);}
+  .btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.88rem 1.5rem;border-radius:8px;font-size:.93rem;font-weight:600;border:none;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:.75rem;}
+  .btn-google{background:#fff;color:#1f1f1f;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+  .btn-google:hover{box-shadow:0 4px 18px rgba(0,0,0,.4);}
+  .btn-google:disabled{opacity:.5;cursor:default;}
+  .btn-import{background:var(--accent);color:#1a1100;}
+  .btn-import:hover:not(:disabled){filter:brightness(1.08);}
+  .btn-import:disabled{opacity:.45;cursor:default;}
+  .status{font-size:.8rem;margin-top:.5rem;min-height:1.2rem;transition:color .2s;}
+  .status.ok{color:var(--success);}
+  .status.err{color:var(--danger);}
+  /* Progress */
+  .progress-wrap{display:none;margin-top:1rem;}
+  .progress-head{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:.4rem;}
+  .track{height:10px;border-radius:999px;background:var(--surface);overflow:hidden;}
+  .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--success),var(--accent));transition:width .35s ease;}
+  .log{margin-top:.85rem;background:var(--surface);border-radius:8px;padding:.75rem 1rem;font-size:.75rem;color:var(--muted);max-height:160px;overflow-y:auto;line-height:1.8;font-family:monospace;display:none;}
+  .log .ok{color:var(--success);} .log .err{color:var(--danger);} .log .info{color:var(--accent);}
+  /* Summary */
+  .summary{display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-top:1rem;font-size:.85rem;line-height:1.6;}
+  .summary h3{color:var(--success);margin-bottom:.4rem;}
+  a{color:var(--accent);}
+  /* Preview table */
+  table{width:100%;border-collapse:collapse;font-size:.76rem;margin-top:.75rem;}
+  th{text-align:left;padding:.3rem .5rem;color:var(--muted);border-bottom:1px solid var(--border);font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;}
+  td{padding:.35rem .5rem;border-bottom:1px solid var(--border);color:#c8c8d8;}
+  tr:last-child td{border-bottom:none;}
+  /* Category map */
+  .cat-map{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.3rem .5rem;margin-top:.6rem;}
+  .cm{font-size:.74rem;color:var(--muted);display:flex;align-items:center;gap:.3rem;}
+  .cm .arrow{color:var(--border);}
+  .cm .dest{color:var(--text);}
+  .divider{border:none;border-top:1px solid var(--border);margin:1rem 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📥 Veettu Chilavu — Data Importer</h1>
+  <p class="subtitle">One-time tool to import <strong style="color:var(--text)">262 expenses</strong> (Nov 2022 – Mar 2026) into your Google Sheet. Safe to re-run — duplicate IDs are ignored.</p>
+
+  <!-- Step 1: Client ID -->
+  <div class="section">
+    <div class="section-title"><span class="num">1</span> Google OAuth Client ID</div>
+    <label>Paste your Client ID (same one used in the Veettu Chilavu app)</label>
+    <input type="text" id="client-id" placeholder="xxxxxxxxx-abc.apps.googleusercontent.com" autocomplete="off" spellcheck="false"/>
+    <p class="hint">Google Cloud Console → APIs &amp; Services → Credentials</p>
+  </div>
+
+  <!-- Step 2: Sign in -->
+  <div class="section">
+    <div class="section-title"><span class="num">2</span> Sign in with Google</div>
+    <button class="btn btn-google" id="btn-signin" onclick="doSignIn()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.566 2.684-3.875 2.684-6.615Z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/></svg>
+      Sign in with Google
+    </button>
+    <p class="status" id="signin-status"></p>
+  </div>
+
+  <!-- Step 3: Sheet ID -->
+  <div class="section">
+    <div class="section-title"><span class="num">3</span> Google Sheet ID</div>
+    <label>Paste the ID from your Veettu Chilavu Google Sheet URL</label>
+    <input type="text" id="sheet-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" spellcheck="false"/>
+    <p class="hint">docs.google.com/spreadsheets/d/<span>[ID IS HERE]</span>/edit</p>
+  </div>
+
+  <!-- Preview -->
+  <div class="section">
+    <div class="section-title">Data preview — 6 of 262 rows</div>
+    <table>
+      <tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th>Via</th></tr>
+      <tr><td>17/03/2026</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Bangalore trip travel</td><td>travel</td><td style="text-align:right">₹635</td><td>Cash</td></tr><tr><td>16/03/2026</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Eating out</td><td>dining</td><td style="text-align:right">₹329</td><td>Credit Card</td></tr><tr><td>14/03/2026</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Eating out</td><td>dining</td><td style="text-align:right">₹290</td><td>Cash</td></tr><tr><td>14/03/2026</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Haircut</td><td>beauty</td><td style="text-align:right">₹250</td><td>Cash</td></tr><tr><td>13/03/2026</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Claude subscription</td><td>education</td><td style="text-align:right">₹2,000</td><td>Cash</td></tr><tr><td>12/03/2026</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Treesa maternity dresses</td><td>apparel</td><td style="text-align:right">₹7,300</td><td>Credit Card</td></tr>
+    </table>
+    <hr class="divider"/>
+    <div class="section-title" style="margin-bottom:.3rem">Category mapping (Excel → App)</div>
+    <div class="cat-map">
+      <div class="cm">Food <span class="arrow">→</span><span class="dest">🍽️ dining</span></div>
+      <div class="cm">Household <span class="arrow">→</span><span class="dest">🛒 groceries</span></div>
+      <div class="cm">Travel <span class="arrow">→</span><span class="dest">✈️ travel</span></div>
+      <div class="cm">Fuel <span class="arrow">→</span><span class="dest">⛽ fuel</span></div>
+      <div class="cm">Health <span class="arrow">→</span><span class="dest">💊 health</span></div>
+      <div class="cm">Education <span class="arrow">→</span><span class="dest">📚 education</span></div>
+      <div class="cm">Entertainment <span class="arrow">→</span><span class="dest">🎉 fun</span></div>
+      <div class="cm">Social Life <span class="arrow">→</span><span class="dest">🥳 party</span></div>
+      <div class="cm">Apparel <span class="arrow">→</span><span class="dest">👗 apparel</span></div>
+      <div class="cm">Beauty <span class="arrow">→</span><span class="dest">💄 beauty</span></div>
+      <div class="cm">Work <span class="arrow">→</span><span class="dest">💼 work</span></div>
+      <div class="cm">Charity <span class="arrow">→</span><span class="dest">🤝 charity</span></div>
+      <div class="cm">Utilities <span class="arrow">→</span><span class="dest">⚡ utilities</span></div>
+      <div class="cm">Shopping <span class="arrow">→</span><span class="dest">🛒 groceries</span></div>
+    </div>
+  </div>
+
+  <!-- Import button -->
+  <button class="btn btn-import" id="btn-import" onclick="startImport()" disabled>
+    ↑ Import 262 Expenses to Sheet
+  </button>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-head"><span id="prog-label">Preparing…</span><span id="prog-pct">0%</span></div>
+    <div class="track"><div class="fill" id="fill" style="width:0%"></div></div>
+  </div>
+  <div class="log" id="log"></div>
+  <div class="summary" id="summary"></div>
+</div>
+
+<script>
+const ROWS = [["17/03/2026", "Bangalore trip travel", "travel", "635.00", "Cash", "", "import_20260317175602_635", "Import"], ["16/03/2026", "Eating out", "dining", "329.00", "Credit Card", "", "import_20260316180011_329", "Import"], ["14/03/2026", "Eating out", "dining", "290.00", "Cash", "", "import_20260314205757_290", "Import"], ["14/03/2026", "Haircut", "beauty", "250.00", "Cash", "", "import_20260314181459_250", "Import"], ["13/03/2026", "Claude subscription", "education", "2000.00", "Cash", "", "import_20260313174906_2000", "Import"], ["12/03/2026", "Treesa maternity dresses", "apparel", "7300.00", "Credit Card", "", "import_20260312205723_7300", "Import"], ["08/03/2026", "Cards", "fun", "75.00", "Cash", "", "import_20260308085127_75", "Import"], ["08/03/2026", "Fuel hycross", "fuel", "3391.50", "Credit Card", "", "import_20260308085038_3391", "Import"], ["07/03/2026", "Dental treatment", "health", "2000.00", "Cash", "", "import_20260307131632_2000", "Import"], ["07/03/2026", "Jio recharge", "utilities", "899.00", "Credit Card", "", "import_20260307095450_899", "Import"], ["06/03/2026", "Bangalore travel", "travel", "8589.00", "Credit Card", "", "import_20260306220908_8589", "Import"], ["06/03/2026", "Kids/treesa dress", "apparel", "3510.00", "Credit Card", "", "import_20260306152100_3510", "Import"], ["06/03/2026", "Lulu", "groceries", "818.21", "Credit Card", "", "import_20260306152034_818", "Import"], ["06/03/2026", "Eating out", "dining", "956.00", "Credit Card", "", "import_20260306151955_956", "Import"], ["06/03/2026", "Treesa checkup", "health", "146.00", "Cash", "", "import_20260306104833_146", "Import"], ["05/03/2026", "Amazon", "groceries", "2011.00", "Credit Card", "", "import_20260305172454_2011", "Import"], ["05/03/2026", "Treesa blood test", "health", "240.00", "Cash", "", "import_20260305172439_240", "Import"], ["04/03/2026", "Sulabha", "groceries", "509.00", "Credit Card", "", "import_20260304162209_509", "Import"], ["03/03/2026", "Anna school farewell", "education", "3000.00", "Cash", "", "import_20260303103256_3000", "Import"], ["02/03/2026", "Anna fees", "education", "500.00", "Cash", "", "import_20260302101531_500", "Import"], ["01/03/2026", "Sarah school bus", "education", "3255.00", "Cash", "", "import_20260301113715_3255", "Import"], ["28/02/2026", "Duster pollution", "utilities", "130.00", "Credit Card", "", "import_20260228165926_130", "Import"], ["27/02/2026", "Amazon", "groceries", "643.34", "Credit Card", "", "import_20260227173726_643", "Import"], ["27/02/2026", "Duster", "fuel", "3681.28", "Credit Card", "", "import_20260227124516_3681", "Import"], ["23/02/2026", "Amazon", "groceries", "1385.35", "Credit Card", "", "import_20260223232314_1385", "Import"], ["23/02/2026", "Clothes", "apparel", "422.00", "Credit Card", "", "import_20260223231112_422", "Import"], ["21/02/2026", "Eating out", "dining", "252.00", "Cash", "", "import_20260221235044_252", "Import"], ["20/02/2026", "Eating out", "dining", "760.00", "Credit Card", "", "import_20260220143344_760", "Import"], ["20/02/2026", "Sulabha", "groceries", "709.00", "Credit Card", "", "import_20260220143247_709", "Import"], ["20/02/2026", "Treesa medicines", "health", "11.00", "Cash", "", "import_20260220120024_11", "Import"], ["20/02/2026", "Treesa checkup scan 9 months", "health", "620.00", "Credit Card", "", "import_20260220114441_620", "Import"], ["20/02/2026", "Coffee", "dining", "15.00", "Cash", "", "import_20260220113336_15", "Import"], ["16/02/2026", "Goura fish for tank", "groceries", "3500.00", "Cash", "", "import_20260216174428_3500", "Import"], ["14/02/2026", "Eating out", "dining", "600.00", "Credit Card", "", "import_20260214172436_600", "Import"], ["14/02/2026", "Treesa dress", "groceries", "4692.00", "Cash", "", "import_20260214155437_4692", "Import"], ["14/02/2026", "Movie night", "fun", "493.22", "Credit Card", "", "import_20260214143551_493", "Import"], ["09/02/2026", "Amazon", "groceries", "2075.00", "Credit Card", "", "import_20260209224057_2075", "Import"], ["09/02/2026", "Ottplay", "fun", "199.00", "Cash", "", "import_20260209131054_199", "Import"], ["07/02/2026", "Hycross petrol", "fuel", "4563.71", "Credit Card", "", "import_20260207174924_4563", "Import"], ["07/02/2026", "Eating out", "dining", "828.00", "Credit Card", "", "import_20260207130006_828", "Import"], ["07/02/2026", "Hycross car wash", "groceries", "700.00", "Cash", "", "import_20260207085210_700", "Import"], ["07/02/2026", "Quippi", "fun", "3176.82", "Credit Card", "", "import_20260207085122_3176", "Import"], ["03/02/2026", "Ouseppachen uncle funeral", "groceries", "430.00", "Cash", "", "import_20260203201309_430", "Import"], ["03/02/2026", "School bus", "education", "3255.00", "Cash", "", "import_20260203090116_3255", "Import"], ["03/02/2026", "Eating out", "dining", "35.00", "Cash", "", "import_20260203085846_35", "Import"], ["02/02/2026", "Anna school fees", "education", "500.00", "Cash", "", "import_20260202102033_500", "Import"], ["02/02/2026", "Ouseppachen uncle funeral", "groceries", "1450.00", "Credit Card", "", "import_20260202085818_1450", "Import"], ["01/02/2026", "Johny tickets", "travel", "36561.00", "Credit Card", "", "import_20260201222437_36561", "Import"], ["01/02/2026", "Coffee", "dining", "60.00", "Cash", "", "import_20260201205036_60", "Import"], ["30/01/2026", "Lulu", "groceries", "688.00", "Credit Card", "", "import_20260130174116_688", "Import"], ["30/01/2026", "Eating out", "dining", "1276.00", "Credit Card", "", "import_20260130174050_1276", "Import"], ["30/01/2026", "Treesa checkup", "health", "221.00", "Cash", "", "import_20260130115253_221", "Import"], ["29/01/2026", "Amma recharge", "utilities", "1499.00", "Credit Card", "", "import_20260129000209_1499", "Import"], ["27/01/2026", "Anna anniversary fees", "education", "500.00", "Cash", "", "import_20260127100405_500", "Import"], ["26/01/2026", "Iron tablets", "health", "504.00", "Credit Card", "", "import_20260126230749_504", "Import"], ["26/01/2026", "Flipkart/myntra", "groceries", "1030.00", "Credit Card", "", "import_20260126225147_1030", "Import"], ["25/01/2026", "Eating out", "dining", "354.90", "Credit Card", "", "import_20260125152121_354", "Import"], ["25/01/2026", "Fuel", "fuel", "3993.47", "Credit Card", "", "import_20260125152042_3993", "Import"], ["24/01/2026", "Fruits", "groceries", "220.00", "Credit Card", "", "import_20260124212319_220", "Import"], ["24/01/2026", "Eating out", "dining", "1290.00", "Credit Card", "", "import_20260124212303_1290", "Import"], ["24/01/2026", "Hair cut kids and myself", "beauty", "750.00", "Cash", "", "import_20260124212215_750", "Import"], ["23/01/2026", "Soda lime", "dining", "25.00", "Cash", "", "import_20260123212114_25", "Import"], ["19/01/2026", "Dental", "health", "400.00", "Cash", "", "import_20260119142926_400", "Import"], ["15/01/2026", "Amazon", "groceries", "767.00", "Credit Card", "", "import_20260115173109_767", "Import"], ["14/01/2026", "Fruits", "groceries", "358.00", "Credit Card", "", "import_20260114130324_358", "Import"], ["14/01/2026", "Eating out", "dining", "250.00", "Credit Card", "", "import_20260114130256_250", "Import"], ["14/01/2026", "Anna school admission", "education", "46350.00", "Credit Card", "", "import_20260114084120_46350", "Import"], ["11/01/2026", "Charity", "charity", "100.00", "Cash", "", "import_20260111232625_100", "Import"], ["10/01/2026", "Cakes", "groceries", "1400.00", "Credit Card", "", "import_20260110232647_1400", "Import"], ["10/01/2026", "Sulabha", "groceries", "2375.00", "Credit Card", "", "import_20260110151812_2375", "Import"], ["10/01/2026", "Medicines", "groceries", "77.00", "Cash", "", "import_20260110140718_77", "Import"], ["10/01/2026", "VI recharge", "utilities", "3449.00", "Credit Card", "", "import_20260110104250_3449", "Import"], ["10/01/2026", "Airtel recharge", "utilities", "2249.00", "Credit Card", "", "import_20260110104219_2249", "Import"], ["10/01/2026", "Eating out", "dining", "1756.00", "Credit Card", "", "import_20260110090849_1756", "Import"], ["05/01/2026", "Horlicks", "groceries", "360.00", "Credit Card", "", "import_20260105235604_360", "Import"], ["05/01/2026", "Kids toys", "groceries", "371.00", "Credit Card", "", "import_20260105235446_371", "Import"], ["05/01/2026", "Anna fees", "education", "500.00", "Cash", "", "import_20260105095943_500", "Import"], ["04/01/2026", "Eating out", "dining", "310.00", "Cash", "", "import_20260104221740_310", "Import"], ["03/01/2026", "School bus fees", "education", "3255.00", "Bank Account", "", "import_20260103182924_3255", "Import"], ["03/01/2026", "Chappathi", "groceries", "120.00", "Cash", "", "import_20260103182419_120", "Import"], ["03/01/2026", "Movie- Sarvam Maya", "fun", "648.40", "Credit Card", "", "import_20260103181934_648", "Import"], ["03/01/2026", "Plant terminelia", "groceries", "800.00", "Cash", "", "import_20260103121504_800", "Import"], ["03/01/2026", "Eating out", "dining", "1458.00", "Credit Card", "", "import_20260103121448_1458", "Import"], ["02/01/2026", "Water/food", "dining", "671.00", "Cash", "", "import_20260102154749_671", "Import"], ["02/01/2026", "Hycross", "fuel", "4460.48", "Credit Card", "", "import_20260102142102_4460", "Import"], ["02/01/2026", "Fruits", "groceries", "740.00", "Credit Card", "", "import_20260102141830_740", "Import"], ["02/01/2026", "Eating out", "dining", "520.00", "Credit Card", "", "import_20260102141801_520", "Import"], ["02/01/2026", "Grocery", "groceries", "672.00", "Credit Card", "", "import_20260102114252_672", "Import"], ["02/01/2026", "Laundry", "groceries", "200.00", "Cash", "", "import_20260102114236_200", "Import"], ["01/01/2026", "Magnet calendar", "groceries", "137.00", "Cash", "", "import_20260101231753_137", "Import"], ["01/01/2026", "Bus", "travel", "40.00", "Cash", "", "import_20260101075340_40", "Import"], ["01/01/2026", "Food", "dining", "631.00", "Cash", "", "import_20260101075206_631", "Import"], ["16/08/2025", "Sarah school fees", "education", "6700.00", "Bank Account", "", "import_20250816164124_6700", "Import"], ["16/08/2025", "Dental", "health", "1000.00", "Bank Account", "", "import_20250816164051_1000", "Import"], ["15/08/2025", "", "groceries", "570.00", "Bank Account", "", "import_20250815164442_570", "Import"], ["15/08/2025", "Car wash hycross", "other", "750.00", "Bank Account", "", "import_20250815164415_750", "Import"], ["15/08/2025", "Hycross petrol", "fuel", "2309.27", "Bank Account", "", "import_20250815164209_2309", "Import"], ["13/08/2025", "Amazon", "groceries", "2110.00", "Credit Card", "", "import_20250813103028_2110", "Import"], ["13/08/2025", "Eye checkup", "health", "150.00", "Bank Account", "", "import_20250813101618_150", "Import"], ["12/08/2025", "Marian check up", "health", "100.00", "Cash", "", "import_20250812102926_100", "Import"], ["12/08/2025", "", "dining", "230.00", "Bank Account", "", "import_20250812102738_230", "Import"], ["10/08/2025", "Medicines", "health", "2489.00", "Credit Card", "", "import_20250810202231_2489", "Import"], ["09/08/2025", "Outing", "dining", "774.00", "Credit Card", "", "import_20250809085103_774", "Import"], ["09/08/2025", "Anna vaccinations", "health", "1500.00", "Cash", "", "import_20250809084955_1500", "Import"], ["06/08/2025", "Blr flight ticket", "work", "8738.00", "Credit Card", "", "import_20250806085421_8738", "Import"], ["05/08/2025", "Dental", "health", "400.00", "Cash", "", "import_20250805085332_400", "Import"], ["02/08/2025", "Trends clothes", "apparel", "3994.00", "Credit Card", "", "import_20250802170404_3994", "Import"], ["02/08/2025", "Party", "fun", "2824.30", "Credit Card", "", "import_20250802170307_2824", "Import"], ["01/08/2025", "Grocery", "groceries", "1620.00", "Credit Card", "", "import_20250801121156_1620", "Import"], ["01/08/2025", "KoCo", "dining", "880.00", "Credit Card", "", "import_20250801121105_880", "Import"], ["01/08/2025", "Clothes shopping", "apparel", "11742.00", "Credit Card", "", "import_20250801114423_11742", "Import"], ["09/11/2024", "Fruits", "groceries", "768.00", "Bank Account", "", "import_20241109174306_768", "Import"], ["09/11/2024", "Movie Swargam", "fun", "880.00", "Credit Card", "", "import_20241109160624_880", "Import"], ["09/11/2024", "Shopping", "groceries", "1175.00", "Credit Card", "", "import_20241109160538_1175", "Import"], ["09/11/2024", "Outing", "dining", "1440.00", "Bank Account", "", "import_20241109160515_1440", "Import"], ["08/11/2024", "Redbus", "travel", "1862.00", "Bank Account", "", "import_20241108084354_1862", "Import"], ["03/11/2024", "Chandigarh flights", "travel", "21656.00", "Bank Account", "", "import_20241103184134_21656", "Import"], ["03/11/2024", "KFC", "dining", "550.00", "Bank Account", "", "import_20241103083106_550", "Import"], ["03/11/2024", "Vaccine", "health", "1000.00", "Bank Account", "", "import_20241103083022_1000", "Import"], ["03/11/2024", "Sarah school fees", "education", "15815.00", "Bank Account", "", "import_20241103074211_15815", "Import"], ["02/11/2024", "DCC delicious", "groceries", "1286.00", "Credit Card", "", "import_20241102091524_1286", "Import"], ["02/11/2024", "Lunch", "dining", "1240.00", "Bank Account", "", "import_20241102074410_1240", "Import"], ["02/11/2024", "Clothes shopping", "groceries", "4583.00", "Credit Card", "", "import_20241102074330_4583", "Import"], ["01/11/2024", "Dentist", "groceries", "500.00", "Bank Account", "", "import_20241101074256_500", "Import"], ["30/10/2024", "Navajeevan trust", "party", "20000.00", "Bank Account", "", "import_20241030080425_20000", "Import"], ["30/10/2024", "Flipkart", "groceries", "853.00", "Cash", "", "import_20241030074848_853", "Import"], ["30/10/2024", "Amazon", "groceries", "560.00", "Cash", "", "import_20241030074744_560", "Import"], ["28/10/2024", "Fedrewards", "groceries", "432.00", "Cash", "", "import_20241028080400_432", "Import"], ["26/10/2024", "Shopping", "groceries", "3500.00", "Credit Card", "", "import_20241026080216_3500", "Import"], ["26/10/2024", "Dine out", "dining", "1583.00", "Cash", "", "import_20241026075031_1583", "Import"], ["24/10/2024", "Ottplay", "fun", "149.00", "Cash", "", "import_20241024074947_149", "Import"], ["20/10/2024", "Medicines", "groceries", "2308.00", "Credit Card", "", "import_20241020080058_2308", "Import"], ["19/10/2024", "", "fun", "1760.00", "Credit Card", "", "import_20241019191240_1760", "Import"], ["19/10/2024", "", "dining", "422.00", "Cash", "", "import_20241019191229_422", "Import"], ["19/10/2024", "", "groceries", "250.00", "Cash", "", "import_20241019184019_250", "Import"], ["19/10/2024", "", "groceries", "578.00", "Cash", "", "import_20241019184011_578", "Import"], ["19/10/2024", "Hair cut", "beauty", "300.00", "Bank Account", "", "import_20241019183919_300", "Import"], ["16/10/2024", "Amazon", "groceries", "501.00", "Credit Card", "", "import_20241016173600_501", "Import"], ["13/10/2024", "Sulabha & fruits", "groceries", "909.00", "Bank Account", "", "import_20241013175131_909", "Import"], ["11/10/2024", "Utsav rewards", "groceries", "240.00", "Bank Account", "", "import_20241011195609_240", "Import"], ["11/10/2024", "Medicines", "health", "266.00", "Bank Account", "", "import_20241011195559_266", "Import"], ["11/10/2024", "Petrol", "fuel", "4056.18", "Bank Account", "", "import_20241011084221_4056", "Import"], ["08/10/2024", "Amazon", "groceries", "349.00", "Bank Account", "", "import_20241008233010_349", "Import"], ["05/10/2024", "Car cleaning", "travel", "500.00", "Cash", "", "import_20241005084321_500", "Import"], ["05/10/2024", "Fruits", "dining", "150.00", "Cash", "", "import_20241005084305_150", "Import"], ["05/10/2024", "Belleza", "groceries", "1150.00", "Cash", "", "import_20241005084226_1150", "Import"], ["05/10/2024", "Biriyani", "dining", "999.00", "Bank Account", "", "import_20241005084126_999", "Import"], ["27/09/2024", "Flipkart shopping", "groceries", "14879.00", "Credit Card", "", "import_20240927001902_14879", "Import"], ["26/09/2024", "Amazon shopping", "groceries", "1680.00", "Credit Card", "", "import_20240926002021_1680", "Import"], ["22/09/2024", "Sarah education", "education", "75.00", "Cash", "", "import_20240922135502_75", "Import"], ["22/09/2024", "Mobile recharge", "groceries", "48.00", "Cash", "", "import_20240922135340_48", "Import"], ["20/09/2024", "Treesa dress", "groceries", "2750.00", "Cash", "", "import_20240920135204_2750", "Import"], ["19/09/2024", "Kids dress", "groceries", "2728.00", "Cash", "", "import_20240919135251_2728", "Import"], ["18/09/2024", "Story books", "education", "790.00", "Credit Card", "", "import_20240918171849_790", "Import"], ["18/09/2024", "Sulabha", "groceries", "780.00", "Cash", "", "import_20240918135315_780", "Import"], ["18/09/2024", "Amazon", "groceries", "1679.00", "Credit Card", "", "import_20240918121950_1679", "Import"], ["18/09/2024", "Dentist", "health", "500.00", "Bank Account", "", "import_20240918121841_500", "Import"], ["17/09/2024", "Duster", "fuel", "4302.00", "Credit Card", "", "import_20240917154814_4302", "Import"], ["17/09/2024", "Fruits", "groceries", "410.00", "Bank Account", "", "import_20240917154730_410", "Import"], ["17/09/2024", "Haircut Balleza", "groceries", "300.00", "Bank Account", "", "import_20240917154701_300", "Import"], ["17/09/2024", "", "dining", "240.00", "Bank Account", "", "import_20240917134817_240", "Import"], ["17/09/2024", "Duster alignment + puncture", "travel", "750.00", "Credit Card", "", "import_20240917123406_750", "Import"], ["17/09/2024", "Router adapter", "groceries", "320.00", "Bank Account", "", "import_20240917115131_320", "Import"], ["16/09/2024", "Fish chellanam", "groceries", "3470.00", "Cash", "", "import_20240916211036_3470", "Import"], ["15/09/2024", "", "fun", "187.00", "Cash", "", "import_20240915210909_187", "Import"], ["15/09/2024", "", "fun", "1400.00", "Cash", "", "import_20240915203804_1400", "Import"], ["15/09/2024", "Movie", "fun", "377.88", "Credit Card", "", "import_20240915203742_377", "Import"], ["15/09/2024", "Zomato", "dining", "429.08", "Credit Card", "", "import_20240915203723_429", "Import"], ["15/09/2024", "Mobile recharge", "groceries", "899.00", "Credit Card", "", "import_20240915124412_899", "Import"], ["14/09/2024", "Coffee", "dining", "171.00", "Bank Account", "", "import_20240914203600_171", "Import"], ["13/09/2024", "", "groceries", "980.00", "Bank Account", "", "import_20240913211002_980", "Import"], ["13/09/2024", "Fuel", "fuel", "3000.00", "Cash", "", "import_20240913210925_3000", "Import"], ["13/09/2024", "Shopping", "groceries", "10339.00", "Credit Card", "", "import_20240913203938_10339", "Import"], ["13/09/2024", "KoCo lunch", "dining", "1040.00", "Credit Card", "", "import_20240913203658_1040", "Import"], ["13/09/2024", "Decathlon", "groceries", "96.00", "Bank Account", "", "import_20240913203446_96", "Import"], ["08/09/2024", "Hycross", "fuel", "3000.72", "Credit Card", "", "import_20240908200406_3000", "Import"], ["04/09/2024", "Selsun shampoo", "health", "2243.00", "Credit Card", "", "import_20240904083803_2243", "Import"], ["03/09/2024", "", "dining", "182.00", "Bank Account", "", "import_20240903001327_182", "Import"], ["01/09/2024", "Johnny tkt date change", "travel", "1599.00", "Credit Card", "", "import_20240901144955_1599", "Import"], ["01/09/2024", "Lunch", "dining", "1445.00", "Credit Card", "", "import_20240901144917_1445", "Import"], ["01/09/2024", "Food", "dining", "718.00", "Credit Card", "", "import_20240901110017_718", "Import"], ["01/09/2024", "Meat", "groceries", "1680.00", "Bank Account", "", "import_20240901105938_1680", "Import"], ["31/08/2024", "Bus tickets", "travel", "30.00", "Cash", "", "import_20240831190931_30", "Import"], ["30/08/2024", "Jigartanda", "dining", "178.00", "Cash", "", "import_20240830180843_178", "Import"], ["30/08/2024", "Auto", "travel", "150.00", "Bank Account", "", "import_20240830180808_150", "Import"], ["30/08/2024", "Breakfast", "dining", "281.00", "Credit Card", "", "import_20240830112223_281", "Import"], ["29/08/2024", "Breakfast", "dining", "252.00", "Credit Card", "", "import_20240829112158_252", "Import"], ["29/08/2024", "Bus tkts", "travel", "85.00", "Bank Account", "", "import_20240829112040_85", "Import"], ["29/08/2024", "Sarah school fees", "education", "6050.00", "Bank Account", "", "import_20240829091824_6050", "Import"], ["28/08/2024", "Breakfast", "dining", "105.00", "Bank Account", "", "import_20240828080046_105", "Import"], ["28/08/2024", "Bus blr", "work", "35.00", "Bank Account", "", "import_20240828063605_35", "Import"], ["27/08/2024", "Dinner", "dining", "150.00", "Credit Card", "", "import_20240827213656_150", "Import"], ["27/08/2024", "Blr return tkts", "work", "1816.55", "Credit Card", "", "import_20240827213517_1816", "Import"], ["26/08/2024", "Bus tkts blr", "work", "1567.13", "Credit Card", "", "import_20240826233938_1567", "Import"], ["26/08/2024", "Blr stay", "work", "4280.13", "Credit Card", "", "import_20240826233847_4280", "Import"], ["25/08/2024", "Threads for Amma", "groceries", "277.00", "Credit Card", "", "import_20240825122827_277", "Import"], ["24/08/2024", "Food", "dining", "410.00", "Bank Account", "", "import_20240824122743_410", "Import"], ["19/08/2024", "Tax filing", "other", "1000.00", "Cash", "", "import_20240819165252_1000", "Import"], ["17/08/2024", "Hycross petrol", "fuel", "3994.00", "Credit Card", "", "import_20240817154027_3994", "Import"], ["17/08/2024", "Shopping Meraki", "groceries", "6490.00", "Credit Card", "", "import_20240817135923_6490", "Import"], ["16/08/2024", "Sarah bus fees", "education", "6510.00", "Bank Account", "", "import_20240816104503_6510", "Import"], ["15/08/2024", "Movie day", "dining", "1070.00", "Bank Account", "", "import_20240815140257_1070", "Import"], ["15/08/2024", "Petrol", "fuel", "1000.00", "Credit Card", "", "import_20240815071404_1000", "Import"], ["14/08/2024", "Movie nunakuzhi", "fun", "1120.00", "Credit Card", "", "import_20240814225902_1120", "Import"], ["14/08/2024", "Sarah PCM", "education", "150.00", "Bank Account", "", "import_20240814225803_150", "Import"], ["11/08/2024", "Mutholy", "dining", "762.00", "Bank Account", "", "import_20240811213551_762", "Import"], ["11/08/2024", "Diesel", "fuel", "2000.00", "Credit Card", "", "import_20240811213538_2000", "Import"], ["10/08/2024", "Family haircut", "beauty", "700.00", "Cash", "", "import_20240810142738_700", "Import"], ["10/08/2024", "Saturday outing", "dining", "1449.00", "Credit Card", "", "import_20240810141737_1449", "Import"], ["10/08/2024", "Treesa phone battery", "groceries", "3000.00", "Bank Account", "", "import_20240810141232_3000", "Import"], ["10/08/2024", "Debit card fees federal bank", "other", "319.00", "Bank Account", "", "import_20240810141134_319", "Import"], ["08/08/2024", "Sarah school wayanad help", "party", "500.00", "Cash", "", "import_20240808213510_500", "Import"], ["08/08/2024", "Sony LIV subscription", "fun", "499.00", "Credit Card", "", "import_20240808142301_499", "Import"], ["07/08/2024", "Sarah footwear", "apparel", "280.00", "Credit Card", "", "import_20240807142153_280", "Import"], ["07/08/2024", "Chellanam fist", "dining", "1050.00", "Cash", "", "import_20240807141907_1050", "Import"], ["07/08/2024", "Chellanam food", "dining", "2230.00", "Cash", "", "import_20240807141759_2230", "Import"], ["07/08/2024", "John air tkts", "travel", "17160.00", "Bank Account", "", "import_20240807141053_17160", "Import"], ["07/08/2024", "Medicine", "health", "206.00", "Bank Account", "", "import_20240807140852_206", "Import"], ["05/08/2024", "Kids shopping", "beauty", "300.00", "Bank Account", "", "import_20240805140737_300", "Import"], ["04/08/2024", "Sarah Sunday school", "groceries", "80.00", "Cash", "", "import_20240804213447_80", "Import"], ["04/08/2024", "Sarah drawing book amazon", "groceries", "189.00", "Credit Card", "", "import_20240804141514_189", "Import"], ["03/08/2024", "Swiggy", "dining", "628.00", "Credit Card", "", "import_20240803142233_628", "Import"], ["01/08/2024", "Printout", "other", "10.00", "Bank Account", "", "import_20240801140451_10", "Import"], ["28/12/2022", "", "fuel", "4009.41", "Cash", "", "import_20221228084642_4009", "Import"], ["20/12/2022", "", "charity", "3100.00", "Cash", "Gift", "import_20221220090811_3100", "Import"], ["18/12/2022", "", "education", "1000.00", "Cash", "Sarah Chavara application", "import_20221218211341_1000", "Import"], ["17/12/2022", "", "education", "500.00", "Cash", "Salon", "import_20221217193142_500", "Import"], ["17/12/2022", "", "dining", "1674.00", "Cash", "", "import_20221217193015_1674", "Import"], ["17/12/2022", "", "groceries", "582.00", "Cash", "", "import_20221217091934_582", "Import"], ["17/12/2022", "", "groceries", "310.00", "Cash", "", "import_20221217090743_310", "Import"], ["16/12/2022", "", "fuel", "3703.00", "Cash", "", "import_20221216222230_3703", "Import"], ["16/12/2022", "", "dining", "260.00", "Cash", "", "import_20221216173033_260", "Import"], ["16/12/2022", "", "health", "197.00", "Cash", "Medicine", "import_20221216173014_197", "Import"], ["14/12/2022", "", "groceries", "95.00", "Cash", "Eggs", "import_20221214151742_95", "Import"], ["14/12/2022", "", "dining", "924.00", "Cash", "Amma birthday cake", "import_20221214151717_924", "Import"], ["14/12/2022", "", "charity", "2000.00", "Cash", "Sarah nursery", "import_20221214151656_2000", "Import"], ["11/12/2022", "", "groceries", "9643.00", "Cash", "Sit stand table", "import_20221211191124_9643", "Import"], ["11/12/2022", "", "fun", "100.00", "Cash", "Turf", "import_20221211175918_100", "Import"], ["10/12/2022", "", "dining", "1330.00", "Cash", "", "import_20221210151100_1330", "Import"], ["10/12/2022", "", "groceries", "861.00", "Cash", "Diaper", "import_20221210151041_861", "Import"], ["10/12/2022", "", "charity", "100.00", "Cash", "", "import_20221210092552_100", "Import"], ["06/12/2022", "", "groceries", "5040.00", "Cash", "Clothes", "import_20221206131623_5040", "Import"], ["06/12/2022", "", "dining", "170.00", "Cash", "", "import_20221206123147_170", "Import"], ["06/12/2022", "", "health", "1395.00", "Cash", "Treesa lab tests", "import_20221206121942_1395", "Import"], ["06/12/2022", "", "groceries", "1999.00", "Cash", "T-shirt", "import_20221206121921_1999", "Import"], ["03/12/2022", "", "dining", "381.00", "Cash", "", "import_20221203125932_381", "Import"], ["03/12/2022", "", "groceries", "4100.00", "Cash", "Clothes", "import_20221203125859_4100", "Import"], ["01/12/2022", "", "fun", "149.00", "Cash", "Airtel xtreme", "import_20221201081906_149", "Import"], ["28/11/2022", "", "dining", "700.00", "Cash", "Ajfan", "import_20221128113652_700", "Import"], ["24/11/2022", "", "dining", "1000.00", "Cash", "", "import_20221124162815_1000", "Import"], ["24/11/2022", "", "groceries", "4442.00", "Cash", "Fuel", "import_20221124162706_4442", "Import"], ["13/11/2022", "", "other", "299.00", "Cash", "AirPods Pro case", "import_20221113225731_299", "Import"], ["13/11/2022", "", "apparel", "380.00", "Cash", "Jersey", "import_20221113142807_380", "Import"], ["12/11/2022", "", "dining", "468.00", "Cash", "", "import_20221112210655_468", "Import"], ["12/11/2022", "", "groceries", "1138.00", "Cash", "", "import_20221112210641_1138", "Import"], ["12/11/2022", "", "dining", "573.20", "Cash", "", "import_20221112210434_573", "Import"], ["10/11/2022", "", "dining", "48.00", "Cash", "", "import_20221110222750_48", "Import"], ["10/11/2022", "", "groceries", "200.00", "Cash", "Haircut", "import_20221110222657_200", "Import"], ["09/11/2022", "", "dining", "190.00", "Cash", "", "import_20221109172127_190", "Import"], ["09/11/2022", "", "health", "1580.00", "Cash", "Hair treatment", "import_20221109172034_1580", "Import"], ["06/11/2022", "", "groceries", "648.00", "Cash", "AirTag case", "import_20221106202406_648", "Import"], ["04/11/2022", "", "education", "500.00", "Cash", "Sarah fees", "import_20221104095621_500", "Import"]];
+let token = null;
+
+function doSignIn() {
+  const cid = document.getElementById('client-id').value.trim();
+  if (!cid || cid.length < 20) { alert('Paste your Client ID in Step 1 first.'); return; }
+  const btn = document.getElementById('btn-signin');
+  btn.disabled = true; btn.textContent = 'Opening sign-in…';
+  google.accounts.oauth2.initTokenClient({
+    client_id: cid,
+    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    callback: r => {
+      btn.disabled = false;
+      if (r.error) {
+        btn.innerHTML = '↺ Try again';
+        setStatus('signin-status', 'Error: ' + r.error, 'err');
+        return;
+      }
+      token = r.access_token;
+      btn.style.display = 'none';
+      setStatus('signin-status', '✅ Signed in — now paste your Sheet ID and click Import', 'ok');
+      document.getElementById('btn-import').disabled = false;
+    },
+  }).requestAccessToken({ prompt: 'select_account' });
+}
+
+async function startImport() {
+  const sid = document.getElementById('sheet-id').value.trim();
+  if (!sid || sid.length < 20) { alert('Paste a valid Sheet ID in Step 3.'); return; }
+  if (!token) { alert('Sign in first (Step 2).'); return; }
+
+  document.getElementById('btn-import').disabled = true;
+  document.getElementById('progress-wrap').style.display = '';
+  const logEl = document.getElementById('log');
+  logEl.style.display = '';
+  const log = (msg, cls) => {
+    logEl.innerHTML += `<span class="${cls||''}">${msg}</span>\n`;
+    logEl.scrollTop = logEl.scrollHeight;
+  };
+
+  // Ensure Expenses header
+  log('Checking Expenses header…', 'info');
+  try {
+    const h = await apiGet(sid, 'Expenses!A1:H1');
+    if (!h.values?.[0]?.[0] || h.values[0][0] !== 'Date') {
+      await apiPut(sid, 'Expenses!A1:H1', [['Date','Description','Category','Amount','PaidThrough','Note','ID','AddedBy']]);
+      log('Header row created.', 'ok');
+    } else {
+      log('Expenses header OK.', 'ok');
+    }
+  } catch(e) { log('Header error: ' + e.message, 'err'); document.getElementById('btn-import').disabled=false; return; }
+
+  // Batch import
+  const CHUNK = 50;
+  let done = 0, errs = 0;
+  log(`Importing ${ROWS.length} rows in batches of ${CHUNK}…`, 'info');
+  for (let i = 0; i < ROWS.length; i += CHUNK) {
+    const chunk = ROWS.slice(i, i + CHUNK);
+    try {
+      await apiAppend(sid, chunk);
+      done += chunk.length;
+      log(`Batch ${Math.floor(i/CHUNK)+1} (${chunk.length} rows) ✓`, 'ok');
+    } catch(e) {
+      errs += chunk.length;
+      log(`Batch ${Math.floor(i/CHUNK)+1} failed: ${e.message}`, 'err');
+    }
+    const pct = Math.round((i + chunk.length) / ROWS.length * 100);
+    document.getElementById('fill').style.width = Math.min(pct, 100) + '%';
+    document.getElementById('prog-label').textContent = `Row ${Math.min(i+CHUNK, ROWS.length)} / ${ROWS.length}`;
+    document.getElementById('prog-pct').textContent = pct + '%';
+    await sleep(300);
+  }
+
+  document.getElementById('fill').style.width = '100%';
+  document.getElementById('fill').style.background = errs === 0
+    ? 'linear-gradient(90deg,#5fc4b8,#4dd9a0)' : 'linear-gradient(90deg,#f0a830,#e07b5f)';
+  document.getElementById('prog-label').textContent = errs === 0 ? '✅ Complete!' : '⚠️ Done with errors';
+
+  const sumEl = document.getElementById('summary');
+  sumEl.style.display = '';
+  sumEl.innerHTML = errs === 0
+    ? `<h3>✅ Import complete!</h3>
+       <p><strong>${done} expenses</strong> written to your Google Sheet.<br/>
+       <a href="https://docs.google.com/spreadsheets/d/${sid}/edit" target="_blank">Open Sheet ↗</a>
+       — then refresh the Veettu Chilavu app to see all your data.</p>`
+    : `<h3>⚠️ Finished with errors</h3>
+       <p>${done} imported · <span style="color:var(--danger)">${errs} failed</span> — check the log above.</p>`;
+}
+
+// API helpers
+async function apiGet(id, range) {
+  const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(range)}`,
+    { headers:{ Authorization:'Bearer '+token } });
+  if (!r.ok) throw new Error(r.status + ': ' + await r.text());
+  return r.json();
+}
+async function apiPut(id, range, values) {
+  const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`,
+    { method:'PUT', headers:{ Authorization:'Bearer '+token,'Content-Type':'application/json' }, body:JSON.stringify({values}) });
+  if (!r.ok) throw new Error(r.status + ': ' + await r.text());
+  return r.json();
+}
+async function apiAppend(id, values) {
+  const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent('Expenses!A2:H')}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+    { method:'POST', headers:{ Authorization:'Bearer '+token,'Content-Type':'application/json' }, body:JSON.stringify({values}) });
+  if (!r.ok) throw new Error(r.status + ': ' + await r.text());
+  return r.json();
+}
+function setStatus(id, msg, cls) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.className = 'status ' + (cls||'');
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>
