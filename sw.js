@@ -14,16 +14,23 @@ const CORE_ASSETS = [
 ];
 
 // ── INSTALL: cache core assets ──────────────────────────
+// Uses Promise.allSettled so a missing file (e.g. icons not yet
+// uploaded) does NOT crash the entire SW install.
 self.addEventListener('install', event => {
-  console.log(`[SW] Installing ${CACHE_NAME}`);
+  console.log('[SW] Installing ' + CACHE_NAME);
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(CORE_ASSETS))
-      .then(() => {
-        // Force this SW to become active immediately
-        // instead of waiting for old tabs to close
-        self.skipWaiting();
-      })
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.allSettled(
+        CORE_ASSETS.map(url =>
+          cache.add(url).catch(err =>
+            console.warn('[SW] Skipping missing asset ' + url + ':', err.message)
+          )
+        )
+      )
+    ).then(() => {
+      console.log('[SW] Install complete');
+      self.skipWaiting();
+    })
   );
 });
 
