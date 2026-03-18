@@ -334,7 +334,7 @@
         Continue with Google
       </button>
       <!-- Hidden div Google renders its sign-in button into (required by GIS API) -->
-      <div id="g-signin-btn-div" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden;" aria-hidden="true"></div>
+      <div id="g-signin-btn-div" style="position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;width:200px;height:40px;overflow:hidden;" aria-hidden="true"></div>
     </div>
     <div class="setup-box" id="login-step-2" style="display:none">
       <h2>Connect your Sheet</h2>
@@ -707,32 +707,46 @@ function signInWithGoogle() {
     return;
   }
 
-  // ── Step 1: Use google.accounts.id to get user identity ──────────────────
-  // This gives us name/email/picture from a JWT — no userinfo API call needed.
+  // Restore cached user immediately so avatar/name show while token loads
+  try {
+    const cached = localStorage.getItem('fl_user');
+    if (cached) state.user = JSON.parse(cached);
+  } catch(_) {}
+
+  // Use google.accounts.id to get user identity via JWT.
+  // ux_mode:'popup' avoids the COOP postMessage warning on GitHub Pages.
+  // We do NOT call google.accounts.id.prompt() — that causes the
+  // "only one navigator.credentials.get at a time" FedCM error.
+  // Instead we let the rendered button handle the full flow.
   google.accounts.id.initialize({
     client_id: CONFIG.CLIENT_ID,
     callback: onIdentityReceived,
-    // auto_select tries One Tap silently if user has an active session
-    auto_select: true,
+    auto_select: false,    // no silent One Tap — avoids FedCM conflict
+    ux_mode: 'popup',      // explicit popup mode — suppresses COOP warning
+    cancel_on_tap_outside: false,
   });
 
-  // Show Google's account picker button rendered in a hidden div,
-  // then programmatically click it so the flow is triggered by our button.
-  // If One Tap auto_select fires, onIdentityReceived is called without a click.
+  // Render the Google button into the hidden div and immediately click it.
+  // This gives us Google's official sign-in flow triggered by our own button.
   const btnDiv = document.getElementById('g-signin-btn-div');
+  btnDiv.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:200px;height:40px;overflow:hidden;';
   google.accounts.id.renderButton(btnDiv, {
-    type: 'standard', theme: 'outline', size: 'large', text: 'signin_with',
+    type: 'standard',
+    theme: 'outline',
+    size: 'large',
+    width: 200,
   });
-  // Attempt One Tap prompt first — if the user has an active session this
-  // completes silently and onIdentityReceived is called.
-  google.accounts.id.prompt(notification => {
-    // If One Tap is not displayed (dismissed, not eligible, etc.)
-    // fall back to clicking the rendered button
-    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-      const renderedBtn = btnDiv.querySelector('[role="button"], button, div[tabindex]');
-      if (renderedBtn) renderedBtn.click();
+  // Small delay to let the button render before clicking
+  setTimeout(() => {
+    const btn = btnDiv.querySelector('[role="button"], button, div[tabindex="0"]');
+    if (btn) {
+      btn.click();
+    } else {
+      // Fallback: button not rendered yet — show toast and let user retry
+      console.warn('[Auth] Google sign-in button not ready, please try again');
+      showToast('Please try signing in again', '');
     }
-  });
+  }, 100);
 }
 
 // ── Step 1 callback: Google tells us who the user is ─────────────────────
