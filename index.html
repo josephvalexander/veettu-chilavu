@@ -64,18 +64,175 @@
       background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
       opacity:.5;
     }
-    #app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 0 90px;min-height:100vh;}
-    /* On desktop, show app as a centered phone-like panel */
-    @media(min-width:520px){
-      body{display:flex;flex-direction:column;align-items:center;background:var(--bg);}
-      body::after{content:'';position:fixed;inset:0;z-index:0;
-        background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(245,200,66,.04) 0%,transparent 70%);}
-      #app{box-shadow:0 0 0 1px var(--border),0 24px 80px rgba(0,0,0,.4);min-height:100vh;}
-      .bottom-nav{border-radius:0;}
-    }
+
+    /* ── MOBILE: single column, bottom nav ── */
+    #app{position:relative;z-index:1;width:100%;max-width:480px;margin:0 auto;padding:0 0 90px;min-height:100vh;}
     .screen{display:none;flex-direction:column;min-height:100vh;width:100%;}
     .tab-content{width:100%;display:block;}
     .screen.active{display:flex;}
+    /* screen-app is flex by default; desktop overrides to grid */
+    #screen-app.active{display:flex;flex-direction:column;}
+
+    /* ── DESKTOP: sidebar layout at ≥900px ── */
+    @media(min-width:900px){
+      body{display:grid;grid-template-columns:1fr;background:var(--bg);overflow-x:hidden;}
+
+      #app{
+        max-width:1200px;width:100%;margin:0 auto;
+        padding:0;
+        display:grid;
+        grid-template-rows:auto 1fr;
+        min-height:100vh;
+      }
+
+      /* Header spans full width */
+      .app-header{
+        grid-column:1/-1;
+        max-width:1200px;width:100%;
+        padding:.9rem 2rem .8rem;
+      }
+
+      /* Screen = sidebar + content side by side */
+      #screen-app{
+        display:grid !important;
+        grid-template-columns:220px 1fr;
+        grid-template-rows:auto 1fr;
+        min-height:calc(100vh - 57px);
+        align-items:start;
+      }
+
+      /* Header inside screen-app spans both columns */
+      #screen-app > .app-header{
+        grid-column:1/-1;
+        position:sticky;top:0;z-index:100;
+      }
+
+      /* Sidebar nav replaces bottom nav */
+      .bottom-nav{
+        position:sticky;top:57px;
+        left:0;
+        width:220px;height:calc(100vh - 57px);
+        transform:none;
+        flex-direction:column;
+        justify-content:flex-start;
+        padding:1.5rem 0;
+        gap:.25rem;
+        border-top:none;
+        border-right:1px solid var(--border);
+        backdrop-filter:none;
+        background:var(--surface);
+        align-self:start;
+      }
+      .nav-item{
+        flex-direction:row;justify-content:flex-start;
+        gap:.75rem;padding:.7rem 1.5rem;
+        font-size:.88rem;border-radius:0;
+        width:100%;
+      }
+      .nav-item svg{width:20px;height:20px;flex-shrink:0;}
+      .nav-item.active{
+        background:rgba(245,200,66,.1);
+        border-right:3px solid var(--accent);
+        color:var(--accent);
+      }
+      /* Sidebar logo area */
+      .sidebar-brand{
+        display:flex;align-items:center;gap:.75rem;
+        padding:.5rem 1.5rem 1.25rem;
+        border-bottom:1px solid var(--border);
+        margin-bottom:.5rem;
+      }
+      .sidebar-brand-logo{
+        font-family:'Manjari','Fraunces',Georgia,serif;
+        font-size:1.2rem;font-weight:700;color:var(--accent);
+      }
+      .sidebar-brand-logo span{color:var(--accent3);font-weight:300;}
+
+      /* Content area */
+      .tab-content{
+        padding:0;
+        min-height:calc(100vh - 57px);
+        overflow-y:auto;
+      }
+
+      /* Hide mobile header — desktop uses sidebar brand */
+      .app-header{ display:none; }
+
+      /* Dashboard two-column grid */
+      .dash-content{
+        padding:1.75rem 2rem;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        grid-template-rows:auto;
+        gap:1.25rem;
+        align-items:start;
+      }
+      /* Period nav — full width */
+      .dash-content > .period-nav{ grid-column:1/-1; }
+      /* Banner — full width */
+      .dash-content > .month-banner{ grid-column:1/-1; }
+      /* Stats row — full width */
+      .dash-content > .stat-row{ grid-column:1/-1; }
+      /* Category chart — left column */
+      .dash-content > div:nth-child(5){ grid-column:1; }
+      /* Recent transactions — right column */
+      .dash-content > div:nth-child(6){ grid-column:2; }
+
+      /* Banner bigger on desktop */
+      .banner-total{font-size:clamp(2rem,3vw,3rem);}
+      .stat-value{font-size:clamp(1.2rem,2vw,1.8rem);}
+
+      /* Add form — constrained width centered */
+      .add-content{
+        max-width:600px;margin:0 auto;
+        padding:2rem;
+      }
+      /* Add form two-col for desc+date */
+      .add-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+
+      /* History — wider content */
+      .history-content{padding:1.5rem 2rem 0;}
+      .filter-row{flex-wrap:wrap;overflow-x:visible;}
+
+      /* Settings — constrained width */
+      .settings-content{max-width:680px;margin:0 auto;padding:2rem;}
+
+      /* Modal — centered dialog on desktop instead of bottom sheet */
+      .modal-overlay{align-items:center;}
+      .modal-sheet{
+        border-radius:14px;border-top:none;
+        max-width:520px;width:90%;
+        max-height:80vh;
+        box-shadow:0 24px 80px rgba(0,0,0,.5);
+      }
+      .modal-handle{display:none;}
+
+      /* Toast — top right on desktop */
+      .toast{
+        bottom:auto;top:1.5rem;
+        left:auto;right:1.5rem;
+        transform:translateX(20px) translateY(0);
+      }
+      .toast.show{transform:translateX(0) translateY(0);}
+
+      /* Scrollbar nicer on desktop */
+      ::-webkit-scrollbar{width:6px;}
+    }
+
+    /* ── TABLET: narrow sidebar at 660–899px ── */
+    @media(min-width:660px) and (max-width:899px){
+      #app{max-width:100%;padding:0 0 80px;}
+      .dash-content{
+        padding:1.25rem 1.5rem;
+        display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+      }
+      .dash-content > .period-nav,
+      .dash-content > .month-banner,
+      .dash-content > .stat-row{ grid-column:1/-1; }
+      .history-content{padding:1rem 1.5rem 0;}
+      .settings-content{padding:1rem 1.5rem;}
+      .add-content{max-width:520px;margin:0 auto;padding:1.5rem;}
+    }
 
     /* ══════════════════════════════════════
        LOGIN
@@ -101,30 +258,47 @@
     .sheet-form input::placeholder{color:var(--muted);}
 
     /* ══════════════════════════════════════
-       HEADER
+       HEADER (mobile) / SIDEBAR (desktop)
     ══════════════════════════════════════ */
     .app-header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.25rem .8rem;background:var(--hdr-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:background .25s;}
     .header-logo{font-family:'Manjari','Fraunces',Georgia,serif;font-size:1.25rem;font-weight:700;color:var(--accent);letter-spacing:.01em;}
     .header-logo span{font-style:italic;font-weight:300;color:var(--accent3);}
     .header-right{display:flex;align-items:center;gap:.6rem;}
-    /* Theme toggle */
     .theme-toggle{width:34px;height:34px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
     .theme-toggle:hover{background:var(--border);}
     .avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);cursor:pointer;}
     .avatar-placeholder{width:34px;height:34px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;color:var(--accent);cursor:pointer;}
+    /* Sidebar brand — hidden on mobile, shown on desktop via media query */
+    .sidebar-brand{display:none;}
+    /* Sidebar footer — theme + avatar at bottom of sidebar */
+    .sidebar-footer{
+      display:none;
+      margin-top:auto;padding:1rem 1.25rem;
+      border-top:1px solid var(--border);
+      gap:.6rem;align-items:center;
+    }
+    .sidebar-theme{width:32px;height:32px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+    .sidebar-theme:hover{background:var(--border);}
+    @media(min-width:900px){
+      .sidebar-brand{display:flex;}
+      .sidebar-footer{display:flex;}
+    }
 
     /* ══════════════════════════════════════
-       BOTTOM NAV
+       BOTTOM NAV (mobile) / SIDEBAR (desktop)
     ══════════════════════════════════════ */
     .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--nav-bg);backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;padding:.5rem 0;z-index:100;transition:background .25s;}
     .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.4rem 0;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.7rem;transition:color .15s;}
     .nav-item.active{color:var(--accent);}
     .nav-item svg{width:22px;height:22px;}
+    /* Hide sidebar-only elements on mobile */
+    .bottom-nav .sidebar-brand,
+    .bottom-nav .sidebar-footer{display:none;}
 
     /* ══════════════════════════════════════
        DASHBOARD
     ══════════════════════════════════════ */
-    .dash-content{padding:1.1rem;display:flex;flex-direction:column;gap:1.1rem;}
+    .dash-content{padding:1.1rem;display:flex;flex-direction:column;gap:1.1rem;width:100%;}
 
     /* Period nav */
     .period-nav{display:flex;align-items:center;gap:.6rem;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:.55rem .7rem;}
@@ -167,7 +341,7 @@
     .pie-leg-amt{font-size:.74rem;font-weight:600;flex-shrink:0;min-width:64px;max-width:90px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
     /* Transactions */
-    .txn-list{display:flex;flex-direction:column;gap:.5rem;}
+    .txn-list{display:flex;flex-direction:column;gap:0;}
     .txn-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.68rem .85rem;display:flex;align-items:center;gap:.65rem;cursor:pointer;transition:background .15s;width:100%;min-width:0;overflow:hidden;}
     .txn-card:hover{background:var(--surface);}
     .txn-emoji{font-size:1.2rem;width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--surface);border-radius:8px;flex-shrink:0;}
@@ -178,6 +352,84 @@
     .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--muted);}
     .empty-state .icon{font-size:2.5rem;margin-bottom:.6rem;}
     .empty-state p{font-size:.88rem;line-height:1.6;}
+
+    /* ── TRANSACTION WRAP — unified desktop + mobile actions ── */
+    .txn-wrap{position:relative;border-radius:8px;margin-bottom:.55rem;}
+
+    /* Desktop: inline icon buttons appear on hover, hidden by default */
+    .txn-inline-actions{
+      display:flex;gap:.3rem;align-items:center;
+      flex-shrink:0;padding-left:.4rem;
+      opacity:0;pointer-events:none;
+      transition:opacity .15s;
+    }
+    .txn-wrap:hover .txn-inline-actions,
+    .txn-wrap:focus-within .txn-inline-actions{
+      opacity:1;pointer-events:auto;
+    }
+    .txn-icon-btn{
+      width:30px;height:30px;border-radius:6px;border:1px solid var(--border);
+      background:var(--surface);color:var(--muted);
+      display:flex;align-items:center;justify-content:center;
+      font-size:.88rem;cursor:pointer;
+      transition:background .12s,color .12s,border-color .12s;
+      flex-shrink:0;
+    }
+    .txn-icon-btn:hover{background:var(--card);}
+    .txn-icon-btn.edit-btn:hover{color:var(--accent3);border-color:var(--accent3);}
+    .txn-icon-btn.delete-btn:hover{color:var(--danger);border-color:var(--danger);}
+
+    /* Mobile: swipe-to-reveal hidden panel */
+    .txn-actions{
+      position:absolute;right:0;top:0;bottom:0;
+      display:flex;align-items:stretch;
+      transform:translateX(100%);
+      transition:transform .22s cubic-bezier(.4,0,.2,1);
+      z-index:3;border-radius:0 8px 8px 0;overflow:hidden;
+    }
+    .txn-wrap.revealed .txn-actions{transform:translateX(0);}
+    .txn-action-btn{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:.2rem;min-width:64px;border:none;cursor:pointer;
+      font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;
+      transition:filter .12s;
+    }
+    .txn-action-btn:hover{filter:brightness(1.12);}
+    .txn-action-btn .act-icon{font-size:1.15rem;}
+    .btn-edit-action {background:var(--accent3);color:#fff;}
+    .btn-delete-action{background:var(--danger);color:#fff;}
+    .txn-wrap .txn-card{
+      overflow:hidden;margin-bottom:0;border-radius:8px;
+      transition:transform .22s cubic-bezier(.4,0,.2,1);
+      position:relative;z-index:2;
+    }
+    .txn-wrap.revealed .txn-card{transform:translateX(-128px);}
+
+    /* On touch devices, hide inline hover buttons (they'd never show anyway)
+       and rely purely on the swipe panel */
+    @media(hover:none){
+      .txn-inline-actions{display:none !important;}
+    }
+    /* On pointer devices, the swipe panel is still available but less needed */
+    @media(hover:hover){
+      /* Keep swipe panel available but make card not slide on hover — only on swipe */
+      .txn-wrap:not(.revealed) .txn-card{transform:none;}
+    }
+
+    /* ── EDIT MODE banner on Add tab ── */
+    .edit-mode-banner{
+      display:none;align-items:center;justify-content:space-between;
+      gap:.5rem;padding:.65rem 1rem;
+      background:rgba(245,200,66,.12);border:1px solid var(--accent);
+      border-radius:8px;margin-bottom:.25rem;
+    }
+    .edit-mode-banner.visible{display:flex;}
+    .edit-mode-label{font-size:.82rem;font-weight:600;color:var(--accent);}
+    .edit-cancel-btn{
+      background:none;border:1px solid var(--border);border-radius:6px;
+      padding:.3rem .7rem;font-size:.78rem;color:var(--muted);cursor:pointer;
+      font-family:'DM Sans',sans-serif;
+    }
 
     /* ══════════════════════════════════════
        ADD EXPENSE
@@ -221,12 +473,18 @@
     .btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border);}
     .btn-danger{background:rgba(224,123,95,.13);color:var(--danger);border:1px solid rgba(224,123,95,.3);}
     .btn-sm{padding:.55rem 1rem;font-size:.82rem;}
+    /* Two-col form layout — single col on mobile, two col on desktop */
+    .add-two-col{display:flex;flex-direction:column;gap:.9rem;}
+    @media(min-width:660px){
+      .add-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start;}
+      .add-two-col > .form-group[style*="grid-column"]{grid-column:1/-1;}
+    }
     .btn-full{width:100%;}
 
     /* ══════════════════════════════════════
        HISTORY
     ══════════════════════════════════════ */
-    .history-content{padding:.9rem .9rem 0;}
+    .history-content{padding:.9rem .9rem 0;min-height:60vh;}
     .filter-row{display:flex;gap:.4rem;margin-bottom:.9rem;overflow-x:auto;padding-bottom:.35rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
     .filter-row::-webkit-scrollbar{display:none;}
     .filter-chip{flex-shrink:0;padding:.36rem .68rem;background:var(--card);border:1px solid var(--border);border-radius:999px;font-size:.77rem;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;}
@@ -395,6 +653,11 @@
     <!-- ADD -->
     <div id="tab-add" class="tab-content" style="display:none">
       <div class="add-content">
+        <!-- Edit mode indicator -->
+        <div class="edit-mode-banner" id="edit-mode-banner">
+          <span class="edit-mode-label">✏️ Editing Expense</span>
+          <button class="edit-cancel-btn" onclick="cancelEdit()">Cancel</button>
+        </div>
         <div class="amount-display">
           <div class="form-label" style="margin-bottom:.45rem">Amount</div>
           <div class="amount-input-row">
@@ -402,26 +665,31 @@
             <input type="number" id="amount-input" class="amount-input" placeholder="0.00" step="0.01" min="0" inputmode="decimal" aria-label="Expense amount"/>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="desc-input">Description</label>
-          <input type="text" id="desc-input" class="form-input" placeholder="What was this for?"/>
+        <!-- Two-column layout on desktop: description+date side by side -->
+        <div class="add-two-col">
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label" for="desc-input">Description</label>
+            <input type="text" id="desc-input" class="form-input" placeholder="What was this for?"/>
+          </div>
         </div>
         <div class="form-group">
           <div class="form-label">Category</div>
           <div class="category-grid" id="cat-grid" role="group" aria-label="Category"></div>
         </div>
-        <!-- PAID THROUGH — replaces "Paid by" text input -->
-        <div class="form-group">
-          <div class="form-label">Paid Through</div>
-          <div class="pay-grid" id="pay-grid">
-            <button class="pay-chip selected" data-pay="Credit Card" onclick="selectPayment(this)"><span class="chip-icon">💳</span>Credit Card</button>
-            <button class="pay-chip" data-pay="Bank Account" onclick="selectPayment(this)"><span class="chip-icon">🏦</span>Bank Account</button>
-            <button class="pay-chip" data-pay="Cash" onclick="selectPayment(this)"><span class="chip-icon">💵</span>Cash</button>
+        <!-- Two-col row: Paid Through + Date -->
+        <div class="add-two-col">
+          <div class="form-group">
+            <div class="form-label">Paid Through</div>
+            <div class="pay-grid" id="pay-grid" style="grid-template-columns:1fr 1fr 1fr">
+              <button class="pay-chip selected" data-pay="Credit Card" onclick="selectPayment(this)"><span class="chip-icon">💳</span>Credit Card</button>
+              <button class="pay-chip" data-pay="Bank Account" onclick="selectPayment(this)"><span class="chip-icon">🏦</span>Bank Account</button>
+              <button class="pay-chip" data-pay="Cash" onclick="selectPayment(this)"><span class="chip-icon">💵</span>Cash</button>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="date-input">Date (dd/mm/yyyy)</label>
-          <input type="date" id="date-input" class="form-input"/>
+          <div class="form-group">
+            <label class="form-label" for="date-input">Date (dd/mm/yyyy)</label>
+            <input type="date" id="date-input" class="form-input"/>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label" for="note-input">Note <span style="color:var(--muted)">(optional)</span></label>
@@ -504,15 +772,20 @@
       </div>
     </div>
 
-    <!-- NAV -->
+    <!-- NAV (mobile: bottom bar / desktop: left sidebar) -->
     <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+      <!-- Sidebar brand — visible only on desktop via CSS -->
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-logo" lang="ml">വീട്ടു <span>ചിലവ്</span></div>
+      </div>
+
       <button class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')" aria-label="Dashboard">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Dashboard
       </button>
       <button class="nav-item" id="nav-add" onclick="switchTab('add')" aria-label="Add expense">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        Add
+        Add Expense
       </button>
       <button class="nav-item" id="nav-history" onclick="switchTab('history')" aria-label="History">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
@@ -522,6 +795,12 @@
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
         Settings
       </button>
+
+      <!-- Sidebar footer — theme toggle + user avatar on desktop -->
+      <div class="sidebar-footer">
+        <button class="theme-toggle sidebar-theme" id="sidebar-theme-btn" onclick="cycleTheme()" title="Toggle theme">🌙</button>
+        <div id="sidebar-avatar-wrap"></div>
+      </div>
     </nav>
   </div>
 </div>
@@ -629,9 +908,14 @@ function applyTheme(theme) {
   state.theme = theme;
   document.documentElement.setAttribute('data-theme', theme);
   document.getElementById('theme-color-meta').content = theme === 'dark' ? '#0f0f1a' : '#f4f3ef';
-  document.getElementById('theme-toggle-btn').textContent = theme === 'dark' ? '🌙' : '☀️';
+  const icon = theme === 'dark' ? '🌙' : '☀️';
+  // Sync all theme toggle buttons (mobile header + desktop sidebar)
+  ['theme-toggle-btn','sidebar-theme-btn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = icon;
+  });
   localStorage.setItem('fl_theme', theme);
-  // Sync settings buttons if visible
+  // Sync settings page toggle buttons
   const od = document.getElementById('theme-opt-dark');
   const ol = document.getElementById('theme-opt-light');
   if (od) { od.classList.toggle('active', theme === 'dark'); ol.classList.toggle('active', theme === 'light'); }
@@ -1041,6 +1325,8 @@ function switchTab(tab) {
   if (tab==='dashboard') renderDashboard();
   if (tab==='history')   renderHistory();
   if (tab==='settings')  { syncThemeButtons(); updateCatCount(); }
+  // If user taps Add tab manually (not via editExpense), clear any edit state
+  if (tab==='add' && !state.editingId) resetAddForm();
 }
 function syncThemeButtons() {
   const od=document.getElementById('theme-opt-dark');
@@ -1175,21 +1461,109 @@ function renderDashboard() {
 // ════════════════════════════════════════════
 //  TRANSACTION CARD
 // ════════════════════════════════════════════
+// Currently open swipe-reveal wrapper
+let _openWrap = null;
+
 function txnCard(e) {
-  const cat=CATEGORIES.find(c=>c.id===e.category)||{emoji:'📦'};
-  const payIco = e.paidThrough==='Credit Card'?'💳':e.paidThrough==='Bank Account'?'🏦':'💵';
-  // date: stored as ISO internally; display as dd/mm/yyyy
-  const dispDate = e.date ? isoToDdMmYyyy(e.date) : (e.displayDate||'');
+  const cat     = CATEGORIES.find(c=>c.id===e.category)||{emoji:'📦'};
+  const payIco  = e.paidThrough==='Credit Card'?'💳':e.paidThrough==='Bank Account'?'🏦':'💵';
+  const dispDate= e.date ? isoToDdMmYyyy(e.date) : (e.displayDate||'');
+  const eid     = esc(e.id);
   return `
-    <div class="txn-card" tabindex="0" role="button" aria-label="${esc(e.description)}, ${fmt(e.amount)}">
-      <div class="txn-emoji">${cat.emoji}</div>
-      <div class="txn-info">
-        <div class="txn-desc">${esc(e.description)}</div>
-        <div class="txn-meta">${dispDate} · ${payIco} ${esc(e.paidThrough||'')}${e.note?' · '+esc(e.note):''}</div>
+    <div class="txn-wrap" id="wrap-${eid}"
+      ontouchstart="onTxnTouchStart(event,'${eid}')"
+      ontouchend="onTxnTouchEnd(event,'${eid}')">
+
+      <!-- Mobile: slide-in panel (swipe left) -->
+      <div class="txn-actions" aria-hidden="true">
+        <button class="txn-action-btn btn-edit-action"
+          onclick="editExpense('${eid}')" tabindex="-1">
+          <span class="act-icon">✏️</span>Edit
+        </button>
+        <button class="txn-action-btn btn-delete-action"
+          onclick="confirmDelete('${eid}')" tabindex="-1">
+          <span class="act-icon">🗑️</span>Delete
+        </button>
       </div>
-      <div class="txn-amount">${fmt(e.amount)}</div>
+
+      <!-- Card row — inline actions appear on hover (desktop) -->
+      <div class="txn-card" tabindex="0" role="listitem"
+        aria-label="${esc(e.description)}, ${fmt(e.amount)}"
+        onclick="onTxnCardClick('${eid}')"
+        onkeydown="onTxnKeyDown(event,'${eid}')">
+        <div class="txn-emoji">${cat.emoji}</div>
+        <div class="txn-info">
+          <div class="txn-desc">${esc(e.description)}</div>
+          <div class="txn-meta">${dispDate} · ${payIco} ${esc(e.paidThrough||'')}${e.note?' · '+esc(e.note):''}</div>
+        </div>
+        <div class="txn-amount">${fmt(e.amount)}</div>
+        <!-- Desktop: hover action buttons inside the card -->
+        <div class="txn-inline-actions" onclick="event.stopPropagation()">
+          <button class="txn-icon-btn edit-btn"
+            onclick="editExpense('${eid}')"
+            title="Edit expense"
+            aria-label="Edit ${esc(e.description)}">✏️</button>
+          <button class="txn-icon-btn delete-btn"
+            onclick="confirmDelete('${eid}')"
+            title="Delete expense"
+            aria-label="Delete ${esc(e.description)}">🗑️</button>
+        </div>
+      </div>
     </div>`;
 }
+
+// ── Touch swipe detection (mobile) ──────────────────────────────────────
+let _touchStartX = 0, _touchStartY = 0;
+function onTxnTouchStart(e, id) {
+  _touchStartX = e.touches[0].clientX;
+  _touchStartY = e.touches[0].clientY;
+}
+function onTxnTouchEnd(e, id) {
+  const dx = e.changedTouches[0].clientX - _touchStartX;
+  const dy = e.changedTouches[0].clientY - _touchStartY;
+  // Ignore vertical scrolls — only act on horizontal swipes
+  if (Math.abs(dy) > Math.abs(dx)) return;
+  const wrap = document.getElementById('wrap-'+id);
+  if (!wrap) return;
+  if (dx < -40)      revealActions(wrap);   // swipe left  → reveal
+  else if (dx > 20)  hideActions(wrap);     // swipe right → hide
+}
+
+// ── Card click / keyboard ────────────────────────────────────────────────
+function onTxnCardClick(id) {
+  const wrap = document.getElementById('wrap-'+id);
+  if (!wrap) return;
+  // On mobile (touch device), clicking a revealed card dismisses the actions
+  if (wrap.classList.contains('revealed')) hideActions(wrap);
+}
+function onTxnKeyDown(event, id) {
+  switch(event.key) {
+    case 'e': case 'E':
+      event.preventDefault();
+      editExpense(id); break;
+    case 'Delete': case 'Backspace':
+      event.preventDefault();
+      confirmDelete(id); break;
+    case 'Escape':
+      hideActions(document.getElementById('wrap-'+id)); break;
+  }
+}
+
+// ── Reveal / hide ────────────────────────────────────────────────────────
+function revealActions(wrap) {
+  if (_openWrap && _openWrap !== wrap) hideActions(_openWrap);
+  wrap.classList.add('revealed');
+  _openWrap = wrap;
+}
+function hideActions(wrap) {
+  if (!wrap) return;
+  wrap.classList.remove('revealed');
+  if (_openWrap === wrap) _openWrap = null;
+}
+// Close open swipe panel when clicking/tapping elsewhere
+document.addEventListener('click', e => {
+  if (_openWrap && !_openWrap.contains(e.target)) hideActions(_openWrap);
+});
 
 // ════════════════════════════════════════════
 //  HISTORY
@@ -1266,15 +1640,30 @@ function selectPayment(el) {
 // ════════════════════════════════════════════
 function renderSettingsUser() {
   const u=state.user; if(!u) return;
+
+  // Settings page user card
   document.getElementById('settings-user-card').innerHTML=`
     <div class="user-card">
       ${u.picture?`<img src="${u.picture}" class="user-avatar" alt="Profile"/>`:`<div class="avatar-placeholder" style="width:50px;height:50px;font-size:1rem">${(u.given_name||u.name||'?')[0].toUpperCase()}</div>`}
-      <div><div class="user-name">${esc(u.name||'')}</div><div class="user-email">${esc(u.email||'')}</div></div>
+      <div>
+        <div class="user-name">${esc(u.name||'')}</div>
+        <div class="user-email">${esc(u.email||'')}</div>
+      </div>
     </div>`;
-  const wrap=document.getElementById('user-avatar-wrap');
-  wrap.innerHTML=u.picture
-    ?`<img src="${u.picture}" class="avatar" alt="Profile" onclick="switchTab('settings')"/>`
-    :`<div class="avatar-placeholder" onclick="switchTab('settings')">${(u.given_name||u.name||'?')[0].toUpperCase()}</div>`;
+
+  // Avatar HTML reused in both mobile header and desktop sidebar
+  const avatarHtml = u.picture
+    ? `<img src="${u.picture}" class="avatar" alt="${esc(u.name||'Profile')}" onclick="switchTab('settings')" title="${esc(u.name||'')}"/>`
+    : `<div class="avatar-placeholder" onclick="switchTab('settings')" title="${esc(u.name||'')}">${(u.given_name||u.name||'?')[0].toUpperCase()}</div>`;
+
+  // Mobile header avatar
+  const mobileWrap = document.getElementById('user-avatar-wrap');
+  if (mobileWrap) mobileWrap.innerHTML = avatarHtml;
+
+  // Desktop sidebar avatar
+  const sidebarWrap = document.getElementById('sidebar-avatar-wrap');
+  if (sidebarWrap) sidebarWrap.innerHTML = avatarHtml;
+
   updateCatCount();
 }
 
@@ -1357,9 +1746,8 @@ function showSheetModal() {
 }
 function changeSheet() {
   // Clear localStorage so the manual entry screen appears
-  // Note: the build-time injected ID will re-apply on next hard reload,
-  // so this is mainly useful for admins testing a different sheet locally.
   state.sheetId=''; localStorage.removeItem('fl_sheet_id');
+  _expensesSheetId = null; // reset cached sheet ID
   closeModal(); showScreen('login');
   document.getElementById('login-step-1').style.display='none';
   document.getElementById('login-step-2').style.display='block';
@@ -1374,37 +1762,237 @@ function refreshData(){showToast('Refreshing…');loadExpenses();}
 //  SAVE EXPENSE
 // ════════════════════════════════════════════
 async function saveExpense() {
-  const amount=parseFloat(document.getElementById('amount-input').value);
-  const desc=document.getElementById('desc-input').value.trim();
-  const isoDate=document.getElementById('date-input').value;   // YYYY-MM-DD from input
-  const note=document.getElementById('note-input').value.trim();
-  const payThrough=state.selectedPayment;
+  const amount    = parseFloat(document.getElementById('amount-input').value);
+  const desc      = document.getElementById('desc-input').value.trim();
+  const isoDate   = document.getElementById('date-input').value;
+  const note      = document.getElementById('note-input').value.trim();
+  const payThrough= state.selectedPayment;
 
-  if (!amount||amount<=0){showToast('Enter a valid amount','error');return;}
-  if (!desc){showToast('Add a description','error');return;}
-  if (!isoDate){showToast('Pick a date','error');return;}
+  if (!amount || amount <= 0) { showToast('Enter a valid amount', 'error'); return; }
+  if (!desc)   { showToast('Add a description', 'error'); return; }
+  if (!isoDate){ showToast('Pick a date', 'error'); return; }
 
-  // Convert to dd/mm/yyyy for storage in Sheet
-  const ddmmyyyy=isoToDdMmYyyy(isoDate);
-  const id='fl_'+Date.now();
-  const addedBy=state.user?(state.user.given_name||state.user.name||''):'';
+  const ddmmyyyy = isoToDdMmYyyy(isoDate);
+  const addedBy  = state.user ? (state.user.given_name || state.user.name || '') : '';
+  const btn      = document.getElementById('btn-save-expense');
 
-  const expense={date:isoDate,displayDate:ddmmyyyy,description:desc,category:state.selectedCategory,amount,paidThrough:payThrough,note,id,addedBy};
-  const btn=document.getElementById('btn-save-expense');
-  btn.disabled=true; btn.textContent='Saving…';
+  // ── EDIT MODE ────────────────────────────────────────────────
+  if (state.editingId) {
+    const editId = state.editingId;
+    const existing = state.expenses.find(e => e.id === editId);
+    if (!existing) { showToast('Expense not found', 'error'); return; }
+
+    btn.disabled = true; btn.textContent = 'Updating…';
+    try {
+      if (state.token !== 'DEMO') {
+        const rowIdx = await findSheetRowById(editId);
+        if (rowIdx === -1) throw new Error('Row not found in sheet');
+        await sheetsUpdateRow(rowIdx, [ddmmyyyy, desc, state.selectedCategory, amount.toFixed(2), payThrough, note, editId, existing.addedBy || addedBy]);
+      }
+      // Update local state
+      Object.assign(existing, {
+        date: isoDate, displayDate: ddmmyyyy, description: desc,
+        category: state.selectedCategory, amount, paidThrough: payThrough, note,
+      });
+      showToast('✦ Updated ' + fmt(amount), 'success');
+      resetAddForm();
+      renderAll();
+      setTimeout(() => switchTab('history'), 400);
+    } catch(e) {
+      showToast('Update failed: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = '✦ Update Expense';
+    }
+    return;
+  }
+
+  // ── ADD MODE ─────────────────────────────────────────────────
+  const id      = 'fl_' + Date.now();
+  const expense = { date:isoDate, displayDate:ddmmyyyy, description:desc,
+                    category:state.selectedCategory, amount, paidThrough:payThrough,
+                    note, id, addedBy };
+  btn.disabled = true; btn.textContent = 'Saving…';
   try {
-    // Store date as dd/mm/yyyy in the Google Sheet
-    await sheetsAppend([[ddmmyyyy,desc,state.selectedCategory,amount.toFixed(2),payThrough,note,id,addedBy]]);
+    await sheetsAppend([[ddmmyyyy, desc, state.selectedCategory, amount.toFixed(2), payThrough, note, id, addedBy]]);
     state.expenses.unshift(expense);
-    document.getElementById('amount-input').value='';
-    document.getElementById('desc-input').value='';
-    document.getElementById('note-input').value='';
-    document.getElementById('date-input').value=todayIso();
-    showToast('✦ Saved '+fmt(amount),'success');
+    resetAddForm();
+    showToast('✦ Saved ' + fmt(amount), 'success');
     renderAll();
-    setTimeout(()=>switchTab('dashboard'),550);
-  } catch(e){showToast('Save failed: '+e.message,'error');}
-  finally{btn.disabled=false;btn.textContent='✦ Add Expense';}
+    setTimeout(() => switchTab('dashboard'), 550);
+  } catch(e) {
+    showToast('Save failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '✦ Add Expense';
+  }
+}
+
+// ════════════════════════════════════════════
+//  EDIT & DELETE
+// ════════════════════════════════════════════
+
+// Holds the id of the expense being edited (null = add mode)
+state.editingId = null;
+
+function editExpense(id) {
+  const e = state.expenses.find(x => x.id === id);
+  if (!e) return;
+  hideActions(document.getElementById('wrap-'+id));
+
+  // Mark edit mode
+  state.editingId = id;
+
+  // Populate the Add form with this expense's data
+  document.getElementById('amount-input').value  = e.amount.toFixed(2);
+  document.getElementById('desc-input').value    = e.description;
+  document.getElementById('date-input').value    = e.date; // ISO for the input
+  document.getElementById('note-input').value    = e.note || '';
+
+  // Select category
+  selectCategory(e.category);
+  buildCategoryGrid(); // re-render so selected chip is highlighted
+
+  // Select payment method
+  state.selectedPayment = e.paidThrough || 'Credit Card';
+  document.querySelectorAll('.pay-chip').forEach(c => {
+    c.classList.toggle('selected', c.dataset.pay === state.selectedPayment);
+  });
+
+  // Show edit banner & update button label
+  document.getElementById('edit-mode-banner').classList.add('visible');
+  const btn = document.getElementById('btn-save-expense');
+  btn.textContent = '✦ Update Expense';
+
+  // Switch to Add tab
+  switchTab('add');
+}
+
+function cancelEdit() {
+  state.editingId = null;
+  resetAddForm();
+}
+
+function resetAddForm() {
+  state.editingId = null;
+  document.getElementById('amount-input').value = '';
+  document.getElementById('desc-input').value   = '';
+  document.getElementById('note-input').value   = '';
+  document.getElementById('date-input').value   = todayIso();
+  document.getElementById('edit-mode-banner').classList.remove('visible');
+  document.getElementById('btn-save-expense').textContent = '✦ Add Expense';
+  // Reset to default category and payment
+  selectCategory(CATEGORIES[0]?.id || 'other');
+  buildCategoryGrid();
+  state.selectedPayment = 'Credit Card';
+  document.querySelectorAll('.pay-chip').forEach(c => {
+    c.classList.toggle('selected', c.dataset.pay === 'Credit Card');
+  });
+}
+
+function confirmDelete(id) {
+  const e = state.expenses.find(x => x.id === id);
+  if (!e) return;
+  hideActions(document.getElementById('wrap-'+id));
+  showModal(`
+    <div class="modal-title">Delete Expense?</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem;margin-bottom:1.1rem;">
+      <div style="font-weight:600;font-size:.92rem;margin-bottom:.25rem">${esc(e.description)}</div>
+      <div style="font-size:.8rem;color:var(--muted)">${isoToDdMmYyyy(e.date)} · ${fmt(e.amount)}</div>
+    </div>
+    <p style="font-size:.84rem;color:var(--muted);margin-bottom:1.1rem;line-height:1.55">
+      This will permanently remove the expense from your Google Sheet. This cannot be undone.
+    </p>
+    <div style="display:flex;gap:.6rem">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" style="flex:1" id="btn-confirm-delete"
+        onclick="deleteExpense('${esc(id)}')">🗑️ Delete</button>
+    </div>`);
+}
+
+async function deleteExpense(id) {
+  const btn = document.getElementById('btn-confirm-delete');
+  if (btn) { btn.disabled = true; btn.textContent = 'Deleting…'; }
+
+  try {
+    if (state.token !== 'DEMO') {
+      // Find the 1-based row index in the sheet (header is row 1, data starts row 2)
+      const rowIdx = await findSheetRowById(id);
+      if (rowIdx === -1) throw new Error('Row not found in sheet');
+      await sheetsDeleteRow(rowIdx);
+    }
+    // Remove from local state
+    state.expenses = state.expenses.filter(e => e.id !== id);
+    closeModal();
+    showToast('Expense deleted', 'success');
+    renderAll();
+  } catch(err) {
+    console.error('[Delete]', err);
+    showToast('Delete failed: ' + err.message, 'error');
+    if (btn) { btn.disabled = false; btn.textContent = '🗑️ Delete'; }
+  }
+}
+
+// Find the sheet row number (1-based) for a given expense ID
+async function findSheetRowById(id) {
+  const data = await sheetsGet(CONFIG.SHEET_RANGE_DATA);
+  const rows = data.values || [];
+  // ID is column G (index 6)
+  const idx = rows.findIndex(row => row[6] === id);
+  if (idx === -1) return -1;
+  return idx + 2; // +1 for header row, +1 for 0-based to 1-based
+}
+
+// Delete a row from the sheet using batchUpdate (deleteRange request)
+async function sheetsDeleteRow(rowIndex) {
+  if (state.token === 'DEMO') return;
+  // We need the sheet's internal sheetId (not the spreadsheet ID)
+  // First, get it from the spreadsheet metadata
+  const sheetId = await getExpensesSheetId();
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}:batchUpdate`;
+  const body = {
+    requests: [{
+      deleteDimension: {
+        range: {
+          sheetId: sheetId,
+          dimension: 'ROWS',
+          startIndex: rowIndex - 1,  // 0-based
+          endIndex: rowIndex,         // exclusive
+        }
+      }
+    }]
+  };
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + state.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) throw new Error('Delete API ' + r.status + ': ' + await r.text());
+}
+
+// Cache the Expenses sheet's internal numeric sheetId
+let _expensesSheetId = null;
+async function getExpensesSheetId() {
+  if (_expensesSheetId !== null) return _expensesSheetId;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}?fields=sheets.properties`;
+  const r = await fetch(url, { headers: { Authorization: 'Bearer ' + state.token } });
+  if (!r.ok) throw new Error('Metadata API ' + r.status);
+  const data = await r.json();
+  const sheet = data.sheets?.find(s => s.properties?.title === 'Expenses');
+  if (!sheet) throw new Error('Expenses sheet tab not found');
+  _expensesSheetId = sheet.properties.sheetId;
+  return _expensesSheetId;
+}
+
+// Update a row in the sheet (for edit)
+async function sheetsUpdateRow(rowIndex, values) {
+  if (state.token === 'DEMO') return;
+  const range = `Expenses!A${rowIndex}:I${rowIndex}`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`;
+  const r = await fetch(url, {
+    method: 'PUT',
+    headers: { Authorization: 'Bearer ' + state.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [values] }),
+  });
+  if (!r.ok) throw new Error('Update API ' + r.status + ': ' + await r.text());
 }
 
 // ════════════════════════════════════════════
