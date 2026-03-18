@@ -872,24 +872,139 @@ const CONFIG = {
 const DEFAULT_CATS = [
   { id:'groceries', label:'Groceries', emoji:'🛒', color:'#5fc4b8' },
   { id:'dining',    label:'Dining',    emoji:'🍽️', color:'#f5c842' },
-  { id:'transport', label:'Transport', emoji:'🚗', color:'#e07b5f' },
+  { id:'travel',    label:'Travel',    emoji:'✈️', color:'#e07b5f' },
   { id:'utilities', label:'Utilities', emoji:'⚡', color:'#9b5fe0' },
   { id:'health',    label:'Health',    emoji:'💊', color:'#5fc48b' },
   { id:'education', label:'Education', emoji:'📚', color:'#5b9be0' },
   { id:'fun',       label:'Fun',       emoji:'🎉', color:'#e05b8b' },
+  { id:'fuel',      label:'Fuel',      emoji:'⛽', color:'#f0a830' },
+  { id:'apparel',   label:'Apparel',   emoji:'👗', color:'#d46abf' },
+  { id:'beauty',    label:'Beauty',    emoji:'💄', color:'#ff8fab' },
+  { id:'party',     label:'Party',     emoji:'🥳', color:'#60b8f0' },
+  { id:'work',      label:'Work',      emoji:'💼', color:'#7c8cf8' },
+  { id:'charity',   label:'Charity',   emoji:'🤝', color:'#52c788' },
   { id:'other',     label:'Other',     emoji:'📦', color:'#8888aa' },
 ];
-const CAT_COLORS = ['#5fc4b8','#f5c842','#e07b5f','#9b5fe0','#5fc48b','#5b9be0','#e05b8b','#f0a830','#d46abf','#60b8f0'];
+const CAT_COLORS = ['#5fc4b8','#f5c842','#e07b5f','#9b5fe0','#5fc48b','#5b9be0','#e05b8b','#f0a830','#d46abf','#60b8f0','#ff8fab','#7c8cf8','#52c788','#ff6b6b'];
 
-function loadCategories() {
-  const saved = localStorage.getItem('fl_categories');
-  return saved ? JSON.parse(saved) : [...DEFAULT_CATS];
+// ── Category storage: Google Sheet tab "Categories" + localStorage cache ──
+// Sheet tab format: one row per category: id | label | emoji | color
+// localStorage is used as a fast cache; sheet is the source of truth.
+const CATS_SHEET_RANGE = 'Categories!A2:D';
+const CATS_SHEET_HEADER = 'Categories!A1:D1';
+const CATS_HEADER_ROW = ['id','label','emoji','color'];
+
+function loadCategoriesFromCache() {
+  try {
+    const saved = localStorage.getItem('fl_categories');
+    if (saved) return JSON.parse(saved);
+  } catch(_) {}
+  return [...DEFAULT_CATS];
 }
-function saveCategories(cats) {
+function cacheCategories(cats) {
   localStorage.setItem('fl_categories', JSON.stringify(cats));
 }
-// Live reference always via state.categories
-let CATEGORIES = loadCategories();
+
+async function loadCategoriesFromSheet() {
+  if (state.token === 'DEMO') return;
+  try {
+    // Ensure header
+    const hdr = await sheetsGet(CATS_SHEET_HEADER);
+    if (!hdr.values || !hdr.values[0] || hdr.values[0][0] !== 'id') {
+      await sheetsPutCats(CATS_SHEET_HEADER, [CATS_HEADER_ROW]);
+      // Write default cats to sheet on first run
+      await sheetsPutCats(CATS_SHEET_RANGE,
+        DEFAULT_CATS.map(c => [c.id, c.label, c.emoji, c.color]));
+      console.log('[Cats] Initialised Categories sheet with defaults');
+      CATEGORIES = [...DEFAULT_CATS];
+      cacheCategories(CATEGORIES);
+      return;
+    }
+    const data = await sheetsGet(CATS_SHEET_RANGE);
+    if (!data.values || data.values.length === 0) {
+      // Sheet exists but empty — write defaults
+      await sheetsPutCats(CATS_SHEET_RANGE,
+        DEFAULT_CATS.map(c => [c.id, c.label, c.emoji, c.color]));
+      CATEGORIES = [...DEFAULT_CATS];
+    } else {
+      const fromSheet = data.values.map(row => ({
+        id:    (row[0] || '').trim(),
+        label: (row[1] || '').trim(),
+        emoji: row[2] || '📦',
+        color: row[3] || '#8888aa',
+      })).filter(c => c.id && c.label);
+
+      // Merge: add any DEFAULT_CATS entries missing from the sheet
+      // (e.g. newly added defaults like fuel, party, apparel etc.)
+      const existingIds = new Set(fromSheet.map(c => c.id));
+      // Also handle legacy 'transport' id → rename to travel in sheet
+      const merged = fromSheet.map(c =>
+        c.id === 'transport'
+          ? { ...c, id: 'travel', label: 'Travel', emoji: '✈️' }
+          : c
+      );
+      const mergedIds = new Set(merged.map(c => c.id));
+      const toAdd = DEFAULT_CATS.filter(c => !mergedIds.has(c.id));
+      if (toAdd.length > 0) {
+        merged.push(...toAdd);
+        console.log('[Cats] Merged', toAdd.length, 'new defaults:', toAdd.map(c=>c.id));
+      }
+      CATEGORIES = merged;
+
+      // If anything changed (merge or rename), persist back to sheet
+      const changed = toAdd.length > 0 || existingIds.has('transport');
+      if (changed) {
+        await sheetsPutCats(CATS_SHEET_RANGE,
+          CATEGORIES.map(c => [c.id, c.label, c.emoji, c.color]));
+        console.log('[Cats] Re-saved after merge/rename');
+      }
+    }
+    cacheCategories(CATEGORIES);
+    buildCategoryGrid(); buildFilterRow(); updateCatCount();
+    console.log('[Cats] Loaded', CATEGORIES.length, 'categories from sheet');
+  } catch(e) {
+    console.warn('[Cats] Could not load from sheet, using cache:', e.message);
+  }
+}
+
+async function saveCategoriesToSheet() {
+  // Write full category list to sheet (overwrite all rows after header)
+  if (state.token === 'DEMO') {
+    cacheCategories(CATEGORIES);
+    return;
+  }
+  try {
+    // Clear old data then write fresh
+    await sheetsPutCats(CATS_SHEET_RANGE,
+      CATEGORIES.map(c => [c.id, c.label, c.emoji, c.color]));
+    cacheCategories(CATEGORIES);
+    console.log('[Cats] Saved', CATEGORIES.length, 'categories to sheet');
+  } catch(e) {
+    // Fall back to localStorage only
+    cacheCategories(CATEGORIES);
+    console.warn('[Cats] Sheet save failed, cached locally:', e.message);
+  }
+}
+
+async function sheetsPutCats(range, values) {
+  // Step 1: clear the range so stale rows from previous larger lists are gone
+  const clearUrl = `https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}/values/${encodeURIComponent(range)}:clear`;
+  await fetch(clearUrl, {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + state.token, 'Content-Type': 'application/json' },
+  });
+  // Step 2: write the fresh data
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`;
+  const r = await fetch(url, {
+    method: 'PUT',
+    headers: { Authorization: 'Bearer ' + state.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values }),
+  });
+  if (!r.ok) throw new Error('Cats PUT ' + r.status + ': ' + await r.text());
+}
+
+// Initialise from cache immediately (fast), then sync from sheet after login
+let CATEGORIES = loadCategoriesFromCache();
 
 const CURRENCIES = [
   { code:'USD', sym:'$',   label:'USD ($)'   },
@@ -1338,14 +1453,11 @@ function initApp() {
   buildCategoryGrid(); buildFilterRow(); renderSettingsUser();
   syncCurrencySymbols();
   document.getElementById('date-input').value = todayIso();
-  // switchTab sets the tab-active class (needed for desktop CSS) and renders
   switchTab('dashboard');
-  // Sync budget input with saved state
   syncBudgetInputUI();
-  // Pre-render history empty state too
   renderHistory();
-  // Fetch real data from sheet
-  loadExpenses();
+  // Load categories from sheet (shared across all users), then load expenses
+  loadCategoriesFromSheet().then(() => loadExpenses());
 }
 function showScreen(id) {
   // Pure class toggle — no inline styles that would fight CSS
@@ -1440,7 +1552,11 @@ function renderDashboard() {
   // ── PIE CHART ──
   const catTotals={};
   CATEGORIES.forEach(c=>catTotals[c.id]=0);
-  pe.forEach(e=>{catTotals[e.category]=(catTotals[e.category]||0)+e.amount;});
+  pe.forEach(e=>{
+    // merge legacy 'transport' into 'travel'
+    const cid = e.category === 'transport' ? 'travel' : e.category;
+    catTotals[cid]=(catTotals[cid]||0)+e.amount;
+  });
   const active=CATEGORIES.filter(c=>catTotals[c.id]>0).sort((a,b)=>catTotals[b.id]-catTotals[a.id]);
   const el=document.getElementById('dash-categories');
 
@@ -1512,7 +1628,9 @@ function renderDashboard() {
 let _openWrap = null;
 
 function txnCard(e) {
-  const cat     = CATEGORIES.find(c=>c.id===e.category)||{emoji:'📦'};
+  // 'transport' is legacy id — alias to travel for display
+  const catId   = e.category === 'transport' ? 'travel' : e.category;
+  const cat     = CATEGORIES.find(c=>c.id===catId)||{emoji:'📦'};
   const payIco  = e.paidThrough==='Credit Card'?'💳':e.paidThrough==='Bank Account'?'🏦':'💵';
   const dispDate= e.date ? isoToDdMmYyyy(e.date) : (e.displayDate||'');
   const eid     = esc(e.id);
@@ -1757,27 +1875,41 @@ function pickEmoji(e) {
   _newCatEmoji=e;
   document.querySelectorAll('.emoji-opt').forEach(el=>el.classList.toggle('active',el.textContent===e));
 }
-function addCategory() {
-  const name=document.getElementById('new-cat-name').value.trim();
-  if (!name){showToast('Enter a category name','error');return;}
-  if (CATEGORIES.find(c=>c.label.toLowerCase()===name.toLowerCase())){showToast('Already exists','error');return;}
-  const id='cat_'+Date.now();
-  const color=CAT_COLORS[CATEGORIES.length%CAT_COLORS.length];
-  CATEGORIES.push({id,label:name,emoji:_newCatEmoji,color});
-  saveCategories(CATEGORIES);
+async function addCategory() {
+  const name = document.getElementById('new-cat-name').value.trim();
+  if (!name) { showToast('Enter a category name', 'error'); return; }
+  if (CATEGORIES.find(c => c.label.toLowerCase() === name.toLowerCase())) {
+    showToast('Already exists', 'error'); return;
+  }
+  const id = 'cat_' + Date.now();
+  const color = CAT_COLORS[CATEGORIES.length % CAT_COLORS.length];
+  CATEGORIES.push({ id, label: name, emoji: _newCatEmoji, color });
   buildCategoryGrid(); buildFilterRow(); updateCatCount();
-  showCategoriesModal(); // refresh modal
-  showToast('Category added: '+name);
-}
-function deleteCategory(idx) {
-  if (CATEGORIES.length<=1){showToast('Need at least one category','error');return;}
-  const removed=CATEGORIES.splice(idx,1)[0];
-  saveCategories(CATEGORIES);
-  if (state.selectedCategory===removed.id) state.selectedCategory=CATEGORIES[0].id;
-  if (state.filterCategory===removed.id) state.filterCategory='all';
-  buildCategoryGrid(); buildFilterRow(); updateCatCount();
+
+  // Disable add button while saving to sheet
+  const addBtn = document.querySelector('#modal-content .btn-primary');
+  if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'Saving…'; }
+
+  await saveCategoriesToSheet();
+
+  closeModal();
+  showToast('✓ ' + name + ' saved to sheet', 'success');
+  // Re-open the modal so user sees updated list
   showCategoriesModal();
-  showToast('Removed: '+removed.label);
+}
+async function deleteCategory(idx) {
+  if (CATEGORIES.length <= 1) { showToast('Need at least one category', 'error'); return; }
+  const removed = CATEGORIES.splice(idx, 1)[0];
+  if (state.selectedCategory === removed.id) state.selectedCategory = CATEGORIES[0].id;
+  if (state.filterCategory === removed.id) state.filterCategory = 'all';
+  buildCategoryGrid(); buildFilterRow(); updateCatCount();
+
+  showToast('Removing…', '');
+  await saveCategoriesToSheet();
+
+  closeModal();
+  showToast('✓ Removed: ' + removed.label, 'success');
+  showCategoriesModal();
 }
 
 function showSheetModal() {
