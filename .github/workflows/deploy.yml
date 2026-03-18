@@ -73,41 +73,65 @@ jobs:
           # Copy icons folder if present, otherwise generate below
           [ -d "${APP_DIR}/icons" ] && cp -r "${APP_DIR}/icons" dist/ || true
 
-      # ── 3b. Generate PWA icons (runs only if icons are missing) ──
+      # ── 3b. Generate all PWA icons using Python/Pillow ───────────
       - name: Generate PWA icons
         run: |
-          if [ ! -f "dist/icons/icon-192.png" ] || [ ! -f "dist/icons/icon-512.png" ]; then
-            echo "⚙️  Generating PWA icons with Node.js..."
-            mkdir -p dist/icons
-            node -e "
-              const fs=require('fs'),zlib=require('zlib');
-              function png(size){
-                const BG=[26,26,46],ACC=[245,200,66];
-                const px=new Uint8Array(size*size*4);
-                const pad=Math.floor(size*0.2);
-                for(let y=0;y<size;y++) for(let x=0;x<size;x++){
-                  const i=(y*size+x)*4;
-                  const c=(x>=pad&&x<size-pad&&y>=pad&&y<size-pad)?ACC:BG;
-                  px[i]=c[0];px[i+1]=c[1];px[i+2]=c[2];px[i+3]=255;
-                }
-                function crc(b){const t=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=(c&1)?0xEDB88320^(c>>>1):c>>>1;t[i]=c;}let c=0xFFFFFFFF;for(const b2 of b)c=t[(c^b2)&0xFF]^(c>>>8);return(c^0xFFFFFFFF)>>>0;}
-                function chunk(t,d){const tb=Buffer.from(t);const lb=Buffer.alloc(4);lb.writeUInt32BE(d.length);const cv=Buffer.alloc(4);cv.writeUInt32BE(crc(Buffer.concat([tb,d])));return Buffer.concat([lb,tb,d,cv]);}
-                const hdr=Buffer.alloc(13);hdr.writeUInt32BE(size,0);hdr.writeUInt32BE(size,4);hdr[8]=8;hdr[9]=2;
-                const rs=size*3;const rr=Buffer.alloc(size*(rs+1));
-                for(let y=0;y<size;y++){rr[y*(rs+1)]=0;for(let x=0;x<size;x++){const s=(y*size+x)*4;const d2=y*(rs+1)+1+x*3;rr[d2]=px[s];rr[d2+1]=px[s+1];rr[d2+2]=px[s+2];}}
-                const cmp=zlib.deflateSync(rr,{level:6});
-                return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',hdr),chunk('IDAT',cmp),chunk('IEND',Buffer.alloc(0))]);
-              }
-              fs.writeFileSync('dist/icons/icon-192.png',png(192));
-              fs.writeFileSync('dist/icons/icon-512.png',png(512));
-              fs.writeFileSync('dist/favicon.ico',png(32));
-              console.log('Icons generated OK');
-            "
-          else
-            echo "✅ Icons already present"
-          fi
-          # Copy favicon to dist root if not already there
-          [ -f "dist/favicon.ico" ] || ([ -f "favicon.ico" ] && cp favicon.ico dist/) || true
+          pip install Pillow --quiet
+          mkdir -p dist/icons
+          python3 - << 'PYEOF'
+from PIL import Image, ImageDraw
+import os
+
+BG=(24,16,20); PAPER=(44,28,38); PAPER_L=(54,38,48)
+CORAL=(232,114,90); GOLD=(245,200,66); MUTED=(120,110,130); TEAL=(95,196,184)
+
+def make_icon(size):
+    img=Image.new("RGBA",(size,size),(0,0,0,0))
+    draw=ImageDraw.Draw(img)
+    pad=max(2,int(size*0.045)); cr=int(size*0.22)
+    draw.rounded_rectangle([pad,pad,size-pad,size-pad],radius=cr,fill=BG)
+    rx1,rx2=int(size*0.28),int(size*0.72); ry1=int(size*0.16)
+    zy=int(size*0.82); zn=8; zh=int(size*0.035); zs=(rx2-rx1)/zn
+    pts=[(rx1,ry1),(rx2,ry1),(rx2,zy)]
+    for i in range(zn):
+        x=rx2-i*zs; pts.append((x,zy)); pts.append((x-zs/2,zy+zh))
+    pts.append((rx1,zy))
+    draw.polygon(pts,fill=PAPER)
+    draw.rounded_rectangle([rx1+2,ry1+2,rx2-2,zy-2],radius=max(1,int(size*0.015)),fill=PAPER_L)
+    lx1=rx1+int(size*0.06); lx2=rx2-int(size*0.06); ax=rx2-int(size*0.07)
+    lh=int(size*0.055); lr=max(1,int(size*0.018))
+    draw.rounded_rectangle([lx1,ry1+int(size*0.055),lx2,ry1+int(size*0.055)+lh],radius=lr,fill=(*CORAL,200))
+    rows=[(int(size*0.14),(*MUTED,140),(*GOLD,220)),(int(size*0.10),(*MUTED,110),(*GOLD,200)),(int(size*0.12),(*MUTED,130),(*GOLD,210)),(int(size*0.09),(*MUTED,100),(*GOLD,190))]
+    sy=ry1+int(size*0.15)
+    for i,(dw,dc,ac) in enumerate(rows):
+        y=sy+i*int(size*0.115); lt=max(2,int(size*0.028))
+        draw.rounded_rectangle([lx1,y,lx1+dw,y+lt],radius=lt//2,fill=dc)
+        aw=int(size*0.09)
+        draw.rounded_rectangle([ax-aw,y,ax,y+lt],radius=lt//2,fill=ac)
+    dy=sy+4*int(size*0.115)+int(size*0.015)
+    draw.rounded_rectangle([lx1,dy,lx2,dy+max(1,int(size*0.012))],radius=1,fill=(*MUTED,60))
+    ty=dy+int(size*0.03); th=max(3,int(size*0.038)); tw=int(size*0.11)
+    draw.rounded_rectangle([lx1,ty,lx1+tw,ty+th],radius=th//2,fill=(*TEAL,230))
+    aw2=int(size*0.12)
+    draw.rounded_rectangle([ax-aw2,ty-int(size*0.005),ax,ty+th+int(size*0.005)],radius=th//2,fill=GOLD)
+    bx=rx2+int(size*0.04); by=ry1-int(size*0.04); bs=int(size*0.18)
+    bolt=[(bx+bs*0.18,by-bs*0.5),(bx-bs*0.05,by+bs*0.05),(bx+bs*0.12,by+bs*0.05),(bx-bs*0.18,by+bs*0.5),(bx+bs*0.02,by),(bx-bs*0.1,by)]
+    draw.polygon(bolt,fill=GOLD)
+    draw.ellipse([bx+bs*0.12-size*0.025,by-bs*0.5-size*0.025,bx+bs*0.12+size*0.025,by-bs*0.5+size*0.025],fill=CORAL)
+    draw.rounded_rectangle([pad,pad,size-pad,size-pad],radius=cr,outline=(*CORAL,45),width=max(1,int(size*0.013)))
+    return img
+
+for sz in [16,32,48,64,128,192,512]:
+    make_icon(sz).save(f"dist/icons/icon-{sz}.png")
+    print(f"Generated icon-{sz}.png")
+
+imgs=[make_icon(s) for s in [16,32,48]]
+imgs[0].save("dist/favicon.ico",format="ICO",sizes=[(16,16),(32,32),(48,48)],append_images=imgs[1:])
+make_icon(32).save("dist/icons/favicon.png")
+make_icon(32).save("dist/favicon.png")
+print("All icons generated")
+PYEOF
+          echo "✅ PWA icons generated"
 
       # ── 4. Inject Google Client ID ────────────────────────
       #    Add secret: repo → Settings → Secrets → Actions
