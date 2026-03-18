@@ -3,10 +3,20 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-  <meta id="theme-color-meta" name="theme-color" content="#0f0f1a"/>
+  <meta id="theme-color-meta" name="theme-color" content="#181014"/>
   <meta name="description" content="വീട്ടു ചിലവ് — Track your family expenses together"/>
   <title>വീട്ടു ചിലവ് — Veettu Chilavu</title>
   <link rel="manifest" href="manifest.json"/>
+  <!-- Favicons: PNG first — browsers respect these from HTML regardless of domain root -->
+  <link rel="icon" type="image/png" sizes="32x32"   href="icons/icon-32.png"/>
+  <link rel="icon" type="image/png" sizes="16x16"   href="icons/icon-16.png"/>
+  <link rel="icon" type="image/png" sizes="48x48"   href="icons/icon-48.png"/>
+  <link rel="icon" type="image/png" sizes="64x64"   href="icons/icon-64.png"/>
+  <link rel="icon" type="image/png" sizes="128x128" href="icons/icon-128.png"/>
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
+  <!-- .ico as last fallback -->
+  <link rel="icon" type="image/x-icon" href="icons/favicon.ico"/>
+  <!-- iOS home screen -->
   <link rel="apple-touch-icon" href="icons/icon-192.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -725,6 +735,8 @@
 
   <!-- ══ LOGIN ══ -->
   <div id="screen-login" class="screen active">
+    <img src="icons/icon-128.png" alt="Veettu Chilavu"
+      style="width:80px;height:80px;border-radius:20px;margin-bottom:1rem;box-shadow:0 8px 32px rgba(245,200,66,.25);"/>
     <div class="login-logo" lang="ml">വീട്ടു <span>ചിലവ്</span></div>
     <p class="login-tagline">കുടുംബ ചിലവുകൾ, ഒരു നോട്ടത്തിൽ</p>
     <div class="login-illustration" aria-hidden="true">
@@ -950,6 +962,8 @@
 <nav class="bottom-nav" id="main-nav" role="navigation" aria-label="Main navigation">
   <!-- Sidebar brand — desktop only -->
   <div class="sidebar-brand">
+    <img src="icons/icon-48.png" alt=""
+      style="width:30px;height:30px;border-radius:7px;flex-shrink:0;"/>
     <div class="sidebar-brand-logo" lang="ml">വീട്ടു <span>ചിലവ്</span></div>
   </div>
 
