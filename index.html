@@ -344,9 +344,9 @@
     .section-title{font-family:'Fraunces',Georgia,serif;font-size:1rem;font-weight:500;color:var(--text);margin-bottom:.75rem;}
 
     /* ── Pie chart ── */
-    .pie-wrap{display:flex;align-items:center;gap:1rem;min-width:0;}
-    .pie-svg-wrap{flex-shrink:0;position:relative;width:130px;height:130px;}
-    .pie-svg-wrap svg{width:130px;height:130px;transform:rotate(-90deg);}
+    .pie-wrap{display:flex;align-items:center;gap:1rem;min-width:0;padding:.25rem 0;}
+    .pie-svg-wrap{flex-shrink:0;position:relative;width:134px;height:134px;padding:2px;}
+    .pie-svg-wrap svg{width:130px;height:130px;transform:rotate(-90deg);overflow:visible;display:block;}
     .pie-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
     .pie-center-val{font-family:'Fraunces',Georgia,serif;font-size:clamp(.62rem,2.2vw,.92rem);font-weight:700;color:var(--text);line-height:1.1;word-break:break-all;text-align:center;}
     .pie-center-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem;}
@@ -360,23 +360,42 @@
     /* ── Transaction cards ── */
     .txn-list{display:flex;flex-direction:column;gap:0;}
     .txn-wrap{position:relative;border-radius:8px;margin-bottom:.55rem;}
+
+    /* Desktop/mouse: icon buttons appear on hover */
     .txn-inline-actions{display:flex;gap:.3rem;align-items:center;flex-shrink:0;padding-left:.4rem;opacity:0;pointer-events:none;transition:opacity .15s;}
     .txn-wrap:hover .txn-inline-actions,.txn-wrap:focus-within .txn-inline-actions{opacity:1;pointer-events:auto;}
     .txn-icon-btn{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:.88rem;cursor:pointer;transition:background .12s,color .12s,border-color .12s;flex-shrink:0;}
     .txn-icon-btn:hover{background:var(--card);}
     .txn-icon-btn.edit-btn:hover{color:var(--accent3);border-color:var(--accent3);}
     .txn-icon-btn.delete-btn:hover{color:var(--danger);border-color:var(--danger);}
+
+    /* Mobile/touch: small always-visible icon buttons on right, no swipe needed */
+    .txn-touch-actions{display:none;gap:.25rem;align-items:center;flex-shrink:0;padding-left:.35rem;}
+    .txn-touch-btn{width:28px;height:28px;border-radius:6px;border:none;display:flex;align-items:center;justify-content:center;font-size:.95rem;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;flex-shrink:0;}
+    .txn-touch-btn.edit{background:rgba(95,196,184,.15);color:var(--accent3);}
+    .txn-touch-btn.del{background:rgba(224,123,95,.15);color:var(--danger);}
+    .txn-touch-btn:active{filter:brightness(1.2);}
+
+    /* Swipe panel — kept for backward compat but not the primary interaction */
     .txn-actions{position:absolute;right:0;top:0;bottom:0;display:flex;align-items:stretch;transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);z-index:3;border-radius:0 8px 8px 0;overflow:hidden;}
     .txn-wrap.revealed .txn-actions{transform:translateX(0);}
-    .txn-action-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;min-width:64px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;transition:filter .12s;}
-    .txn-action-btn:hover{filter:brightness(1.12);}
-    .txn-action-btn .act-icon{font-size:1.15rem;}
+    .txn-action-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;min-width:56px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.65rem;font-weight:600;transition:filter .12s;}
+    .txn-action-btn .act-icon{font-size:1.1rem;}
     .btn-edit-action{background:var(--accent3);color:#fff;}
     .btn-delete-action{background:var(--danger);color:#fff;}
     .txn-wrap .txn-card{overflow:hidden;margin-bottom:0;border-radius:8px;transition:transform .22s cubic-bezier(.4,0,.2,1);position:relative;z-index:2;}
-    .txn-wrap.revealed .txn-card{transform:translateX(-128px);}
-    @media(hover:none){.txn-inline-actions{display:none !important;}}
-    @media(hover:hover){.txn-wrap:not(.revealed) .txn-card{transform:none;}}
+    .txn-wrap.revealed .txn-card{transform:translateX(-112px);}
+
+    /* Touch devices: hide hover buttons, show always-on touch icons */
+    @media(hover:none){
+      .txn-inline-actions{display:none !important;}
+      .txn-touch-actions{display:flex !important;}
+      .txn-actions{display:none;}  /* hide swipe panel — icons replace it */
+    }
+    @media(hover:hover){
+      .txn-touch-actions{display:none !important;}
+      .txn-wrap:not(.revealed) .txn-card{transform:none;}
+    }
     .txn-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.68rem .85rem;display:flex;align-items:center;gap:.65rem;cursor:pointer;transition:background .15s;width:100%;min-width:0;overflow:hidden;}
     .txn-card:hover{background:var(--surface);}
     .txn-emoji{font-size:1.2rem;width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--surface);border-radius:8px;flex-shrink:0;}
@@ -962,6 +981,17 @@ async function loadCategoriesFromSheet() {
     cacheCategories(CATEGORIES);
     buildCategoryGrid(); buildFilterRow(); updateCatCount();
     console.log('[Cats] Loaded', CATEGORIES.length, 'categories from sheet');
+    // Load shared budget from Categories!E1
+    try {
+      const bdata = await sheetsGet('Categories!E1');
+      const bval = parseFloat(bdata?.values?.[0]?.[0] || '0');
+      if (!isNaN(bval) && bval > 0) {
+        state.budgetLimit = bval;
+        localStorage.setItem('fl_budget', bval);
+        syncBudgetInputUI();
+        console.log('[Budget] Loaded from sheet:', bval);
+      }
+    } catch(e) { console.warn('[Budget] Could not load from sheet:', e.message); }
   } catch(e) {
     console.warn('[Cats] Could not load from sheet, using cache:', e.message);
   }
@@ -1456,8 +1486,16 @@ function initApp() {
   switchTab('dashboard');
   syncBudgetInputUI();
   renderHistory();
-  // Load categories from sheet (shared across all users), then load expenses
+  // Load categories (and budget) from sheet, then load expenses
   loadCategoriesFromSheet().then(() => loadExpenses());
+  // Auto-refresh every 5 minutes so family members see each other's entries
+  if (window._autoRefreshInterval) clearInterval(window._autoRefreshInterval);
+  window._autoRefreshInterval = setInterval(() => {
+    if (state.token && state.token !== 'DEMO' && document.visibilityState !== 'hidden') {
+      console.log('[App] Auto-refresh at', new Date().toLocaleTimeString());
+      loadExpenses();
+    }
+  }, 5 * 60 * 1000);
 }
 function showScreen(id) {
   // Pure class toggle — no inline styles that would fight CSS
@@ -1605,9 +1643,10 @@ function renderDashboard() {
       <div class="pie-legend">${legend}</div>
     </div>`;
 
-  // Budget health bar — only for monthly view
+  // Budget health bar — only for monthly view, always pass current total
+  // (even if 0) so empty months show as zero, not the last filled month
   if (state.periodMode === 'month') {
-    renderBudgetBar(total, state.budgetLimit);
+    renderBudgetBar(total, state.budgetLimit);  // total = 0 when no expenses
   } else {
     hideBudgetBar();
   }
@@ -1651,7 +1690,7 @@ function txnCard(e) {
         </button>
       </div>
 
-      <!-- Card row — inline actions appear on hover (desktop) -->
+      <!-- Card row — inline actions on hover (desktop) / always-on icons (touch) -->
       <div class="txn-card" tabindex="0" role="listitem"
         aria-label="${esc(e.description)}, ${fmt(e.amount)}"
         onclick="onTxnCardClick('${eid}')"
@@ -1662,16 +1701,15 @@ function txnCard(e) {
           <div class="txn-meta">${dispDate} · ${payIco} ${esc(e.paidThrough||'')}${e.note?' · '+esc(e.note):''}</div>
         </div>
         <div class="txn-amount">${fmt(e.amount)}</div>
-        <!-- Desktop: hover action buttons inside the card -->
+        <!-- Desktop hover buttons -->
         <div class="txn-inline-actions" onclick="event.stopPropagation()">
-          <button class="txn-icon-btn edit-btn"
-            onclick="editExpense('${eid}')"
-            title="Edit expense"
-            aria-label="Edit ${esc(e.description)}">✏️</button>
-          <button class="txn-icon-btn delete-btn"
-            onclick="confirmDelete('${eid}')"
-            title="Delete expense"
-            aria-label="Delete ${esc(e.description)}">🗑️</button>
+          <button class="txn-icon-btn edit-btn" onclick="editExpense('${eid}')" title="Edit">✏️</button>
+          <button class="txn-icon-btn delete-btn" onclick="confirmDelete('${eid}')" title="Delete">🗑️</button>
+        </div>
+        <!-- Touch always-on icon buttons (iOS/Android) -->
+        <div class="txn-touch-actions" onclick="event.stopPropagation()">
+          <button class="txn-touch-btn edit" onclick="editExpense('${eid}')" aria-label="Edit">✏️</button>
+          <button class="txn-touch-btn del" onclick="confirmDelete('${eid}')" aria-label="Delete">🗑️</button>
         </div>
       </div>
     </div>`;
@@ -1821,9 +1859,9 @@ function renderSettingsUser() {
     ? `<img src="${u.picture}" class="avatar" alt="${esc(u.name||'Profile')}" onclick="switchTab('settings')" title="${esc(u.name||'')}"/>`
     : `<div class="avatar-placeholder" onclick="switchTab('settings')" title="${esc(u.name||'')}">${(u.given_name||u.name||'?')[0].toUpperCase()}</div>`;
 
-  // Mobile header avatar
+  // Mobile header avatar — intentionally left empty (avatar shown in Settings only)
   const mobileWrap = document.getElementById('user-avatar-wrap');
-  if (mobileWrap) mobileWrap.innerHTML = avatarHtml;
+  if (mobileWrap) mobileWrap.innerHTML = '';
 
 
   updateCatCount();
@@ -2177,11 +2215,18 @@ async function sheetsUpdateRow(rowIndex, values) {
 //  BUDGET
 // ════════════════════════════════════════════
 
-function saveBudgetLimit() {
+async function saveBudgetLimit() {
   const val = parseFloat(document.getElementById('budget-limit-input').value);
   state.budgetLimit = (isNaN(val) || val <= 0) ? 0 : val;
   localStorage.setItem('fl_budget', state.budgetLimit);
   renderDashboard();
+  // Persist to sheet so all family members share the same budget
+  if (state.token && state.token !== 'DEMO') {
+    try {
+      // Store in Categories!E1 — a spare cell that won't interfere with cat rows
+      await sheetsPutCats('Categories!E1', [[state.budgetLimit.toString()]]);
+    } catch(e) { console.warn('[Budget] Sheet save failed:', e.message); }
+  }
   showToast(state.budgetLimit > 0
     ? '🎯 Budget set to ' + fmt(state.budgetLimit)
     : '🎯 Budget limit cleared', 'success');
@@ -2202,6 +2247,8 @@ function renderBudgetBar(total, limit) {
   if (!limit || limit <= 0 || state.periodMode !== 'month') {
     hideBudgetBar(); return;
   }
+  // Always reset to safe state first — prevents stale color from last month
+  total = total || 0;
   const wrap  = document.getElementById('budget-bar-wrap');
   const fill  = document.getElementById('budget-fill');
   const pct   = document.getElementById('budget-bar-pct');
