@@ -704,7 +704,6 @@
   <!-- Sidebar footer — desktop only -->
   <div class="sidebar-footer">
     <button class="sidebar-theme" id="sidebar-theme-btn" onclick="cycleTheme()" title="Toggle theme">🌙</button>
-    <div id="sidebar-avatar-wrap"></div>
   </div>
 </nav>
 
@@ -1566,9 +1565,6 @@ function renderSettingsUser() {
   const mobileWrap = document.getElementById('user-avatar-wrap');
   if (mobileWrap) mobileWrap.innerHTML = avatarHtml;
 
-  // Desktop sidebar avatar
-  const sidebarWrap = document.getElementById('sidebar-avatar-wrap');
-  if (sidebarWrap) sidebarWrap.innerHTML = avatarHtml;
 
   updateCatCount();
 }
