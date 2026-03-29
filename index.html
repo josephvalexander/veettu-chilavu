@@ -1002,7 +1002,10 @@ body::before{
 </nav>
 
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal-sheet"><div class="modal-handle"></div><div id="modal-content"></div></div>
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle" id="modal-handle"></div>
+    <div id="modal-content"></div>
+  </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1062,17 +1065,27 @@ function cacheCategories(cats) {
 async function loadCategoriesFromSheet() {
   if (state.token === 'DEMO') return;
   try {
-    // Ensure header
+    // Ensure header — but always check data range too before writing defaults
     const hdr = await sheetsGet(CATS_SHEET_HEADER);
-    if (!hdr.values || !hdr.values[0] || hdr.values[0][0] !== 'id') {
-      await sheetsPutCats(CATS_SHEET_HEADER, [CATS_HEADER_ROW]);
-      // Write default cats to sheet on first run
-      await sheetsPutCats(CATS_SHEET_RANGE,
-        DEFAULT_CATS.map(c => [c.id, c.label, c.emoji, c.color]));
-      console.log('[Cats] Initialised Categories sheet with defaults');
-      CATEGORIES = [...DEFAULT_CATS];
-      cacheCategories(CATEGORIES);
-      return;
+    const headerMissing = !hdr.values || !hdr.values[0] || hdr.values[0][0] !== 'id';
+    if (headerMissing) {
+      // Check if data rows exist even without a proper header (e.g. re-auth after reinstall)
+      const existingData = await sheetsGet(CATS_SHEET_RANGE);
+      if (existingData.values && existingData.values.length > 0) {
+        // Data exists — just fix the header, don't overwrite categories
+        await sheetsPutCats(CATS_SHEET_HEADER, [CATS_HEADER_ROW]);
+        console.log('[Cats] Fixed missing header, keeping existing data');
+        // Fall through to read the data below
+      } else {
+        // Truly first run — write header + defaults
+        await sheetsPutCats(CATS_SHEET_HEADER, [CATS_HEADER_ROW]);
+        await sheetsPutCats(CATS_SHEET_RANGE,
+          DEFAULT_CATS.map(c => [c.id, c.label, c.emoji, c.color]));
+        console.log('[Cats] Initialised Categories sheet with defaults');
+        CATEGORIES = [...DEFAULT_CATS];
+        cacheCategories(CATEGORIES);
+        return;
+      }
     }
     const data = await sheetsGet(CATS_SHEET_RANGE);
     if (!data.values || data.values.length === 0) {
@@ -2503,8 +2516,35 @@ function sym_budget() {
 // ════════════════════════════════════════════
 //  MODAL & TOAST
 // ════════════════════════════════════════════
-function showModal(html){document.getElementById('modal-content').innerHTML=html;document.getElementById('modal-overlay').classList.add('open');}
-function closeModal(e){if(e&&e.target!==document.getElementById('modal-overlay'))return;document.getElementById('modal-overlay').classList.remove('open');}
+function showModal(html){
+  document.getElementById('modal-content').innerHTML=html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+// Swipe-down-to-close on modal sheet
+(function(){
+  let startY=0, isDragging=false;
+  document.addEventListener('touchstart', e=>{
+    const sheet=document.getElementById('modal-sheet');
+    if(sheet && sheet.contains(e.target) && document.getElementById('modal-overlay').classList.contains('open')){
+      startY=e.touches[0].clientY; isDragging=true;
+    }
+  },{passive:true});
+  document.addEventListener('touchend', e=>{
+    if(!isDragging) return; isDragging=false;
+    const dy=e.changedTouches[0].clientY - startY;
+    if(dy > 80) closeModal(); // swipe down >80px closes
+  },{passive:true});
+})();
+function closeModal(e){
+  // Close if: no event, or tap was on overlay background (not modal sheet itself)
+  if (e) {
+    const sheet = document.querySelector('.modal-sheet');
+    // Allow close if tap target is overlay OR is outside the sheet
+    if (sheet && sheet.contains(e.target)) return;
+  }
+  document.getElementById('modal-overlay').classList.remove('open');
+}
 let _tt;
 function showToast(msg,type=''){
   const t=document.getElementById('toast');
