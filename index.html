@@ -82,13 +82,14 @@ body::before{
 /* Mobile base */
 #app{
   position:relative;z-index:1;
-  width:100%;
+  width:100%; min-width:0; max-width:100%;
   padding-bottom:calc(80px + env(safe-area-inset-bottom));
   min-height:100vh;
+  overflow-x:hidden;
 }
-.screen{display:none;flex-direction:column;width:100%;min-height:calc(100vh - 80px);min-height:calc(-webkit-fill-available - 80px);}
-.screen.active{display:flex;}
-#screen-app.active{display:block;}
+.screen{display:none;flex-direction:column;width:100%;min-width:0;max-width:100%;min-height:calc(100vh - 80px);min-height:calc(-webkit-fill-available - 80px);}
+.screen.active{display:flex;width:100%;min-width:0;max-width:100%;overflow-x:hidden;}
+#screen-app.active{display:block;overflow-x:hidden;}
 /* Tab visibility — controlled ONLY by .tab-active class, never inline styles */
 .tab-content        { display:none; width:100%; }
 .tab-content.tab-active { display:block; }
@@ -401,7 +402,7 @@ body::before{
 /* ══════════════════════════════════════
    HEADER (mobile) + SIDEBAR BRAND
 ══════════════════════════════════════ */
-.app-header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.25rem .8rem;background:var(--hdr-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:background .25s;}
+.app-header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.25rem .8rem;background:var(--hdr-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:background .25s;width:100%;left:0;right:0;box-sizing:border-box;}
 .header-logo{
   font-family:'Manjari','Noto Sans Malayalam',Georgia,serif;
   font-size:1.25rem;font-weight:700;color:var(--accent);
@@ -438,8 +439,8 @@ body::before{
 /* ══════════════════════════════════════
    DASHBOARD COMPONENTS
 ══════════════════════════════════════ */
-.dash-content{padding:1.1rem;display:flex;flex-direction:column;gap:1.1rem;width:100%;}
-.period-nav{display:flex;align-items:center;gap:.6rem;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:.55rem .7rem;}
+.dash-content{padding:1.1rem;display:flex;flex-direction:column;gap:1.1rem;width:100%;box-sizing:border-box;overflow-x:hidden;}
+.period-nav{display:flex;align-items:center;gap:.6rem;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:.55rem .7rem;width:100%;box-sizing:border-box;min-width:0;overflow:hidden;}
 .period-toggle{display:flex;background:var(--surface);border-radius:8px;padding:.2rem;gap:.1rem;flex-shrink:0;}
 .period-btn{padding:.28rem .65rem;border-radius:6px;border:none;font-family:'DM Sans',sans-serif;font-size:.74rem;font-weight:600;cursor:pointer;background:none;color:var(--muted);transition:all .15s;}
 .period-btn.active{background:var(--accent);color:var(--text-inv);}
