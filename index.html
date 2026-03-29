@@ -65,6 +65,10 @@
 ══════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{overflow-x:hidden;width:100%;max-width:100%;}
+/* Nuclear option: nothing can be wider than the viewport */
+body *{max-width:100%;box-sizing:border-box;}
+/* Exceptions for things that legitimately need to be wider */
+body img,body svg,body canvas,body video{max-width:100%;}
 html{font-size:16px;scroll-behavior:smooth;height:-webkit-fill-available;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:-webkit-fill-available;overscroll-behavior:none;transition:background .25s,color .25s;}
 body::before{
@@ -334,20 +338,21 @@ body::before{
   padding:2rem 1.5rem 3rem;
   background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--banner-g1) 0%,var(--bg) 70%);
   text-align:center;
-  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  width:100%;box-sizing:border-box;
 }
 
 /* ── Malayalam logo — refined display ── */
 .login-logo{
   font-family:'Manjari','Noto Sans Malayalam',Georgia,serif;
-  font-size:3rem;
+  font-size:clamp(2rem,10vw,3rem);
   font-weight:700;
   color:var(--accent);
   line-height:1.25;
-  letter-spacing:.04em;   /* slight open-tracking helps Malayalam glyphs breathe */
+  letter-spacing:.04em;
   margin-bottom:.3rem;
-  /* Subtle text shadow for depth */
   text-shadow:0 2px 24px rgba(245,200,66,.22);
+  width:100%;overflow:hidden;
 }
 .login-logo span{
   color:var(--accent3);
@@ -370,7 +375,7 @@ body::before{
 .coin-3{width:44px;height:44px;background:linear-gradient(135deg,#e07b5f,#b85a3e);bottom:10px;left:60px;box-shadow:0 6px 18px rgba(224,123,95,.25);}
 
 /* setup boxes */
-.setup-box{width:100%;max-width:340px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem 1.5rem;margin-bottom:1.25rem;}
+.setup-box{width:100%;max-width:min(340px,calc(100vw - 3rem));background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem 1.5rem;margin-bottom:1.25rem;box-sizing:border-box;}
 .setup-box h2{font-family:'Fraunces',Georgia,serif;font-size:1.25rem;margin-bottom:.35rem;}
 .setup-box p{font-size:.82rem;color:var(--muted);line-height:1.5;margin-bottom:1.25rem;}
 
