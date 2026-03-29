@@ -333,21 +333,27 @@ body::before{
   padding:2rem 1.5rem 3rem;
   background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--banner-g1) 0%,var(--bg) 70%);
   text-align:center;
+  overflow-x:hidden;
   overflow-y:auto;-webkit-overflow-scrolling:touch;
   width:100%;
+  max-width:100%;
+  box-sizing:border-box;
 }
 
 /* ── Malayalam logo — refined display ── */
 .login-logo{
   font-family:'Manjari','Noto Sans Malayalam',Georgia,serif;
-  font-size:clamp(2rem,10vw,3rem);
+  font-size:clamp(1.8rem,8vw,2.6rem);
   font-weight:700;
   color:var(--accent);
   line-height:1.25;
-  letter-spacing:.04em;
+  letter-spacing:.01em;
   margin-bottom:.3rem;
   text-shadow:0 2px 24px rgba(245,200,66,.22);
-  width:100%;overflow:hidden;
+  width:100%;
+  max-width:100%;
+  overflow:hidden;
+  word-break:break-word;
 }
 .login-logo span{
   color:var(--accent3);
@@ -742,7 +748,7 @@ body::before{
     <div class="login-illustration" aria-hidden="true">
       <div class="coin coin-1"></div><div class="coin coin-2"></div><div class="coin coin-3"></div>
     </div>
-    <div class="setup-box" id="login-step-1">
+    <div class="setup-box" id="login-step-1" style="width:100%;max-width:min(340px,calc(100vw - 3rem));box-sizing:border-box;">
       <h2>Sign in with Google</h2>
       <p>Your family's data lives in a shared Google Sheet — free, transparent, always yours.</p>
       <button class="btn-google" onclick="signInWithGoogle()">
@@ -2684,27 +2690,4 @@ window.addEventListener('load', () => { registerSW(); startVersionPolling(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('modal-overlay').classList.remove('open'); });
 </script>
 
-<div id="debug-overlay" style="position:fixed;top:50px;left:0;right:0;z-index:99999;background:rgba(0,0,0,0.85);color:#0f0;font-size:11px;font-family:monospace;padding:8px;max-height:50vh;overflow-y:auto;display:none;"></div>
-<button id="debug-btn" onclick="runDebug()" style="position:fixed;bottom:120px;right:10px;z-index:99999;background:red;color:white;border:none;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:bold;">DEBUG</button>
-<script>
-function runDebug() {
-  const overlay = document.getElementById('debug-overlay');
-  overlay.style.display = 'block';
-  overlay.innerHTML = '';
-  const vw = window.innerWidth;
-  const results = [];
-  results.push('vw=' + vw + ' scrollW=' + document.body.scrollWidth);
-  document.querySelectorAll('*').forEach(el => {
-    const r = el.getBoundingClientRect();
-    if (r.right > vw + 2) {
-      const name = (el.id ? '#'+el.id : '') || ('.' + (el.className+'').split(' ').join('.')) || el.tagName;
-      results.push('OVER: ' + name.substring(0,40) + ' right=' + Math.round(r.right) + ' (' + Math.round(r.right-vw) + 'px over)');
-    }
-  });
-  if (results.length === 1) results.push('No overflow found!');
-  overlay.innerHTML = results.join('<br>');
-}
-</script>
-
 </body>
-</html>
