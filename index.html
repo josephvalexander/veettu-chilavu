@@ -64,6 +64,7 @@
    BASE
 ══════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{overflow-x:hidden;width:100%;max-width:100%;}
 html{font-size:16px;scroll-behavior:smooth;height:-webkit-fill-available;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:-webkit-fill-available;overscroll-behavior:none;transition:background .25s,color .25s;}
 body::before{
@@ -81,12 +82,12 @@ body::before{
 /* Mobile base */
 #app{
   position:relative;z-index:1;
-  width:100%;max-width:480px;
-  margin:0 auto;
+  width:100%;
+  overflow-x:hidden;
   padding-bottom:calc(80px + env(safe-area-inset-bottom)); /* clear bottom nav + iOS home bar */
   min-height:100vh;
 }
-.screen{display:none;flex-direction:column;width:100%;min-height:calc(100vh - 80px);min-height:calc(-webkit-fill-available - 80px);}
+.screen{display:none;flex-direction:column;width:100%;max-width:100%;overflow-x:hidden;min-height:calc(100vh - 80px);min-height:calc(-webkit-fill-available - 80px);}
 .screen.active{display:flex;}
 #screen-app.active{display:block;}
 /* Tab visibility — controlled ONLY by .tab-active class, never inline styles */
@@ -136,7 +137,7 @@ body::before{
 ════════════════════════════════════════ */
 @media(min-width:900px){
   /* Body: full width */
-  body{ overflow-x:hidden; }
+  body,#app{ overflow-x:hidden; }
 
   /* Hide mobile header */
   .app-header{ display:none !important; }
