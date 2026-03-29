@@ -63,13 +63,8 @@
 /* ══════════════════════════════════════
    BASE
 ══════════════════════════════════════ */
-*{margin:0;padding:0;}
-html,body{
-  overflow-x:clip;   /* clip is stronger than hidden on iOS — prevents scroll AND layout shift */
-  width:100%;
-  position:relative;
-}
-*,*::before,*::after{box-sizing:border-box;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{overflow-x:hidden;width:100%;max-width:100%;}
 html{font-size:16px;scroll-behavior:smooth;height:-webkit-fill-available;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:-webkit-fill-available;overscroll-behavior:none;transition:background .25s,color .25s;}
 body::before{
@@ -88,12 +83,11 @@ body::before{
 #app{
   position:relative;z-index:1;
   width:100%;
-  overflow-x:clip;
   padding-bottom:calc(80px + env(safe-area-inset-bottom));
   min-height:100vh;
 }
-.screen{display:none;flex-direction:column;width:100%;overflow-x:clip;min-height:calc(100vh - 80px);min-height:calc(-webkit-fill-available - 80px);}
-.screen.active{display:block;}
+.screen{display:none;flex-direction:column;width:100%;min-height:calc(100vh - 80px);min-height:calc(-webkit-fill-available - 80px);}
+.screen.active{display:flex;}
 #screen-app.active{display:block;}
 /* Tab visibility — controlled ONLY by .tab-active class, never inline styles */
 .tab-content        { display:none; width:100%; }
@@ -334,18 +328,12 @@ body::before{
    LOGIN SCREEN
 ══════════════════════════════════════ */
 #screen-login{
-  display:block !important;   /* override flex — use block + margin:auto for centering */
+  align-items:center;justify-content:center;
   padding:2rem 1.5rem 3rem;
   background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--banner-g1) 0%,var(--bg) 70%);
   text-align:center;
-  overflow-x:clip;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
   width:100%;
-}
-/* Centre login children without flex side-effects */
-#screen-login > *{
-  display:block;
-  margin-left:auto;
-  margin-right:auto;
 }
 
 /* ── Malayalam logo — refined display ── */
