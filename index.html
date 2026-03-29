@@ -454,7 +454,7 @@ body::before{
 .nav-arrow{width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;flex-shrink:0;}
 .nav-arrow:hover{background:var(--border);}
 .period-label{font-family:'Fraunces',Georgia,serif;font-size:.88rem;font-weight:500;text-align:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.month-banner{background:linear-gradient(135deg,var(--banner-g1) 0%,var(--banner-g2) 100%);border:1px solid var(--border);border-radius:14px;padding:1.35rem;position:relative;overflow:hidden;transition:background .25s;}
+.month-banner{background:linear-gradient(135deg,var(--banner-g1) 0%,var(--banner-g2) 100%);border:1px solid var(--border);border-radius:14px;padding:1.35rem;position:relative;transition:background .25s;}
 .month-banner::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(245,200,66,.18) 0%,transparent 70%);pointer-events:none;}
 .banner-sublabel{font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.3rem;}
 .banner-total{font-family:'Fraunces',Georgia,serif;font-size:clamp(1.4rem,7vw,2.5rem);font-weight:700;color:var(--accent);line-height:1.15;word-break:break-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
@@ -673,10 +673,10 @@ body::before{
 }
 .budget-track{
   width:100%; height:10px; border-radius:999px;
-  background:rgba(255,255,255,.08);
+  background:rgba(0,0,0,.12);
   overflow:hidden; position:relative;
 }
-[data-theme="light"] .budget-track{ background:rgba(0,0,0,.08); }
+[data-theme="dark"] .budget-track{ background:rgba(255,255,255,.12); }
 .budget-fill{
   height:100%; border-radius:999px;
   transition:width .6s cubic-bezier(.4,0,.2,1), background .3s;
@@ -2485,9 +2485,11 @@ function renderBudgetBar(total, limit) {
     over:    '🚨 Over budget by ' + fmt(Math.abs(remaining)),
   };
 
-  wrap.style.display  = '';
-  fill.style.width    = fillPct.toFixed(1) + '%';
+  wrap.style.display  = 'block';
+  // Force a reflow so the transition animates from 0
+  fill.style.width    = '0%';
   fill.className      = 'budget-fill ' + status;
+  requestAnimationFrame(() => { fill.style.width = fillPct.toFixed(1) + '%'; });
   pct.textContent     = pctNum + '%';
   pct.style.color     = status === 'safe'    ? 'var(--success)'
                       : status === 'warning' ? '#f0a830'
@@ -2540,12 +2542,8 @@ function showModal(html){
   },{passive:true});
 })();
 function closeModal(e){
-  // Close if: no event, or tap was on overlay background (not modal sheet itself)
-  if (e) {
-    const sheet = document.querySelector('.modal-sheet');
-    // Allow close if tap target is overlay OR is outside the sheet
-    if (sheet && sheet.contains(e.target)) return;
-  }
+  // Only close when tapping the dark overlay — not anything inside the sheet
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
   document.getElementById('modal-overlay').classList.remove('open');
 }
 let _tt;
