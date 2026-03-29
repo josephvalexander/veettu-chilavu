@@ -63,12 +63,10 @@
 /* ══════════════════════════════════════
    BASE
 ══════════════════════════════════════ */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{overflow-x:hidden;width:100%;max-width:100%;}
-/* Nuclear option: nothing can be wider than the viewport */
-body *{max-width:100%;box-sizing:border-box;}
-/* Exceptions for things that legitimately need to be wider */
-body img,body svg,body canvas,body video{max-width:100%;}
+*{margin:0;padding:0;}
+html{overflow-x:hidden;}
+body{overflow-x:hidden;width:100vw;max-width:100vw;position:relative;}
+*,*::before,*::after{box-sizing:border-box;}
 html{font-size:16px;scroll-behavior:smooth;height:-webkit-fill-available;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:-webkit-fill-available;overscroll-behavior:none;transition:background .25s,color .25s;}
 body::before{
@@ -86,13 +84,12 @@ body::before{
 /* Mobile base */
 #app{
   position:relative;z-index:1;
-  width:100%;
-  box-sizing:border-box;
+  width:100vw;max-width:100vw;
   overflow-x:hidden;
-  padding-bottom:calc(80px + env(safe-area-inset-bottom)); /* clear bottom nav + iOS home bar */
+  padding-bottom:calc(80px + env(safe-area-inset-bottom));
   min-height:100vh;
 }
-.screen{display:none;flex-direction:column;width:100%;max-width:100%;overflow-x:hidden;min-height:calc(100vh - 80px);min-height:calc(-webkit-fill-available - 80px);}
+.screen{display:none;flex-direction:column;width:100vw;max-width:100vw;overflow-x:hidden;min-height:calc(100vh - 80px);min-height:calc(-webkit-fill-available - 80px);}
 .screen.active{display:flex;}
 #screen-app.active{display:block;}
 /* Tab visibility — controlled ONLY by .tab-active class, never inline styles */
@@ -148,7 +145,7 @@ body::before{
 
   /* App: push right of sidebar, full width */
   #app{
-    max-width:100%;
+    width:100%;max-width:100%;
     margin:0;
     padding-bottom:0;
     padding-left:240px; /* sidebar width */
@@ -339,7 +336,7 @@ body::before{
   background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--banner-g1) 0%,var(--bg) 70%);
   text-align:center;
   overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  width:100%;box-sizing:border-box;
+  width:100vw;max-width:100vw;
 }
 
 /* ── Malayalam logo — refined display ── */
