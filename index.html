@@ -83,6 +83,7 @@ body::before{
 #app{
   position:relative;z-index:1;
   width:100%;
+  box-sizing:border-box;
   overflow-x:hidden;
   padding-bottom:calc(80px + env(safe-area-inset-bottom)); /* clear bottom nav + iOS home bar */
   min-height:100vh;
@@ -100,9 +101,8 @@ body::before{
 ══════════════════════════════════════ */
 .bottom-nav{
   position:fixed;
-  bottom:0;left:50%;
-  transform:translateX(-50%);
-  width:100%;max-width:480px;
+  bottom:0;left:0;right:0;
+  width:100%;
   background:var(--nav-bg);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border-top:1px solid var(--border);
@@ -638,8 +638,8 @@ body::before{
 /* ══════════════════════════════════════
    TOAST
 ══════════════════════════════════════ */
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--border);padding:.72rem 1.2rem;border-radius:999px;font-size:.86rem;font-weight:500;z-index:300;opacity:0;transition:all .3s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast{position:fixed;bottom:100px;left:50%;transform:translate(-50%, 20px);background:var(--card);border:1px solid var(--border);padding:.72rem 1.2rem;border-radius:999px;font-size:.86rem;font-weight:500;z-index:300;opacity:0;transition:all .3s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
+.toast.show{opacity:1;transform:translate(-50%, 0);}
 .toast.success{border-color:var(--success);color:var(--success);}
 .toast.error{border-color:var(--danger);color:var(--danger);}
 
