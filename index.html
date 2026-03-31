@@ -217,14 +217,17 @@
       .tab-content.tab-active {
         display:block !important;
         width:100%;
-        min-height:100vh;
-        overflow-y:auto;
+        min-height:calc(100vh - 40px);
+        /* Let body scroll — no overflow here */
       }
-      /* Ensure screen-app fills the space left of sidebar */
+      /* screen-app scrolls with the page naturally */
       #screen-app {
         width:100%;
         min-height:100vh;
+        overflow:visible;
       }
+      /* body is the scroll container on desktop */
+      body { overflow-y:auto; }
 
       /* Dashboard: responsive layout */
       .dash-content{
