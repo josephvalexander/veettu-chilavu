@@ -601,6 +601,8 @@
     .btn-primary{background:var(--accent);color:var(--text-inv);box-shadow:0 4px 16px rgba(245,200,66,.25);}
     .btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px);}
     .btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border);}
+    .btn-ghost{background:none;border:none;color:var(--muted);cursor:pointer;font-family:inherit;padding:.4rem 0;}
+    .btn-ghost:hover{color:var(--text);}
     .btn-danger{background:rgba(224,123,95,.13);color:var(--danger);border:1px solid rgba(224,123,95,.3);}
     .btn-sm{padding:.55rem 1rem;font-size:.82rem;}
     .btn-full{width:100%;}
@@ -653,6 +655,28 @@
     /* ══════════════════════════════════════
        MODAL
     ══════════════════════════════════════ */
+
+    /* ── Help modal styles ── */
+    .help-tabs{display:flex;gap:.4rem;margin-bottom:1rem;}
+    .help-tab{flex:1;padding:.55rem .5rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s;}
+    .help-tab.active{background:var(--accent);color:var(--text-inv);border-color:var(--accent);}
+    .help-panel{animation:fadeIn .15s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+    .help-platform-badge{display:inline-block;padding:.3rem .85rem;border-radius:999px;font-size:.78rem;font-weight:600;margin-bottom:.9rem;}
+    .help-platform-badge.ios{background:rgba(95,196,184,.15);color:var(--accent3);}
+    .help-platform-badge.android{background:rgba(95,196,184,.15);color:var(--accent3);}
+    .help-platform-badge.desktop{background:rgba(245,200,66,.15);color:var(--accent);}
+    .help-check{color:var(--success);font-weight:600;font-size:.9rem;padding:.5rem 0;}
+    .help-steps{padding-left:1.2rem;display:flex;flex-direction:column;gap:.55rem;margin-bottom:.75rem;}
+    .help-steps li{font-size:.85rem;line-height:1.55;color:var(--text);}
+    .help-steps strong{color:var(--accent);}
+    .help-note{font-size:.78rem;color:var(--muted);line-height:1.5;padding:.55rem .75rem;background:var(--surface);border-radius:6px;border-left:3px solid var(--border);}
+    .help-icon-inline{font-size:.9rem;}
+    .help-scenario{margin-bottom:1.1rem;padding-bottom:1.1rem;border-bottom:1px solid var(--border);}
+    .help-scenario:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+    .help-scenario-title{font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:.6rem;}
+    .help-tip{font-size:.78rem;color:var(--accent3);background:rgba(95,196,184,.1);border-radius:6px;padding:.55rem .75rem;margin-top:.6rem;line-height:1.5;}
+
     .modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;}
     .modal-overlay.open{display:flex;}
     .modal-sheet{width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);border-radius:14px 14px 0 0;padding:1.4rem 1.2rem 2rem;max-height:88vh;overflow-y:auto;animation:slideUp .22s ease;}
@@ -780,12 +804,32 @@
       </button>
     </div>
     <div class="setup-box" id="login-step-2" style="display:none">
-      <h2>Connect your Sheet</h2>
-      <p>Paste your shared Google Sheet ID below.</p>
-      <div class="sheet-form">
-        <input type="text" id="sheet-id-input" placeholder="Paste Google Sheet ID here" autocomplete="off"/>
-        <button class="btn btn-primary btn-full" onclick="connectSheet()">Connect Sheet →</button>
-        <button class="btn btn-secondary btn-full" onclick="createNewSheet()">📋 Help me set up a new Sheet</button>
+      <h2>Set up your Sheet</h2>
+      <p style="font-size:.83rem;color:var(--muted);margin-bottom:1.1rem;line-height:1.55">
+        Your expenses live in a Google Sheet in your own Drive.
+      </p>
+      <!-- Option A: auto-create -->
+      <button class="btn btn-primary btn-full" id="btn-auto-create" onclick="autoCreateSheet()" style="margin-bottom:.55rem">
+        ✨ Create a new Sheet for me
+      </button>
+      <!-- Option B: pick from Drive -->
+      <button class="btn btn-secondary btn-full" onclick="showPickSheet()" style="margin-bottom:.55rem">
+        📂 Use an existing Sheet
+      </button>
+      <!-- Option C: paste manually (collapsed by default) -->
+      <button class="btn btn-ghost btn-full" onclick="toggleManualEntry()" id="btn-manual-toggle"
+        style="font-size:.82rem;color:var(--muted);background:none;border:none;cursor:pointer;padding:.4rem 0;text-decoration:underline;">
+        or enter Sheet ID manually
+      </button>
+      <div id="manual-sheet-entry" style="display:none;margin-top:.75rem">
+        <div class="sheet-form">
+          <input type="text" id="sheet-id-input" placeholder="Paste Sheet ID from URL" autocomplete="off"
+            style="font-size:.85rem;"/>
+          <button class="btn btn-primary btn-full" onclick="connectSheet()">Connect →</button>
+        </div>
+        <p style="font-size:.72rem;color:var(--muted);margin-top:.5rem;line-height:1.5">
+          From: docs.google.com/spreadsheets/d/<span style="color:var(--accent)">[ID HERE]</span>/edit
+        </p>
       </div>
     </div>
     <p class="login-note">✦ No servers. No subscriptions. Data in your Google Drive.</p>
@@ -972,6 +1016,14 @@
           </div>
         </div>
         <div class="settings-card">
+          <div class="settings-row" onclick="showHelp()">
+            <span class="settings-icon">❓</span>
+            <span class="settings-label">Help & Guide</span>
+            <span class="settings-value">Install · Setup · Share</span>
+            <span class="settings-arrow">›</span>
+          </div>
+        </div>
+        <div class="settings-card">
           <div class="settings-row" onclick="signOut()" style="color:var(--danger)">
             <span class="settings-icon">🚪</span>
             <span class="settings-label" style="color:var(--danger)">Sign Out</span>
@@ -1035,7 +1087,7 @@ const CONFIG = {
   // ⚠️  These values are injected at build time by GitHub Actions from
   //     repository secrets. Never put real values here.
   CLIENT_ID: '__GOOGLE_CLIENT_ID__',
-  SCOPES: 'https://www.googleapis.com/auth/spreadsheets',
+  SCOPES: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.metadata.readonly',
   SHEET_RANGE_DATA: 'Expenses!A2:I',
   SHEET_RANGE_HEADER: 'Expenses!A1:I1',
   HEADER_ROW: ['Date','Description','Category','Amount','PaidThrough','Note','ID','AddedBy','PaymentMethod'],
@@ -1518,28 +1570,133 @@ function onTokenReceived(r) {
 function showStep2() {
   document.getElementById('login-step-1').style.display='none';
   document.getElementById('login-step-2').style.display='block';
-  if (state.sheetId) document.getElementById('sheet-id-input').value=state.sheetId;
+  // Pre-fill manual entry if they already have a sheet ID
+  const existing = document.getElementById('sheet-id-input');
+  if (existing && state.sheetId) existing.value = state.sheetId;
 }
+
+function toggleManualEntry() {
+  const el = document.getElementById('manual-sheet-entry');
+  const btn = document.getElementById('btn-manual-toggle');
+  if (!el) return;
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  if (btn) btn.textContent = open ? 'hide manual entry' : 'or enter Sheet ID manually';
+}
+
 function connectSheet() {
-  const id=document.getElementById('sheet-id-input').value.trim();
-  if (!id){showToast('Please enter a Sheet ID','error');return;}
-  state.sheetId=id; localStorage.setItem('fl_sheet_id',id); initApp();
+  const id = (document.getElementById('sheet-id-input')?.value || '').trim();
+  if (!id || id.length < 20) { showToast('Enter a valid Sheet ID', 'error'); return; }
+  state.sheetId = id;
+  localStorage.setItem('fl_sheet_id', id);
+  initApp();
 }
-function createNewSheet() {
-  showModal(`
-    <div class="modal-title">Create a Family Sheet</div>
-    <p style="font-size:.86rem;color:var(--muted);line-height:1.75;margin-bottom:1rem">
-      1. Go to <strong style="color:var(--text)">sheets.new</strong><br>
-      2. Name it "Family Expenses"<br>
-      3. File → Share → add family as <strong style="color:var(--text)">Editor</strong><br>
-      4. Copy the ID from the URL:<br>
-      <code style="font-size:.75rem;color:var(--accent);background:var(--bg);padding:.25rem .4rem;border-radius:4px;display:block;margin-top:.35rem;word-break:break-all">
-        spreadsheets/d/<strong>[THIS PART]</strong>/edit
-      </code>
-    </p>
-    <a href="https://sheets.new" target="_blank" rel="noopener" class="btn btn-primary btn-full" style="text-decoration:none;margin-bottom:.5rem">📋 Open sheets.new →</a>
-    <button class="btn btn-secondary btn-full" onclick="closeModal()">Got my Sheet ID</button>`);
+
+// ── Auto-create a new Google Sheet in the user's Drive ────────────────────
+async function autoCreateSheet() {
+  const btn = document.getElementById('btn-auto-create');
+  if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
+  try {
+    const name = 'Veettu Chilavu' + (state.user?.given_name ? ' — ' + state.user.given_name : '');
+    const res = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + state.token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        properties: { title: name },
+        sheets: [
+          { properties: { title: 'Expenses' } },
+          { properties: { title: 'Categories' } },
+        ],
+      }),
+    });
+    if (!res.ok) throw new Error('API ' + res.status);
+    const sheet = await res.json();
+    const id = sheet.spreadsheetId;
+    state.sheetId = id;
+    localStorage.setItem('fl_sheet_id', id);
+    // Show success with share instructions
+    showModal(`
+      <div class="modal-title">✅ Sheet created!</div>
+      <p style="font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:1rem">
+        "<strong style="color:var(--text)">${esc(name)}</strong>" is ready in your Google Drive.
+      </p>
+      <div style="background:var(--bg);border-radius:8px;padding:.8rem;margin-bottom:1rem">
+        <p style="font-size:.75rem;color:var(--muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em">Share with family</p>
+        <p style="font-size:.83rem;line-height:1.65;color:var(--text)">
+          Open the sheet → click <strong>Share</strong> → add family members as <strong>Editor</strong>.
+          Everyone enters the same Sheet ID when they first open the app.
+        </p>
+        <p style="font-size:.78rem;font-family:monospace;background:var(--surface);padding:.4rem .6rem;border-radius:6px;margin-top:.5rem;word-break:break-all;color:var(--accent)">${esc(id)}</p>
+      </div>
+      <a href="https://docs.google.com/spreadsheets/d/${esc(id)}/edit" target="_blank"
+        rel="noopener" class="btn btn-secondary btn-full" style="text-decoration:none;margin-bottom:.5rem">
+        🔗 Open in Google Sheets
+      </a>
+      <button class="btn btn-primary btn-full" onclick="closeModal();initApp()">
+        Continue to App →
+      </button>`);
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '✨ Create a new Sheet for me'; }
+    showToast('Could not create sheet: ' + e.message, 'error');
+    console.error('[Sheet] Create failed:', e);
+  }
 }
+
+// ── Pick an existing sheet from the user's Drive ──────────────────────────
+async function showPickSheet() {
+  showModal('<div class="modal-title">Loading your sheets…</div><p style="color:var(--muted);font-size:.85rem">Please wait</p>');
+  try {
+    // Search Drive for spreadsheet files
+    const res = await fetch(
+      'https://www.googleapis.com/drive/v3/files?q=mimeType%3D%22application%2Fvnd.google-apps.spreadsheet%22&orderBy=modifiedTime+desc&pageSize=20&fields=files(id,name,modifiedTime)',
+      { headers: { Authorization: 'Bearer ' + state.token } }
+    );
+    if (!res.ok) throw new Error('Drive API ' + res.status);
+    const data = await res.json();
+    const files = data.files || [];
+    if (files.length === 0) {
+      showModal(`
+        <div class="modal-title">No sheets found</div>
+        <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem">No Google Sheets found in your Drive.</p>
+        <button class="btn btn-primary btn-full" onclick="closeModal();autoCreateSheet()">Create one now</button>
+        <button class="btn btn-secondary btn-full" style="margin-top:.5rem" onclick="closeModal()">Cancel</button>`);
+      return;
+    }
+    const rows = files.map(f => {
+      const date = new Date(f.modifiedTime).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+      return `<div onclick="pickSheetId('${esc(f.id)}','${esc(f.name)}')"
+        style="padding:.75rem;border-radius:8px;border:1px solid var(--border);cursor:pointer;margin-bottom:.5rem;transition:background .12s"
+        onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">
+        <div style="font-weight:600;font-size:.88rem;color:var(--text)">${esc(f.name)}</div>
+        <div style="font-size:.75rem;color:var(--muted)">Modified ${date}</div>
+      </div>`;
+    }).join('');
+    showModal(`
+      <div class="modal-title">Pick a Sheet</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:.85rem">Tap a sheet to connect it</p>
+      <div style="max-height:55vh;overflow-y:auto">${rows}</div>
+      <button class="btn btn-secondary btn-full" style="margin-top:.75rem" onclick="closeModal()">Cancel</button>`);
+  } catch(e) {
+    showModal(`
+      <div class="modal-title">Couldn't load sheets</div>
+      <p style="color:var(--muted);font-size:.85rem;margin-bottom:1rem">${esc(e.message)}<br><br>You may need to allow Drive access. Try entering the Sheet ID manually.</p>
+      <button class="btn btn-secondary btn-full" onclick="closeModal();toggleManualEntry()">Enter ID manually</button>`);
+  }
+}
+
+function pickSheetId(id, name) {
+  state.sheetId = id;
+  localStorage.setItem('fl_sheet_id', id);
+  closeModal();
+  showToast('Connected: ' + name);
+  setTimeout(initApp, 400);
+}
+
+// Keep old createNewSheet as alias (used elsewhere)
+function createNewSheet() { autoCreateSheet(); }
 function signOut() {
   if (state.token && state.token !== 'DEMO') {
     try { google.accounts.oauth2.revoke(state.token, ()=>{}); } catch(_){}
@@ -2755,6 +2912,114 @@ function startVersionPolling() {
 
 window.addEventListener('load', () => { registerSW(); startVersionPolling(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('modal-overlay').classList.remove('open'); });
+
+// ════════════════════════════════════════════════════════════════════════
+//  HELP & GUIDE
+// ════════════════════════════════════════════════════════════════════════
+function detectPlatform() {
+  const ua = navigator.userAgent;
+  if (/iPad|iPhone|iPod/.test(ua)) return 'ios';
+  if (/Android/.test(ua)) return 'android';
+  return 'desktop';
+}
+
+function showHelp() {
+  const platform = detectPlatform();
+  const isStandalone = window.navigator.standalone ||
+    window.matchMedia('(display-mode: standalone)').matches;
+
+  const installSteps = {
+    ios: isStandalone
+      ? '<div class="help-check">\u2705 Already installed as app!</div>'
+      : `<ol class="help-steps">
+          <li>Open this page in <strong>Safari</strong> (required on iPhone/iPad)</li>
+          <li>Tap the <strong>Share</strong> button \u2B06\uFE0F at the bottom of the screen</li>
+          <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+          <li>Tap <strong>"Add"</strong> at the top right</li>
+          <li>Open <strong>Veettu Chilavu</strong> from your home screen</li>
+        </ol>
+        <p class="help-note">\u26A0\uFE0F Must use Safari — Chrome or Firefox on iPhone cannot install PWAs.</p>`,
+
+    android: isStandalone
+      ? '<div class="help-check">\u2705 Already installed as app!</div>'
+      : `<ol class="help-steps">
+          <li>Open this page in <strong>Chrome</strong></li>
+          <li>Tap the <strong>\u22EE menu</strong> (three dots, top right)</li>
+          <li>Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></li>
+          <li>Tap <strong>"Install"</strong> to confirm</li>
+          <li>Open <strong>Veettu Chilavu</strong> from your home screen</li>
+        </ol>
+        <p class="help-note">Works on Chrome or Edge for Android.</p>`,
+
+    desktop: `<ol class="help-steps">
+        <li>Look for the <strong>install icon \u2295</strong> in the browser address bar (right side)</li>
+        <li>Click it and select <strong>"Install"</strong></li>
+        <li>Veettu Chilavu opens as a standalone app window</li>
+      </ol>
+      <p class="help-note">Supported on Chrome and Edge. On Safari for Mac: File \u2192 Add to Dock.</p>`
+  };
+
+  const badge = { ios: 'ios', android: 'android', desktop: 'desktop' };
+  const badgeLabel = { ios: '\uD83D\uDCF1 iPhone / iPad', android: '\uD83D\uDCF1 Android', desktop: '\uD83D\uDDA5\uFE0F Desktop / Laptop' };
+
+  showModal(`
+    <div class="modal-title">Help & Guide</div>
+    <div class="help-tabs">
+      <button class="help-tab active" id="htab-install" onclick="switchHelpTab('install')">\uD83D\uDCF2 Install App</button>
+      <button class="help-tab" id="htab-sheet" onclick="switchHelpTab('sheet')">\uD83D\uDCC8 Google Sheet</button>
+    </div>
+
+    <div id="help-panel-install" class="help-panel">
+      <div class="help-platform-badge ${badge[platform]}">${badgeLabel[platform]}</div>
+      ${installSteps[platform]}
+    </div>
+
+    <div id="help-panel-sheet" class="help-panel" style="display:none">
+      <div class="help-scenario">
+        <div class="help-scenario-title">\uD83D\uDC64 For just yourself</div>
+        <ol class="help-steps">
+          <li>Sign in with your Google account</li>
+          <li>Tap <strong>"\u2728 Create a new Sheet for me"</strong></li>
+          <li>The app creates and connects your sheet automatically</li>
+          <li>Start adding expenses \u2014 done!</li>
+        </ol>
+      </div>
+      <div class="help-scenario">
+        <div class="help-scenario-title">\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67 For a family sharing one sheet</div>
+        <ol class="help-steps">
+          <li><strong>One person</strong> signs in and taps <strong>"\u2728 Create a new Sheet for me"</strong></li>
+          <li>After creation, copy the <strong>Sheet ID</strong> shown (long code) or the Sheet link</li>
+          <li>Open the sheet \u2192 click <strong>Share</strong> \u2192 add each family member's Gmail as <strong>Editor</strong></li>
+          <li>Each family member signs in \u2192 taps <strong>"or enter Sheet ID manually"</strong> \u2192 pastes the same ID</li>
+          <li>Everyone's expenses go to one shared sheet \u2713</li>
+        </ol>
+        <div class="help-tip">\uD83D\uDCA1 Easiest way to share: send the Google Sheet link on WhatsApp. The Sheet ID is the long string between /d/ and /edit in the URL.</div>
+      </div>
+      <div class="help-scenario">
+        <div class="help-scenario-title">\uD83C\uDFE0 Multiple families, separate sheets</div>
+        <ol class="help-steps">
+          <li>Each family creates their <strong>own sheet</strong> \u2014 data stays private per family</li>
+          <li>Family A shares their sheet ID only within Family A</li>
+          <li>Family B shares their sheet ID only within Family B</li>
+          <li>Everyone uses the same app \u2014 only the Sheet ID differs</li>
+        </ol>
+        <div class="help-tip">\uD83D\uDD12 Each family's expenses are completely separate. No one outside the family can see your data.</div>
+      </div>
+    </div>
+
+    <button class="btn btn-secondary btn-full" style="margin-top:1rem" onclick="closeModal()">Close</button>
+  `);
+}
+
+function switchHelpTab(tab) {
+  ['install','sheet'].forEach(t => {
+    const panel = document.getElementById('help-panel-' + t);
+    const btn   = document.getElementById('htab-' + t);
+    if (panel) panel.style.display = t === tab ? 'block' : 'none';
+    if (btn)   btn.classList.toggle('active', t === tab);
+  });
+}
+
 </script>
 
 
