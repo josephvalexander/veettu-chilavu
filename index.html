@@ -149,7 +149,7 @@
 
       /* Screens */
       .screen{ min-height:0; height:auto; }
-      .screen.active{ display:block !important; }
+      .screen.active{ display:block !important; width:auto !important; max-width:none !important; }
       #screen-app.active{ display:block !important; }
 
       /* Sidebar: fixed left */
@@ -328,7 +328,7 @@
       }
       .modal-handle{ display:none; }
 
-      /* Toast: top right, compact */
+      /* Toast: top right, compact, high contrast */
       .toast{
         bottom:auto; top:1.25rem;
         left:auto;   right:1.75rem;
@@ -339,7 +339,13 @@
         text-align:left;
         font-size:.82rem;
         padding:.55rem .85rem;
+        background:#222 !important;
+        color:#fff !important;
+        border:none !important;
+        box-shadow:0 4px 16px rgba(0,0,0,.25);
+        z-index:9999;
       }
+      .toast.error{ background:#c0392b !important; color:#fff !important; }
       .toast.show{ transform:translateX(0); }
       ::-webkit-scrollbar{ width:6px; }
     }
