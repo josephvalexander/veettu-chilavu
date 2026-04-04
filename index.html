@@ -3127,4 +3127,33 @@ function switchHelpTab(tab) {
 
 
 
+
+<script id="debug2">
+(function(){
+  document.addEventListener('wheel', function(e){
+    let el = e.target;
+    let chain = [];
+    while(el && el !== document) {
+      const cs = window.getComputedStyle(el);
+      const oy = cs.overflowY, ox = cs.overflowX, ov = cs.overflow;
+      const sh = el.scrollHeight, ch = el.clientHeight;
+      chain.push((el.id||el.tagName+'.'+[...el.classList].join('.'))+'[oy:'+oy+',sh:'+sh+',ch:'+ch+']');
+      if(oy==='hidden'||oy==='clip'||ov==='hidden') {
+        console.warn('[SCROLL-BLOCKED]', el.id||el.tagName, el.className?.toString().slice(0,30), 'oy:'+oy,'ov:'+ov);
+      }
+      el = el.parentElement;
+    }
+    console.log('[WHEEL-CHAIN]', chain.slice(0,6).join(' > '));
+  }, {passive:true, capture:true});
+
+  document.addEventListener('focusin', function(e){
+    const el = e.target;
+    const cs = window.getComputedStyle(el);
+    console.log('[FOCUS]', el.tagName, el.id||el.className?.toString().slice(0,30),
+      'outline:', cs.outline, 'box-shadow:', cs.boxShadow,
+      'w:', el.offsetWidth, 'h:', el.offsetHeight);
+  }, true);
+})();
+</script>
+
 </body>
