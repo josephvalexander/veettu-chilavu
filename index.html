@@ -148,7 +148,7 @@
       }
 
       /* Screens */
-      .screen{ min-height:100vh; }
+      .screen{ min-height:0; height:auto; }
       .screen.active{ display:block !important; }
       #screen-app.active{ display:block !important; width:100%; }
 
@@ -217,24 +217,22 @@
       .tab-content.tab-active {
         display:block !important;
         width:100%;
-        min-height:calc(100vh - 40px);
-        /* Let body scroll — no overflow here */
+        min-height:0;
+        height:auto;
+        /* Content height drives scroll — no viewport clamping */
       }
-      /* screen-app: natural flow, no scroll trapping */
+      /* screen-app: height driven by content, not viewport */
       #screen-app {
         width:100%;
-        min-height:100vh;
+        min-height:0;
         height:auto;
         overflow:visible;
       }
-      /* Desktop scroll: html/body contain everything, scroll naturally */
-      html { overflow-y:auto; }
-      body { overflow-y:auto; height:auto; min-height:100vh; }
-      /* Prevent any child from trapping wheel events */
-      #app, #screen-app, .tab-content.tab-active {
-        overflow:visible !important;
-        height:auto !important;
-      }
+      /* Desktop scroll: let body grow with content */
+      html { overflow-y:scroll; height:auto; min-height:100%; }
+      body { overflow-y:visible; height:auto; min-height:0; }
+      #app { min-height:0; height:auto; overflow:visible; }
+      #screen-app, .tab-content.tab-active { min-height:0; height:auto; overflow:visible; }
 
       /* Dashboard: responsive layout */
       .dash-content{
@@ -618,6 +616,7 @@
     ══════════════════════════════════════ */
     .btn{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.88rem 1.5rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.93rem;font-weight:600;border:none;cursor:pointer;transition:all .15s;}
     .btn-primary{background:var(--accent);color:var(--text-inv);box-shadow:0 4px 16px rgba(245,200,66,.25);}
+    .btn-primary:focus,.btn-primary:active{box-shadow:none;outline:none;}
     .btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px);}
     .btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border);}
     .btn-ghost{background:none;border:none;color:var(--muted);cursor:pointer;font-family:inherit;padding:.4rem 0;}
@@ -2446,17 +2445,19 @@ async function saveExpense() {
   const payThrough= state.selectedPayment;
 
   if (!amount || amount <= 0) {
-    document.getElementById('btn-save-expense')?.blur();
     showToast('Enter a valid amount', 'error');
-    const el = document.getElementById('amount-input');
-    if (el) { el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); el.style.borderColor='var(--danger)'; setTimeout(()=>el.style.borderColor='',2000); }
+    setTimeout(() => {
+      const el = document.getElementById('amount-input');
+      if (el) { el.focus(); el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.outline='2px solid var(--danger)'; setTimeout(()=>el.style.outline='',2000); }
+    }, 50);
     return;
   }
   if (!desc) {
-    document.getElementById('btn-save-expense')?.blur();
     showToast('Add a description', 'error');
-    const el = document.getElementById('desc-input');
-    if (el) { el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); el.style.borderColor='var(--danger)'; setTimeout(()=>el.style.borderColor='',2000); }
+    setTimeout(() => {
+      const el = document.getElementById('desc-input');
+      if (el) { el.focus(); el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.outline='2px solid var(--danger)'; setTimeout(()=>el.style.outline='',2000); }
+    }, 50);
     return;
   }
   if (!isoDate) {
@@ -3128,32 +3129,5 @@ function switchHelpTab(tab) {
 
 
 
-<script id="debug2">
-(function(){
-  document.addEventListener('wheel', function(e){
-    let el = e.target;
-    let chain = [];
-    while(el && el !== document) {
-      const cs = window.getComputedStyle(el);
-      const oy = cs.overflowY, ox = cs.overflowX, ov = cs.overflow;
-      const sh = el.scrollHeight, ch = el.clientHeight;
-      chain.push((el.id||el.tagName+'.'+[...el.classList].join('.'))+'[oy:'+oy+',sh:'+sh+',ch:'+ch+']');
-      if(oy==='hidden'||oy==='clip'||ov==='hidden') {
-        console.warn('[SCROLL-BLOCKED]', el.id||el.tagName, el.className?.toString().slice(0,30), 'oy:'+oy,'ov:'+ov);
-      }
-      el = el.parentElement;
-    }
-    console.log('[WHEEL-CHAIN]', chain.slice(0,6).join(' > '));
-  }, {passive:true, capture:true});
-
-  document.addEventListener('focusin', function(e){
-    const el = e.target;
-    const cs = window.getComputedStyle(el);
-    console.log('[FOCUS]', el.tagName, el.id||el.className?.toString().slice(0,30),
-      'outline:', cs.outline, 'box-shadow:', cs.boxShadow,
-      'w:', el.offsetWidth, 'h:', el.offsetHeight);
-  }, true);
-})();
-</script>
 
 </body>
