@@ -226,8 +226,8 @@
         min-height:100vh;
         overflow:visible;
       }
-      /* body is the scroll container on desktop */
-      body { overflow-y:auto; }
+      /* html+body are the scroll container on desktop */
+      html, body { overflow-y:auto; height:auto; }
 
       /* Dashboard: responsive layout */
       .dash-content{
@@ -349,6 +349,12 @@
     ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important;}}
     :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+    /* Suppress browser's giant oval focus ring on chip/button elements */
+    .cat-chip:focus-visible,
+    .pay-chip:focus-visible,
+    .btn:focus-visible,
+    .nav-item:focus-visible,
+    .nav-arrow:focus-visible{ outline:none; box-shadow:0 0 0 2px var(--accent); }
 
     /* ══════════════════════════════════════
        LOGIN SCREEN
@@ -2426,9 +2432,24 @@ async function saveExpense() {
   const note      = document.getElementById('note-input').value.trim();
   const payThrough= state.selectedPayment;
 
-  if (!amount || amount <= 0) { showToast('Enter a valid amount', 'error'); return; }
-  if (!desc)   { showToast('Add a description', 'error'); return; }
-  if (!isoDate){ showToast('Pick a date', 'error'); return; }
+  if (!amount || amount <= 0) {
+    showToast('Enter a valid amount', 'error');
+    const el = document.getElementById('amount-input');
+    el?.focus(); el?.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  if (!desc) {
+    showToast('Add a description', 'error');
+    const el = document.getElementById('desc-input');
+    el?.focus(); el?.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  if (!isoDate) {
+    showToast('Pick a date', 'error');
+    const el = document.getElementById('date-input');
+    el?.focus(); el?.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
 
   const ddmmyyyy = isoToDdMmYyyy(isoDate);
   const addedBy  = state.user ? (state.user.given_name || state.user.name || '') : '';
