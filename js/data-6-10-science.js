@@ -2,7 +2,7 @@
 window.EXPERIMENTS_6_10_SCI = [
 
   // ── CLASS 6 SCIENCE ──
-  {id:'c6-s1',title:'Cell: The Unit of Life',subject:'Science',classes:['6'],icon:'🔬',bgGrad:'rgba(255,107,107,.18)',
+  {id:'c6-s1',title:'Cell: The Unit of Life',subject:'Science',classes:['8'],icon:'🔬',bgGrad:'rgba(255,107,107,.18)',
    desc:'Prepare an onion-skin slide. Observe plant cells and label their parts.',
    ncert:'NCERT Science Class 6 – Ch 1 (intro) | Full treatment: Class 8 Ch 8 – Cell',
    why:'All living things are made of cells. Plant cells have a cell wall, central vacuole, and (in green parts) chloroplasts. Robert Hooke first saw cells in cork in 1665.',
@@ -26,7 +26,7 @@ window.EXPERIMENTS_6_10_SCI = [
    steps:['Mix iron filings and sand; separate with magnet.','Dissolve salt in water; filter (salt passes through).','Evaporate the salt-water on a warm plate — salt crystals remain.','Mix mud and water; let it settle (sedimentation), pour off clear water (decantation).','Draw and label each method.'],
    simId:'separation-sim',buddy:'Desalination plants on the Arabian coast use giant evaporation chambers to make fresh water from seawater — same principle, planetary scale.'},
 
-  {id:'c6-s4',title:'Photosynthesis Bubbles',subject:'Science',classes:['6'],icon:'🌿',bgGrad:'rgba(255,107,107,.18)',
+  {id:'c6-s4',title:'Photosynthesis Bubbles',subject:'Science',classes:['7'],icon:'🌿',bgGrad:'rgba(255,107,107,.18)',
    desc:'Count oxygen bubbles from an aquatic plant in bright light vs dark.',
    ncert:'NCERT Science Class 6 – Photosynthesis',
    why:'Aquatic plants release O₂ as a by-product of photosynthesis. More light = more bubbles = more photosynthesis. Darkness stops the reaction, proving light is essential.',
@@ -34,7 +34,7 @@ window.EXPERIMENTS_6_10_SCI = [
    steps:['Place plant in water in bright light; count bubbles per minute.','Cover with dark cloth; count bubbles after 5 minutes.','Move lamp closer — does bubble rate increase?','Record all three rates in a table.','Test: what gas is in the bubbles? (Relights a glowing splint — oxygen!)'],
    simId:'photo-bubbles',buddy:'Every breath of oxygen you take was produced by a plant or ocean algae. And every carbon atom in your body was once CO₂, captured by a leaf doing exactly what you\'re watching.'},
 
-  {id:'c6-s5',title:'Build Weather Instruments',subject:'Science',classes:['6'],icon:'🌡️',bgGrad:'rgba(255,107,107,.18)',
+  {id:'c6-s5',title:'Build Weather Instruments',subject:'Science',classes:['7'],icon:'🌡️',bgGrad:'rgba(255,107,107,.18)',
    desc:'Make a rain gauge, wind vane, and simple barometer from household materials.',
    ncert:'NCERT Science Class 6 – Weather, Climate and Adaptations',
    why:'Meteorologists measure temperature, rainfall, wind direction, and pressure. Building your own instruments shows what each measurement physically means.',
@@ -59,7 +59,7 @@ window.EXPERIMENTS_6_10_SCI = [
    steps:['Fill a large container with room-temperature water.','Gently pour red-coloured hot water at one end.','Drop a blue-dyed ice cube at the opposite end.','Observe: red rises, blue sinks, they circulate.','Draw the convection loop you see.'],
    simId:'convection-sim',buddy:'The same convection you see in the glass drives the Indian monsoon! Warm ocean heats air → air rises → cool moist ocean air rushes in = monsoon rain over Kerala.'},
 
-  {id:'c7-s3',title:'Build a Simple Electric Motor',subject:'Science',classes:['7'],icon:'🔌',bgGrad:'rgba(255,107,107,.18)',
+  {id:'c7-s3',title:'Build a Simple Electric Motor',subject:'Science',classes:['10'],icon:'🔌',bgGrad:'rgba(255,107,107,.18)',
    desc:'Wind a copper coil, balance it over a magnet, connect a battery — watch it spin.',
    ncert:'NCERT Science Class 7 – Electric Current and its Effects',
    why:'A motor converts electrical energy to mechanical energy. Current through a coil in a magnetic field experiences a force and rotates. Every fan, mixer, pump, and EV uses this exact principle.',
@@ -75,7 +75,7 @@ window.EXPERIMENTS_6_10_SCI = [
    steps:['Connect: battery → ammeter → resistor → back to battery. Voltmeter across resistor.','Record V and I with 1 battery.','Add second battery (3 V) — record again.','Plot V (y-axis) vs I (x-axis). Draw best-fit line.','Slope = V/I = resistance. Does it match 100 Ω?'],
    simId:'ohms-law',buddy:'Georg Ohm published his law in 1827 and was mocked — peers called it "a tissue of naked fantasy." He was vindicated 15 years later and awarded the Royal Society Gold Medal.'},
 
-  {id:'c7-s5',title:'Bone Structure Lab',subject:'Science',classes:['7'],icon:'🦴',bgGrad:'rgba(255,107,107,.18)',
+  {id:'c7-s5',title:'Bone Structure Lab',subject:'Science',classes:['6'],icon:'🦴',bgGrad:'rgba(255,107,107,.18)',
    desc:'Soak a chicken bone in vinegar to remove calcium. Feel the difference.',
    ncert:'NCERT Science Class 7 – Body Movement',
    why:'Bone strength comes from calcium phosphate (mineral); flexibility from collagen (protein). Vinegar dissolves the mineral, leaving only collagen — bendy and rubbery.',
@@ -414,4 +414,24 @@ window.EXPERIMENTS_6_10_SCI = [
 
   /* Moved from data-1-5.js */
   ,{id:'c5-s4',title:'Acid or Base?',subject:'Science',classes:['7'],icon:'🧪',bgGrad:'rgba(255,107,107,.18)',desc:'Make a natural pH indicator from red cabbage. Test common liquids.',ncert:'NCERT Science Class 7 – Ch 5: Acids, Bases and Salts',why:'Red cabbage contains anthocyanin — a natural pH indicator. It turns red in acids, green/yellow in bases, and stays purple at neutral.',materials:['Red cabbage','Water','Glasses','Lemon juice, baking soda, vinegar, milk, soap'],steps:['Boil red cabbage in water. Strain — keep the purple liquid.','Pour into several glasses.','Add test liquids one per glass.','Record colour change.','Classify as acid, base, or neutral.'],simId:'ph-indicator',buddy:'Your stomach acid (pH 1.5–3.5) is strong enough to dissolve metal! Luckily, your stomach lining renews itself every 4 days to protect itself.'}
+
+
+  /* Moved: correct NCERT class */
+  ,{id:'c3-s5',title:'Lung Capacity Balloon',subject:'Science',classes:['7'],icon:'🫁',bgGrad:'rgba(255,107,107,.18)',desc:'Measure your lung capacity using a balloon. Compare between classmates.',ncert:'NCERT Science Class 3 – Breathing',why:'Lung capacity is the maximum air your lungs can hold. Average adult lungs hold about 6 litres. Exercise increases lung capacity over time.',materials:['A balloon per person','Ruler','Paper to record'],steps:['Take the deepest breath you can.','Blow it all into the balloon in one breath.','Pinch it shut quickly.','Measure the widest diameter of the balloon.','Compare with 3 others — who has biggest capacity?'],simId:'lung-capacity',buddy:'Trained swimmers and singers have much larger lung capacity. Singers practice breathing exercises daily. Your lungs can be strengthened just like muscles!'}
+
+
+  /* Moved: correct NCERT class */
+  ,{id:'c4-s4',title:'Sound and Pitch',subject:'Science',classes:['8'],icon:'🎵',bgGrad:'rgba(255,107,107,.18)',desc:'Make a musical scale with water glasses. Understand pitch and frequency.',ncert:'NCERT Science Class 4 – Sound',why:'Pitch depends on frequency — how fast air vibrates. More water = shorter air column = faster vibration = higher pitch. Less water = lower pitch.',materials:['6–8 identical glasses','Water','A metal spoon'],steps:['Line up glasses.','Fill each with different amounts of water (from empty to full).','Tap each gently with the spoon.','Listen — which gives the highest/lowest pitch?','Can you play a simple tune like "Do Re Mi"?'],simId:'sound-pitch',buddy:'A guitar string vibrating 440 times per second makes the note A. That\'s 440 Hz! Higher strings vibrate faster, producing higher notes.'}
+
+
+  /* Moved: correct NCERT class */
+  ,{id:'c4-s5',title:'Reflection and Mirrors',subject:'Science',classes:['6'],icon:'🪞',bgGrad:'rgba(255,107,107,.18)',desc:'Explore how mirrors reflect light. Build a simple periscope!',ncert:'NCERT Science Class 4 – Light',why:'Reflection law: the angle of incidence equals the angle of reflection. Mirrors are flat, polished surfaces that reflect nearly all light hitting them.',materials:['2 small mirrors','Cardboard tube or box','Tape','A torch'],steps:['Shine a torch at a mirror — see where the beam goes.','Angle the mirror differently — observe the reflected beam.','Build a periscope: 2 mirrors at 45° in a tall box.','Look through the bottom — you can see over obstacles!','Why do ambulances have reversed writing?'],simId:'reflection-sim',buddy:'Fun house mirrors distort your reflection because they\'re curved, not flat. Concave mirrors focus light (telescopes); convex mirrors widen the view (car side mirrors).'}
+
+
+  /* Moved: correct NCERT class */
+  ,{id:'c5-s3',title:'Photosynthesis in a Leaf',subject:'Science',classes:['7'],icon:'🍃',bgGrad:'rgba(255,107,107,.18)',desc:'Test for starch in leaves to prove photosynthesis happened.',ncert:'NCERT Science Class 5 – Photosynthesis',why:'Leaves produce glucose via photosynthesis, stored as starch. Iodine turns dark blue/black in the presence of starch — proving photosynthesis happened.',materials:['A leaf (kept in sunlight and one kept in dark)','Iodine solution','Boiling water (adult help)','Alcohol'],steps:['Boil the leaf in water 2 min to soften.','Place in alcohol 5 min to remove chlorophyll.','Wash leaf. Place flat on white paper.','Add drops of iodine.','Which leaf turns dark? Why?'],simId:'photosynthesis-test',buddy:'A single large tree produces enough oxygen for 4 people per day. And one tree can absorb up to 22 kg of CO₂ per year. That\'s why deforestation is an oxygen problem.'}
+
+
+  /* Moved: correct NCERT class */
+  ,{id:'c5-s5',title:'Gravity and Projectiles',subject:'Science',classes:['9'],icon:'🏀',bgGrad:'rgba(255,107,107,.18)',desc:'Drop a ball and throw one horizontally. Do they land at the same time?',ncert:'NCERT Science Class 5 – Force and Motion',why:'Gravity acts equally on all objects regardless of horizontal motion. A ball thrown horizontally and one dropped from the same height hit the ground simultaneously.',materials:['Two identical small balls','A table','Tape to mark starting point'],steps:['Hold both balls at the same height at the table edge.','Drop one straight down. Simultaneously roll the other off the table.','Listen carefully — do they land at the same time?','Try from different heights.','What do you notice?'],simId:'projectile-sim',buddy:'This is why a bullet fired horizontally and one dropped from the same height hit the ground at the same time! Galileo proved this in 1590 — and people refused to believe him.'}
 ];
