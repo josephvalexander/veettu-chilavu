@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Privacy Policy — Veettu Chilavu</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:680px;margin:3rem auto;padding:0 1.5rem;line-height:1.7;color:#222;}
+  h1{font-size:1.6rem;margin-bottom:.25rem;}
+  h2{font-size:1.1rem;margin-top:2rem;}
+  .sub{color:#666;font-size:.9rem;margin-bottom:2rem;}
+  a{color:#1a6b5c;}
+  #back-btn{
+    display:inline-flex;align-items:center;gap:.4rem;
+    margin-bottom:1.5rem;
+    padding:.5rem 1rem;
+    background:#1a4a44;color:#f5c842;
+    border-radius:8px;font-size:.88rem;font-weight:600;
+    text-decoration:none;
+    transition:opacity .15s;
+  }
+  #back-btn:hover{opacity:.85;}
+</style>
+<script>
+function goBack(e) {
+  // In PWA (no browser chrome), use history.back() if there's history,
+  // otherwise navigate to the app root
+  if (window.history.length > 1) {
+    e.preventDefault();
+    window.history.back();
+  }
+  // else let the href="index.html" handle it naturally
+}
+</script>
+</head>
+<body>
+<a href="index.html" id="back-btn" onclick="goBack(event)">← Back to App</a>
+<h1>Privacy Policy</h1>
+<p class="sub">Veettu Chilavu · Last updated: April 2026</p>
+
+<h2>What this app is</h2>
+<p>Veettu Chilavu ("വീട്ടു ചിലവ്") is a free, open-source family expense tracker. It runs entirely in your browser and stores all data in a Google Sheet that you own.</p>
+
+<h2>Data we access</h2>
+<p>When you sign in with Google, this app requests access to:</p>
+<ul>
+  <li><strong>Google Sheets</strong> — to read and write expense data to a specific spreadsheet you provide. We only access the sheet you explicitly connect.</li>
+  <li><strong>Your Google profile</strong> (name, email, profile picture) — displayed inside the app to identify who added an expense.</li>
+</ul>
+
+<h2>Data we do NOT collect</h2>
+<ul>
+  <li>We do not store any data on our servers — there are no servers.</li>
+  <li>We do not share your data with any third party.</li>
+  <li>We do not use your data for advertising or analytics beyond basic page-view counts.</li>
+  <li>We do not store your Google credentials. OAuth tokens are held only in your browser's memory for the current session.</li>
+</ul>
+
+<h2>Your Google Sheet</h2>
+<p>All expense data is written directly to a Google Sheet in your own Google Drive. You have full ownership and control. You can delete or revoke access at any time from your <a href="https://myaccount.google.com/permissions">Google Account permissions page</a>.</p>
+
+<h2>Revoking access</h2>
+<p>You can revoke this app's access to your Google account at any time by visiting <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a> and removing "Veettu Chilavu".</p>
+
+<h2>Contact</h2>
+<p>For questions about this privacy policy, contact: <a href="/cdn-cgi/l/email-protection#4b2124382e3b233d2a272e332a252f2e39390b2c262a222765282426"><span class="__cf_email__" data-cfemail="5832372b3d28302e39343d2039363c3d2a2a183f35393134763b3735">[email&#160;protected]</span></a></p>
+
+<p style="margin-top:3rem;color:#999;font-si

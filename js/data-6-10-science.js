@@ -1,0 +1,437 @@
+/* data-6-10-science.js — Science experiments, classes 6–10 */
+window.EXPERIMENTS_6_10_SCI = [
+
+  // ── CLASS 6 SCIENCE ──
+  {id:'c6-s1',title:'Cell: The Unit of Life',subject:'Science',classes:['8'],icon:'🔬',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Prepare an onion-skin slide. Observe plant cells and label their parts.',
+   ncert:'NCERT Science Class 6 – Ch 1 (intro) | Full treatment: Class 8 Ch 8 – Cell',
+   why:'All living things are made of cells. Plant cells have a cell wall, central vacuole, and (in green parts) chloroplasts. Robert Hooke first saw cells in cork in 1665.',
+   materials:['Onion','Iodine solution','Glass slide & cover slip','Microscope or drop lens'],
+   steps:['Peel a single translucent layer from an onion.','Place flat on the slide; add a drop of iodine.','Lower cover slip carefully — no bubbles.','Observe under microscope.','Draw and label: cell wall, nucleus, vacuole, cytoplasm.'],
+   simId:'cell-view',buddy:'Your body has ~37 trillion cells. Each carries your complete DNA — a 2-metre-long molecule coiled inside a nucleus just 6 micrometres wide.'},
+
+  {id:'c9-s0',title:'Newton\'s Three Laws',subject:'Science',classes:['9'],icon:'🍎',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Demonstrate all three laws using a toy car, a book, and a balloon.',
+   ncert:'NCERT Science Class 6 – Force and Motion',
+   why:'Law 1: objects stay still or moving unless a force acts. Law 2: F = ma. Law 3: every action has an equal and opposite reaction.',
+   materials:['Toy car','Heavy book','Inflated balloon'],
+   steps:['Law 1: Slide a book on a smooth floor — it keeps going until friction stops it.','Law 2: Push the toy car, then push the heavy book with same force — compare acceleration.','Law 3: Release an inflated balloon — air rushes back, balloon flies forward.','Record which law each shows.','Find two more examples of each law in your home.'],
+   simId:'newtons-laws',buddy:'Every time you walk, Newton\'s 3rd law works — you push the ground backward, it pushes you forward. Without that reaction, you couldn\'t move.'},
+
+  {id:'c6-s3',title:'Separation Techniques',subject:'Science',classes:['6'],icon:'🧫',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Separate mixtures by filtration, evaporation, and magnetism.',
+   ncert:'NCERT Science Class 6 – Separation of Substances',
+   why:'Each separation method exploits a different property — particle size (filtration), volatility (evaporation), magnetism. Understanding this is the foundation of chemistry and materials science.',
+   materials:['Sand','Salt','Iron filings','Water','Magnet','Filter paper'],
+   steps:['Mix iron filings and sand; separate with magnet.','Dissolve salt in water; filter (salt passes through).','Evaporate the salt-water on a warm plate — salt crystals remain.','Mix mud and water; let it settle (sedimentation), pour off clear water (decantation).','Draw and label each method.'],
+   simId:'separation-sim',buddy:'Desalination plants on the Arabian coast use giant evaporation chambers to make fresh water from seawater — same principle, planetary scale.'},
+
+  {id:'c6-s4',title:'Photosynthesis Bubbles',subject:'Science',classes:['7'],icon:'🌿',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Count oxygen bubbles from an aquatic plant in bright light vs dark.',
+   ncert:'NCERT Science Class 6 – Photosynthesis',
+   why:'Aquatic plants release O₂ as a by-product of photosynthesis. More light = more bubbles = more photosynthesis. Darkness stops the reaction, proving light is essential.',
+   materials:['Aquatic plant (hydrilla)','Beaker of water','Bright lamp','Dark cloth','Timer'],
+   steps:['Place plant in water in bright light; count bubbles per minute.','Cover with dark cloth; count bubbles after 5 minutes.','Move lamp closer — does bubble rate increase?','Record all three rates in a table.','Test: what gas is in the bubbles? (Relights a glowing splint — oxygen!)'],
+   simId:'photo-bubbles',buddy:'Every breath of oxygen you take was produced by a plant or ocean algae. And every carbon atom in your body was once CO₂, captured by a leaf doing exactly what you\'re watching.'},
+
+  {id:'c6-s5',title:'Build Weather Instruments',subject:'Science',classes:['7'],icon:'🌡️',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Make a rain gauge, wind vane, and simple barometer from household materials.',
+   ncert:'NCERT Science Class 6 – Weather, Climate and Adaptations',
+   why:'Meteorologists measure temperature, rainfall, wind direction, and pressure. Building your own instruments shows what each measurement physically means.',
+   materials:['Plastic bottle (rain gauge)','Cardboard + pencil (wind vane)','Clear bottle + straw + clay (barometer)'],
+   steps:['Rain gauge: cut bottle top off, invert as funnel; mark mm scale on side.','Wind vane: arrow-shaped cardboard balanced on pencil in clay — points into wind.','Barometer: seal a bottle; insert a straw through clay stopper; mark water level inside straw.','Record daily readings for a week.','Compare to TV weather forecast — how accurate is yours?'],
+   simId:'weather-instruments',buddy:'Before instruments, farmers read weather from nature: red sky at night, crows flying low, ants moving uphill. Many of these signs are still reliable — centuries of observation.'},
+
+  // ── CLASS 7 SCIENCE ──
+  {id:'c7-s1',title:'Acid Rain Simulation',subject:'Science',classes:['7'],icon:'🌧️',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Use vinegar as a proxy for acid rain. Observe its effect on plants and marble.',
+   ncert:'NCERT Science Class 7 – Acids, Bases and Salts',
+   why:'Burning fossil fuels releases SO₂ and NOₓ, which dissolve in rain to form sulphuric and nitric acids. Acid rain damages leaves, erodes stone buildings, and acidifies lakes.',
+   materials:['Two small plants or leaves','Vinegar','Normal water','Piece of chalk or marble','Spray bottle'],
+   steps:['Spray one plant daily with plain water, the other with vinegar solution, for 5 days.','Place chalk in vinegar — observe CO₂ bubbles (acid attacking carbonate).','Compare the two plants after 5 days — colour, texture.','This models how acid rain destroys forests and corrodes monuments.','Research: which Indian monuments are suffering from acid rain?'],
+   simId:'acid-rain',buddy:'The Taj Mahal\'s white marble is yellowing from air pollution and acid rain. The government has set up an Eco-Sensitive Zone around it to limit vehicle emissions.'},
+
+  {id:'c7-s2',title:'Convection Currents',subject:'Science',classes:['7'],icon:'🌊',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Visualise convection in water using hot (red) and cold (blue) coloured water.',
+   ncert:'NCERT Science Class 7 – Heat',
+   why:'Hot fluid is less dense and rises; cold fluid is denser and sinks — creating a circulation loop called a convection current. This drives ocean currents, wind patterns, and even plate tectonics.',
+   materials:['Large clear container','Food colouring (red and blue)','Hot water','Ice cube'],
+   steps:['Fill a large container with room-temperature water.','Gently pour red-coloured hot water at one end.','Drop a blue-dyed ice cube at the opposite end.','Observe: red rises, blue sinks, they circulate.','Draw the convection loop you see.'],
+   simId:'convection-sim',buddy:'The same convection you see in the glass drives the Indian monsoon! Warm ocean heats air → air rises → cool moist ocean air rushes in = monsoon rain over Kerala.'},
+
+  {id:'c7-s3',title:'Build a Simple Electric Motor',subject:'Science',classes:['10'],icon:'🔌',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Wind a copper coil, balance it over a magnet, connect a battery — watch it spin.',
+   ncert:'NCERT Science Class 7 – Electric Current and its Effects',
+   why:'A motor converts electrical energy to mechanical energy. Current through a coil in a magnetic field experiences a force and rotates. Every fan, mixer, pump, and EV uses this exact principle.',
+   materials:['AA battery','Strong neodymium magnet','Enamelled copper wire (~1m)','2 safety pins','Tape'],
+   steps:['Coil copper wire around a battery (20 turns). Slip off carefully.','Sand the enamel off one side only of each wire end.','Balance the coil horizontally on two safety pins (acting as rails).','Tape the safety pins to battery terminals.','Place magnet below coil — it should spin!'],
+   simId:'motor-model',buddy:'Michael Faraday built the first electric motor in 1821 with a magnet, wire, and battery. The same principle today powers electric buses, trains, and every EV on Indian roads.'},
+
+  {id:'c7-s4',title:'Verify Ohm\'s Law',subject:'Science',classes:['10'],icon:'⚡',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Measure voltage and current across a resistor. Plot V vs I — expect a straight line.',
+   ncert:'NCERT Science Class 10 – Ch 12: Electricity (Ohm\'s Law)',
+   why:'Ohm\'s Law (V = IR): if resistance is constant, voltage and current are directly proportional. The straight line on your graph IS the proof.',
+   materials:['1.5 V battery (×2)','100 Ω resistor','Voltmeter','Ammeter','Wires'],
+   steps:['Connect: battery → ammeter → resistor → back to battery. Voltmeter across resistor.','Record V and I with 1 battery.','Add second battery (3 V) — record again.','Plot V (y-axis) vs I (x-axis). Draw best-fit line.','Slope = V/I = resistance. Does it match 100 Ω?'],
+   simId:'ohms-law',buddy:'Georg Ohm published his law in 1827 and was mocked — peers called it "a tissue of naked fantasy." He was vindicated 15 years later and awarded the Royal Society Gold Medal.'},
+
+  {id:'c7-s5',title:'Bone Structure Lab',subject:'Science',classes:['6'],icon:'🦴',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Soak a chicken bone in vinegar to remove calcium. Feel the difference.',
+   ncert:'NCERT Science Class 7 – Body Movement',
+   why:'Bone strength comes from calcium phosphate (mineral); flexibility from collagen (protein). Vinegar dissolves the mineral, leaving only collagen — bendy and rubbery.',
+   materials:['Clean chicken leg bone','Vinegar','Glass jar with lid'],
+   steps:['Examine fresh bone: try bending it — rigid.','Submerge in vinegar for 3 days; check daily.','Remove, rinse, try bending again.','It bends! Only collagen remains.','Now identify joint types on your own body: ball-and-socket (shoulder), hinge (knee), pivot (neck).'],
+   simId:'bone-joints',buddy:'Your femur is stronger than concrete per unit area and can withstand 8,000 N. Yet a chicken bone soaks rubbery in 3 days — same principle, same mineral.'},
+
+  // ── CLASS 8 SCIENCE ──
+  {id:'c8-s1',title:'Extract Your Own DNA',subject:'Science',classes:['8'],icon:'🧬',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Extract visible DNA from a strawberry using dish soap, salt, and cold alcohol.',
+   ncert:'NCERT Science Class 8 – Ch 8: Cell – Structure and Functions (practical extension)',
+   why:'Detergent breaks cell membranes; salt shields DNA charges so strands clump; cold alcohol precipitates DNA out of solution. The white threads you see are millions of DNA molecules.',
+   materials:['2 strawberries','Zip-lock bag','1 tsp dish soap','Pinch of salt','Cold isopropyl alcohol','Coffee filter','Clear glass'],
+   steps:['Mash strawberries in the zip-lock bag.','Add 2 tsp water + dish soap + salt. Gently mix.','Filter through coffee filter into the glass.','Slowly pour cold alcohol down the inside of the glass.','Watch white stringy strands appear — that\'s DNA!'],
+   simId:'dna-extraction',buddy:'Your DNA, uncoiled from all cells, would stretch Earth-to-Sun and back 600 times. Yet it fits in a nucleus 6 µm wide — packaged more tightly than any human technology.'},
+
+  {id:'c8-s2',title:'Fire Triangle Demo',subject:'Science',classes:['8'],icon:'🔥',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Extinguish candle flames by removing fuel, oxygen, or heat — one at a time.',
+   ncert:'NCERT Science Class 8 – Combustion and Flame',
+   why:'Fire needs three things: fuel, oxygen, and heat (ignition temperature). Remove any one and combustion stops. This is the scientific basis for every fire extinguisher.',
+   materials:['Candle','Glass jar','Baking soda + vinegar (CO₂ source)','Water in a spray bottle'],
+   steps:['Light the candle.','Cover with jar — oxygen depletes, flame dies. (Remove oxygen.)','Relight; pour CO₂ from baking soda + vinegar over flame — dies. (Displaces oxygen.)','Relight; spray a tiny mist of water — cools below ignition. (Remove heat.)','Ask: why shouldn\'t you pour water on a grease fire or electrical fire?'],
+   simId:'fire-triangle',buddy:'Kerala forest fires are fought using "firebreaks" — strips of cleared land that remove fuel ahead of the fire\'s path. Fighting fire with fire, scientifically.'},
+
+  {id:'c8-s3',title:'Pressure Increases with Depth',subject:'Science',classes:['8'],icon:'🤿',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Three holes at different heights on a bottle show water pressure vs depth.',
+   ncert:'NCERT Science Class 8 – Force and Pressure',
+   why:'Pressure = Force / Area. Water pressure increases with depth because more water weight presses above. The deeper hole shoots water furthest — highest pressure.',
+   materials:['Tall plastic bottle','Nail or skewer (to make holes)','Tape','Water','Tray'],
+   steps:['Make three holes at: 2 cm, 10 cm, and 18 cm from the bottom. Cover with tape.','Fill bottle with water.','Hold over tray, remove tape simultaneously.','Observe: which stream shoots furthest?','Measure horizontal distances — deepest hole wins. Record results.'],
+   simId:'pressure-depth',buddy:'The Mariana Trench (11 km deep) has pressure of 1,086 bar — 50 jumbo jets pressing on you. Submarines exploring it have steel walls 13 cm thick.'},
+
+  {id:'c8-s4',title:'Metal Reactivity Series',subject:'Science',classes:['8'],icon:'⚗️',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Test zinc, iron, and copper with dilute acid. Build your own reactivity series.',
+   ncert:'NCERT Science Class 8 – Metals and Non-metals',
+   why:'Metals vary in reactivity from potassium (explosive in water) to gold (never reacts). The reactivity series predicts which metals displace others — critical for metallurgy and battery design.',
+   materials:['Zinc granules','Iron nail','Copper wire','Dilute vinegar or HCl','Test tubes'],
+   steps:['Add each metal to water — any bubbles?','Add each metal to dilute acid — rank bubble intensity.','Place iron nail in copper sulphate solution — copper deposits on iron (displacement).','Arrange metals in order: most reactive → least reactive.','Compare to the standard reactivity series.'],
+   simId:'reactivity-series',buddy:'Gold\'s unreactivity is why it has been treasured for 6,000 years — it never tarnishes. Gold from ancient Egyptian tombs looks freshly polished today.'},
+
+  {id:'c8-s5',title:'Electromagnetic Induction',subject:'Science',classes:['8','10'],icon:'💡',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Move a magnet through a copper coil. Watch an LED flicker from generated electricity.',
+   ncert:'NCERT Science Class 10 – Ch 13: Magnetic Effects of Electric Current',
+   why:'Faraday\'s law: a changing magnetic field induces a current in a nearby conductor. This is how every power plant on Earth generates electricity — spinning magnets near coils of wire.',
+   materials:['Strong bar magnet','~100 turns of enamelled copper wire (solenoid)','LED','Sensitive ammeter (or galvanometer)'],
+   steps:['Wind copper wire tightly into a solenoid (50–100 turns). Connect ends to LED and meter.','Quickly push the magnet into the coil.','Observe LED flicker and meter deflect.','Pull magnet out — current flows in opposite direction.','Push faster — does the LED shine brighter?'],
+   simId:'em-induction',buddy:'Faraday had almost no formal education — he was a bookbinder\'s apprentice. His discovery of electromagnetic induction in 1831 powers every electrical device in your home today.'},
+
+  // ── CLASS 9 SCIENCE ──
+  {id:'c9-s1',title:'Atomic Structure Models',subject:'Science',classes:['9'],icon:'⚛️',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Build Bohr models for C, O, and Na. Identify valence electrons.',
+   ncert:'NCERT Science Class 9 – Structure of the Atom',
+   why:'Electrons fill shells in order: shell 1 (max 2), shell 2 (max 8), shell 3 (max 18). Valence electrons (outermost) determine all chemical behaviour — bonding, reactivity, and electrical conductivity.',
+   materials:['Cardboard circles (shells)','Coloured stickers (electrons)','Cotton balls (nucleus)'],
+   steps:['Carbon (6p, 6n): draw nucleus, add 2 electrons on shell 1, 4 on shell 2.','Oxygen (8p, 8n): 2 on shell 1, 6 on shell 2.','Sodium (11p, 12n): 2 + 8 + 1.','Which atoms have full outer shells? (Noble gases — most stable.)','Which have 1 valence electron? (Alkali metals — most reactive.)'],
+   simId:'atomic-model',buddy:'Democritus proposed atoms in 400 BC with no evidence. Dalton gave the first scientific model in 1803. Bohr\'s 1913 model explained chemical behaviour. Knowledge builds across centuries.'},
+
+  {id:'c9-s2',title:'Velocity-Time Graphs',subject:'Science',classes:['9'],icon:'📈',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Roll a ball down a slope. Record times. Plot v-t graph; find acceleration from slope.',
+   ncert:'NCERT Science Class 9 – Motion',
+   why:'On a v-t graph: slope = acceleration; area under graph = displacement. A horizontal line = constant velocity; a rising diagonal = uniform acceleration (like free fall at 9.8 m/s²).',
+   materials:['Smooth ramp (a plank on books)','Ball','Metre ruler','Stopwatch','Graph paper'],
+   steps:['Mark 25 cm intervals on the ramp.','Roll ball; time it reaching each mark.','Calculate average velocity for each segment (distance ÷ time).','Plot time vs velocity.','Draw best-fit line. Slope = acceleration. Compare to expected ~9.8 × sin(angle).'],
+   simId:'velocity-time',buddy:'Fighter pilots study v-t graphs intensively. A tight turn at high speed produces G-forces (accelerations) that can cause blackout. Pilots train to withstand 9 G.'},
+
+  {id:'c9-s3',title:'Periodic Table Trends',subject:'Science',classes:['9'],icon:'🧪',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Colour-code metals, non-metals, and metalloids. Trace reactivity trends across periods and down groups.',
+   ncert:'NCERT Science Class 9 – Periodic Classification of Elements',
+   why:'Mendeleev arranged 63 elements in 1869 and predicted three undiscovered ones. Modern table uses atomic number. Periodicity — regular patterns — makes chemistry predictable without memorising every element.',
+   materials:['Printed periodic table','Pencil','Colour pencils'],
+   steps:['Colour metals one colour, non-metals another, metalloids a third.','Across Period 2 (Li→Ne): how does metallic character change?','Down Group 1 (Li→Cs): how does reactivity change?','Find the element in your phone battery (Lithium).','Find the most reactive metal (Caesium/Francium) and most reactive non-metal (Fluorine).'],
+   simId:'periodic-table',buddy:'Mendeleev left gaps for undiscovered elements and predicted their properties. When Gallium was found in 1875, it matched his predictions almost exactly. That\'s the power of seeing patterns.'},
+
+  {id:'c9-s4',title:'Verify Archimedes\' Principle',subject:'Science',classes:['9'],icon:'🛁',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Measure weight in air and in water. Collect displaced water. Compare buoyant force.',
+   ncert:'NCERT Science Class 9 – Gravitation',
+   why:'Buoyant force = weight of fluid displaced. If buoyant force ≥ object\'s weight, it floats. This explains ships, submarines, hot-air balloons, and why you feel lighter in a swimming pool.',
+   materials:['Spring balance','A stone','Overflow can','Water','Measuring cup'],
+   steps:['Weigh stone in air (W₁).','Submerge stone on spring balance in overflow can (W₂). Note displaced water collected.','Buoyant force = W₁ − W₂.','Weigh the collected displaced water (W₃).','Is W₃ ≈ W₁ − W₂? Archimedes\' Principle confirmed!'],
+   simId:'archimedes',buddy:'Archimedes reportedly ran naked through Syracuse shouting "Eureka!" when he realised displaced water could measure volume — and therefore purity of the king\'s gold crown.'},
+
+  {id:'c9-s5',title:'Tissue Types: Plant and Animal',subject:'Science',classes:['9'],icon:'🔬',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Examine onion root tip and skeletal muscle slides. Draw and label tissue types.',
+   ncert:'NCERT Science Class 9 – Tissues',
+   why:'Tissues are groups of similar cells performing a specific function. Plants have meristematic (dividing) and permanent tissue. Animals have epithelial, connective, muscle, and nervous tissue.',
+   materials:['Prepared slides: onion root tip, skeletal muscle','Microscope','Reference diagram'],
+   steps:['Examine onion root tip — find actively dividing meristematic cells near the tip.','Examine leaf cross-section — identify parenchyma (thin-walled), xylem (rings), phloem.','Examine muscle fibre — note parallel striations.','Draw each at ×40 and ×100 magnification.','Label and state the function of each tissue type.'],
+   simId:'tissue-types',buddy:'Your stomach lining replaces itself every 4 days. Your skeleton rebuilds itself every 10 years. Your body is never static — it\'s constantly reconstructing itself cell by cell.'},
+
+  // ── CLASS 10 SCIENCE ──
+  {id:'c10-s1',title:'Acid-Base Titration',subject:'Science',classes:['10'],icon:'⚗️',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Titrate HCl with NaOH to find concentration. Watch the indicator change colour.',
+   ncert:'NCERT Science Class 10 – Acids, Bases and Salts',
+   why:'At the equivalence point, moles acid = moles base. Using M₁V₁ = M₂V₂, if you know three values you find the fourth. Titration is used daily in food labs, water treatment, and pharmacies.',
+   materials:['NaOH solution (0.1 M)','HCl (unknown concentration)','Phenolphthalein','Burette or measuring syringe','Conical flask'],
+   steps:['Add 10 mL HCl to flask; add 2 drops phenolphthalein (colourless in acid).','Fill burette with NaOH.','Add NaOH drop by drop, swirling constantly.','Stop when solution turns permanent pale pink (endpoint).','Record NaOH volume used; calculate HCl concentration with M₁V₁ = M₂V₂.'],
+   simId:'titration',buddy:'Quality control labs titrate products daily — checking acidity of vinegar, vitamin C in juice, pH of medicines. Titration is a multi-billion-dollar industrial process performed millions of times each day.'},
+
+  {id:'c10-s2',title:'Punnett Square Genetics',subject:'Science',classes:['10'],icon:'🧬',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Predict offspring traits for monohybrid crosses. Calculate phenotype ratios.',
+   ncert:'NCERT Science Class 10 – Heredity and Evolution',
+   why:'Mendel showed that traits are inherited in predictable ratios. A Punnett square maps all possible allele combinations. Dominant alleles mask recessive ones — unless both alleles are recessive.',
+   materials:['Pencil and paper'],
+   steps:['Tallness (T) dominates shortness (t). Cross Tt × Tt.','Draw 2×2 Punnett square; fill with parental gametes.','Genotype ratio: 1 TT : 2 Tt : 1 tt.','Phenotype ratio: 3 tall : 1 short.','Now cross Tt × tt — what fraction of offspring will be short?'],
+   simId:'punnett',buddy:'Mendel grew 28,000 pea plants over 8 years in a monastery garden. He sent his results to the scientific community — and was ignored for 35 years. Vindicated only after his death.'},
+
+  {id:'c10-s3',title:'Focal Length of a Convex Lens',subject:'Science',classes:['10'],icon:'🔭',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Find focal length experimentally. Verify lens formula 1/f = 1/v − 1/u.',
+   ncert:'NCERT Science Class 10 – Light: Refraction and Lenses',
+   why:'The lens formula links object distance (u), image distance (v), and focal length (f). By measuring u and v in an experiment, you calculate f and verify the formula.',
+   materials:['Convex lens (reading glasses)','White card (screen)','A light source','Ruler'],
+   steps:['Hold lens near a window; focus sunlight onto card. Distance lens→card ≈ focal length f.','Set up: lamp → lens → screen. Move screen until image is sharp.','Measure u (lamp to lens) and v (lens to screen).','Calculate 1/f = 1/v − 1/u.','Repeat with different u values. Is f constant?'],
+   simId:'lens-optics',buddy:'Your phone\'s camera autofocuses by rapidly adjusting lens-sensor distance (v) until the image sharpest — executing the same formula thousands of times per second.'},
+
+  {id:'c10-s4',title:'Electrolysis of Water',subject:'Science',classes:['10'],icon:'🔋',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Split water into H₂ and O₂ using pencil electrodes. Verify 2:1 gas ratio.',
+   ncert:'NCERT Science Class 10 – Chemical Reactions',
+   why:'Electrolysis drives a non-spontaneous reaction using electricity. Water (H₂O) splits into hydrogen (cathode) and oxygen (anode) in a 2:1 volume ratio — confirming water\'s molecular formula.',
+   materials:['9 V battery','2 pencils (sharpened both ends)','Salt water','2 inverted test tubes','Container'],
+   steps:['Connect pencils as electrodes to battery terminals; submerge in salt water.','Collect gas in inverted test tubes over each pencil.','One tube fills twice as fast — that\'s hydrogen.','Test hydrogen: a burning splint produces a "pop."','Test oxygen: a glowing splint reignites.'],
+   simId:'electrolysis',buddy:'Green hydrogen (made with renewable electricity + electrolysis) may power next-generation ships and steelworks. India has a ₹19,000 crore National Hydrogen Mission. You\'re doing the same reaction!'},
+
+  {id:'c10-s5',title:'Natural Selection Simulation',subject:'Science',classes:['10'],icon:'🦋',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Scatter coloured paper moths on newspaper. "Predators" pick moths. Count survivors per generation.',
+   ncert:'NCERT Science Class 10 – Evolution',
+   why:'Natural selection: individuals with favourable traits survive longer, reproduce more, and pass on those traits. Over generations, the population shifts toward the favourable form.',
+   materials:['20 white paper moths','20 brown paper moths','A sheet of newspaper (background)','Timer'],
+   steps:['Scatter all 40 moths on newspaper.','One person is "predator" — pick up moths as fast as possible for 10 seconds.','Count survivors of each colour.','Survivors "reproduce": double their count.','Repeat 4 generations. Which colour dominates? Why?'],
+   simId:'natural-selection',buddy:'This is exactly what happened to Peppered Moths in industrial England — soot darkened tree bark, dark moths survived better, and in 50 years the population was mostly dark. Observable evolution in a human lifetime.'},
+
+
+  /* ── 3D SIMS ── */
+  ,{id:'c10-s6',title:'DNA Double Helix 3D',subject:'Science',classes:['10'],icon:'🧬',bgGrad:'linear-gradient(135deg,rgba(52,211,153,.25),rgba(96,165,250,.2))',
+   desc:'Explore the 3D structure of DNA — rotate the double helix, identify base pairs, and see how the molecule encodes genetic information.',
+   ncert:'NCERT Science Class 10 – Heredity and Evolution',
+   why:'DNA is a double helix — two antiparallel strands wound around each other. Complementary base pairs (A-T, G-C) held by hydrogen bonds carry the genetic code. The 3D structure, discovered by Watson & Crick in 1953 using Rosalind Franklin\'s X-ray data, explains how DNA replicates and transmits hereditary information.',
+   materials:['Twisted rope or wire (2 pieces)','Beads in 4 colours','String for rungs'],
+   steps:['Take two long wires — these are the sugar-phosphate backbones.','Twist them around each other in a right-hand spiral.','Connect them with coloured beads: red-blue pairs (A-T) and green-yellow pairs (G-C).','Notice the pairs always match — A never bonds with G or C.','Measure: one full twist every 10 base pairs (3.4 nm in real DNA).'],
+   simId:'dna-helix-3d',buddy:'If you uncoiled the DNA from just one of your cells, it would be 2 metres long. Packed into a nucleus 6 micrometres wide — that\'s like fitting a 40 km thread into a marble.'}
+
+  ,{id:'c9-s6',title:'Atomic Structure 3D',subject:'Science',classes:['9','10'],icon:'⚛️',bgGrad:'linear-gradient(135deg,rgba(251,191,36,.22),rgba(249,115,22,.18))',
+   desc:'Build and explore 3D atomic models — select any element, watch electron shells fill and orbit the nucleus. See Bohr model come alive.',
+   ncert:'NCERT Science Class 9 – Structure of the Atom',
+   why:'Atoms have a dense nucleus (protons + neutrons) surrounded by electron shells at fixed energy levels. Shells fill in order: K(2), L(8), M(18). The outermost electrons (valence electrons) determine an element\'s chemical behaviour and position in the periodic table.',
+   materials:['Thermocol ball (nucleus)','Smaller balls in different colours (protons, neutrons, electrons)','Wire or cardboard rings for shells'],
+   steps:['Make the nucleus: combine protons (red) and neutrons (blue) together.','First shell (K): add up to 2 electrons on the inner ring.','Second shell (L): add up to 8 electrons on the next ring.','Third shell (M): add up to 18 electrons on the outer ring.','Count protons = atomic number. Compare your model to the periodic table.'],
+   simId:'atom-3d',buddy:'The nucleus is tiny compared to the atom — if an atom were the size of a football stadium, the nucleus would be a grain of sand at the centre. Atoms are mostly empty space, including every atom in your body.'}
+
+  /* ── NEW 3D SCIENCE SIMS ── */
+
+  /* Class 8 — Animal Cell 3D */
+  ,{id:'c8-s6-3d',title:'Animal Cell 3D',subject:'Science',classes:['8'],icon:'🔬',
+   bgGrad:'linear-gradient(135deg,rgba(167,139,250,.25),rgba(236,72,153,.18))',
+   desc:'Explore a 3D animal cell — rotate it, click each organelle to learn its function.',
+   ncert:'NCERT Science Class 8 – Cell: Structure and Function',
+   why:'Animal cells have a plasma membrane, nucleus (control centre), mitochondria (energy), ribosomes (protein synthesis), endoplasmic reticulum, Golgi apparatus (packaging), and lysosomes. No cell wall or chloroplasts — unlike plant cells.',
+   materials:['Clay or play-dough in 6 colours','Toothpicks for labels'],
+   steps:['Use a large ball of clay as the cell membrane.','Press a firm ball inside for the nucleus.','Add bean-shaped pieces for mitochondria.','Roll thin sheets for endoplasmic reticulum.','Add small dots for ribosomes.','Label each organelle with a toothpick flag.'],
+   simId:'cell-3d',buddy:'Your mitochondria have their own DNA — separate from your nuclear DNA. Scientists believe mitochondria were once free-living bacteria absorbed by larger cells 1.5 billion years ago.'}
+
+  /* Class 8 — Electromagnetic Induction 3D */
+  ,{id:'c8-s7-3d',title:'Electromagnetic Induction 3D',subject:'Science',classes:['8'],icon:'⚡',
+   bgGrad:'linear-gradient(135deg,rgba(251,191,36,.25),rgba(245,158,11,.18))',
+   desc:'See a 3D bar magnet moving through a coil — watch current direction flip with magnet orientation. Faraday\'s law made visible.',
+   ncert:'NCERT Science Class 10 – Ch 13: Magnetic Effects of Electric Current',
+   why:'When a magnet moves through a coil, the changing magnetic flux induces an EMF — Faraday\'s Law. The current direction depends on the pole orientation and motion direction — Lenz\'s Law. This is how every generator and alternator works.',
+   materials:['Strong bar magnet','Copper wire coil (50 turns)','Galvanometer or LED','Cardboard tube'],
+   steps:['Wind 50 turns of copper wire around a cardboard tube.','Connect ends to a galvanometer.','Push the north pole into the coil — note needle deflection.','Pull it out — needle deflects opposite.','Push south pole in — what happens?'],
+   simId:'em-induction-3d',buddy:'Every time you charge your phone wirelessly, Faraday\'s law is at work. The charging pad creates a changing magnetic field; your phone\'s coil converts it to current. Faraday discovered this in 1831.'}
+
+  /* Class 9 — Gravity and Orbits 3D */
+  ,{id:'c9-s7-3d',title:'Gravity and Orbits 3D',subject:'Science',classes:['9'],icon:'🪐',
+   bgGrad:'linear-gradient(135deg,rgba(16,185,129,.22),rgba(6,182,212,.18))',
+   desc:'Visualise Newton\'s law of gravitation in 3D — change mass and distance, watch orbital speed and gravitational force update live.',
+   ncert:'NCERT Science Class 9 – Gravitation',
+   why:'F = Gm\u2081m\u2082/r\u00b2. Gravitational force is proportional to the product of masses and inversely proportional to the square of distance. Double the distance and force drops to one quarter. This inverse-square law governs planetary orbits, tides, and satellite motion.',
+   materials:['Rubber sheet','Heavy ball (sun)','Small ball (planet)','Ruler'],
+   steps:['Stretch a rubber sheet tightly over a frame.','Place a heavy ball in the centre — it warps the sheet.','Roll a smaller ball near it — it curves toward the large ball.','Roll it faster — it orbits instead of falling in.','This is how planets orbit: constant falling balanced by sideways speed.'],
+   simId:'gravity-3d',buddy:'The ISS orbits at 7.7 km/s — so fast it falls around the Earth rather than into it. Astronauts aren\'t weightless because there\'s no gravity — they\'re in free fall the whole time.'}
+
+  /* Class 9 — Mitosis 3D */
+  ,{id:'c9-s8-3d',title:'Mitosis 3D — Cell Division',subject:'Science',classes:['9'],icon:'🔬',
+   bgGrad:'linear-gradient(135deg,rgba(52,211,153,.22),rgba(16,185,129,.15))',
+   desc:'Watch mitosis unfold in 3D — chromosomes condense, line up, split, and form two identical daughter cells. Step through each phase.',
+   ncert:'NCERT Science Class 9 – The Fundamental Unit of Life',
+   why:'Mitosis produces two genetically identical daughter cells. Phases: Prophase (chromosomes condense), Metaphase (line up at centre), Anaphase (chromatids pulled apart), Telophase (two nuclei form), Cytokinesis (cell splits). Your body makes 3.8 million new cells every second this way.',
+   materials:['String (chromosomes)','Circle on paper (cell)','Scissors'],
+   steps:['Draw a circle (cell). Place 4 strings inside (chromosomes).','Prophase: coil the strings tightly.','Metaphase: line all strings across the centre.','Anaphase: pull each pair to opposite ends.','Telophase: draw a new circle around each group.'],
+   simId:'mitosis-3d',buddy:'Cancer is uncontrolled mitosis — cells that forgot when to stop dividing. Chemotherapy drugs disrupt specific phases of mitosis, particularly the spindle fibres that pull chromosomes apart in anaphase.'}
+
+  /* Class 10 — Human Eye 3D */
+  ,{id:'c10-s7-3d',title:'Human Eye 3D',subject:'Science',classes:['10'],icon:'👁️',
+   bgGrad:'linear-gradient(135deg,rgba(56,189,248,.25),rgba(99,102,241,.2))',
+   desc:'Explore a 3D cross-section of the human eye — see how the lens focuses light on the retina. Switch between normal vision, myopia, and hypermetropia.',
+   ncert:'NCERT Science Class 10 – The Human Eye and the Colourful World',
+   why:'The eye\'s lens refracts light to focus on the retina. In myopia, the image forms in front of the retina — corrected by concave lens. In hypermetropia, image forms behind retina — corrected by convex lens. The lens changes shape (accommodation) to focus near and far objects.',
+   materials:['Convex lens','Screen','Candle','Ruler'],
+   steps:['Set a convex lens 30 cm from a screen.','Place a candle 60 cm from the lens.','Adjust until a sharp image forms on screen.','Move candle closer — image blurs (like myopia).','Add a second convex lens — image sharpens (like spectacles).'],
+   simId:'eye-3d',buddy:'Eagles have two foveas in each eye versus our one. They can spot a rabbit from 3 km away. Your eye has 120 million rod cells for night vision and 6 million cone cells for colour — all connected to one optic nerve.'}
+
+  /* Class 10 — Magnetic Field Lines 3D */
+  ,{id:'c10-s8-3d',title:'Magnetic Field Lines 3D',subject:'Science',classes:['10'],icon:'🧲',
+   bgGrad:'linear-gradient(135deg,rgba(244,63,94,.22),rgba(251,113,133,.15))',
+   desc:'Visualise 3D magnetic field lines around a bar magnet — rotate freely, flip poles, see how field lines never cross and always form closed loops.',
+   ncert:'NCERT Science Class 10 – Magnetic Effects of Electric Current',
+   why:'Magnetic field lines emerge from the north pole and re-enter at the south pole. They never cross — field has one direction at each point. Closer lines mean stronger field. The Earth itself is a giant magnet whose field deflects solar wind, protecting all life.',
+   materials:['Bar magnet','Iron filings','White paper','Compass'],
+   steps:['Place a bar magnet flat under white paper.','Sprinkle iron filings evenly over the paper.','Gently tap the paper — filings align with field lines.','Sketch the pattern.','Place a compass at 10 different points — which way does it point each time?'],
+   simId:'magfield-3d',buddy:'The Earth\'s magnetic field has flipped hundreds of times in geological history — north becomes south. We\'re overdue for another flip. Compasses would point south during the transition.'}
+
+
+
+
+
+  /* Class 8 — Solar System Scale Model (NCERT Science Ch 17) */
+  ,{id:'c8-s9',title:'Solar System Scale Model',subject:'Science',classes:['8'],icon:'🪐',bgGrad:'rgba(255,107,107,.18)',
+   desc:'Build a scale model of our solar system using everyday objects. Feel how vast space really is.',
+   ncert:'NCERT Science Class 8 – Ch 17: Stars and the Solar System',
+   why:'If the Sun were a basketball, Earth would be a grain of sand 26 metres away. Neptune would be 800 metres away. Real scale makes the emptiness of space visceral.',
+   materials:['Open space (school ground)','Balls of different sizes','Chalk or markers','Measuring tape'],
+   steps:['Sun = basketball (25 cm). Place at one end of the ground.','Mercury = poppy seed, 10m away.','Venus = pea, 19m away. Earth = pea, 26m away.','Mars = aspirin, 39m. Jupiter = golf ball, 134m.','Saturn = marble, 247m. Uranus = grape, 496m. Neptune = grape, 777m.'],
+   simId:'solar-system',buddy:'Voyager 1, launched in 1977, left our solar system in 2012. It is now 23 billion km away — sending data home at the speed of light, which takes 22 hours to arrive.'}
+
+  /* ── NEW PRACTICALS BATCH ── */
+
+  /* Class 8 — Friction (Ch 12) */
+  ,{id:'c8-s10',title:'Friction on Different Surfaces',subject:'Science',classes:['8'],icon:'🧲',
+   bgGrad:'linear-gradient(135deg,rgba(255,107,107,.18),rgba(255,60,0,.08))',
+   desc:'Push a block across glass, wood, rubber, sandpaper and ice. Compare the force needed to start movement.',
+   ncert:'NCERT Science Class 8 – Ch 12: Friction',
+   why:'Friction is the force opposing relative motion between two surfaces. It depends on the nature of surfaces (coefficient of friction μ) and the normal force. F_friction = μ × N. Smoother surfaces have lower μ.',
+   materials:['A wooden block (or book)','Different surface materials: glass plate, rubber mat, sandpaper sheet','Spring balance or rubber band','A flat table'],
+   steps:['Place block on table. Attach spring balance horizontally.','Pull slowly — note force just as block starts moving (static friction).','Switch surface: place glass plate under block. Repeat.','Try rubber mat, then sandpaper. Record all readings.','Plot a bar chart: surface vs force needed.'],
+   simId:'friction-sim',
+   buddy:'Car tyres are made of rubber because rubber on tarmac gives μ ≈ 0.7 — enough grip to stop safely. Ice gives μ ≈ 0.05, which is why cars skid on icy roads!'},
+
+  /* Class 8 — Pin-hole camera (Ch 16: Light) */
+  ,{id:'c8-s11',title:'Pin-Hole Camera — Inverted Image',subject:'Science',classes:['8'],icon:'📷',
+   bgGrad:'linear-gradient(135deg,rgba(255,107,107,.18),rgba(200,0,50,.08))',
+   desc:'Build a pin-hole camera from a cardboard box. See how a tiny hole forms an inverted real image — the same principle as your eye!',
+   ncert:'NCERT Science Class 8 – Ch 16: Light',
+   why:'Light travels in straight lines. Rays from the top of an object pass through the pinhole and hit the screen below the centre — forming an inverted image. A convex lens does the same thing, just brighter. Your eye uses a lens to form an inverted image on the retina.',
+   materials:['Shoe box with lid','Pin or needle','Tracing paper or butter paper','Knife or scissors','Black paint (optional)'],
+   steps:['Make a pinhole (1–2mm) in one end of the box.','Stretch tracing paper over the other end — tape it.','Darken the inside of the box with black paper.','Point the pinhole at a bright object (window, lamp).','Look at the tracing paper — you should see an inverted image!'],
+   simId:'reflection-sim',
+   buddy:'The first cameras were called Camera Obscura (Latin for dark room) — entire rooms with a pinhole in one wall. Artists traced the projected image to draw accurate perspectives. Every modern camera and your eye works on this exact principle.'},
+
+  /* Class 9 — Tyndall Effect (Ch 1: Matter) */
+  ,{id:'c9-s9',title:'Tyndall Effect — Identify Colloids',subject:'Science',classes:['9'],icon:'💡',
+   bgGrad:'linear-gradient(135deg,rgba(255,107,107,.18),rgba(255,200,0,.1))',
+   desc:'Shine a laser beam through salt solution, milk, and muddy water. See which ones scatter light — the Tyndall Effect.',
+   ncert:'NCERT Science Class 9 – Ch 1: Matter in Our Surroundings',
+   why:'True solutions (salt water) have particles < 1nm — too small to scatter light. Colloids (milk, fog) have particles 1–100nm — they scatter light sideways (Tyndall Effect). Suspensions (muddy water) have particles > 100nm — they scatter and absorb. This is how we identify colloids.',
+   materials:['3 identical glasses of water','Salt (for true solution)','Milk — 2 drops (for colloid)','Soil/chalk dust (for suspension)','Laser pointer or bright torch'],
+   steps:['Prepare 3 glasses: (1) salt water, (2) 2 drops milk in water, (3) pinch of soil in water.','Darken the room.','Shine laser beam horizontally through each glass.','Observe: in which glass is the beam visible?','Salt water — invisible. Milk — clear bright beam. Soil — murky beam.'],
+   simId:'tyndall-effect',
+   buddy:'Fog in headlights, smoke in sunbeams, and the blue colour of the sky are all Tyndall scattering. The sky is blue because air scatters short (blue) wavelengths more than long (red) ones — called Rayleigh scattering, a related effect.'},
+
+  /* Class 9 — Temporary Slide (Ch 13: Why Do We Fall Ill) */
+  ,{id:'c9-s10',title:'Prepare a Temporary Slide',subject:'Science',classes:['9'],icon:'🔬',
+   bgGrad:'linear-gradient(135deg,rgba(107,203,119,.18),rgba(0,150,80,.08))',
+   desc:'Mount and stain onion peel and human cheek cells. Observe plant vs animal cell differences under a microscope.',
+   ncert:'NCERT Science Class 9 – Ch 5: The Fundamental Unit of Life',
+   why:'Plant cells have a rigid cell wall (cellulose), a large central vacuole, and chloroplasts. Animal cells lack cell walls and have smaller vacuoles. Staining (Safranin for plant cells, Methylene Blue for animal cells) makes the nucleus and cell boundaries visible.',
+   materials:['Microscope and glass slides','Coverslips','Onion bulb','Safranin stain (or food colouring)','Methylene blue stain','Dropper','Clean toothpick'],
+   steps:['Peel a thin transparent layer from inner surface of onion scale.','Place in a drop of water on a glass slide.','Add one drop of Safranin. Wait 30 seconds. Wash excess with water.','Lower coverslip slowly at 45° angle — avoid bubbles.','Observe under microscope: start at 10×, then 40×.','For cheek cells: gently scrape inner cheek, stain with Methylene Blue.'],
+   simId:'temp-slide',
+   buddy:'Robert Hooke first observed cells in 1665 — in a thin slice of cork under a primitive microscope. He named them "cells" because they looked like monks\' rooms (cellula in Latin). He had no idea he was looking at dead plant cell walls!'},
+
+  /* Class 10 — Refraction through glass slab (Ch 10: Light) */
+  ,{id:'c10-s9',title:'Refraction Through a Glass Slab',subject:'Science',classes:['10'],icon:'🔦',
+   bgGrad:'linear-gradient(135deg,rgba(255,107,107,.18),rgba(100,0,200,.1))',
+   desc:'Trace incident, refracted and emergent rays through a rectangular glass slab. Verify Snell\'s Law and measure lateral displacement.',
+   ncert:'NCERT Science Class 10 – Ch 10: Light — Reflection and Refraction',
+   why:'When light passes from air (n=1) to glass (n=1.5), it bends toward the normal (Snell\'s Law: n₁sinθ₁ = n₂sinθ₂). Through a parallel-sided slab, the emergent ray is always parallel to the incident ray but shifted sideways — called lateral displacement. The shift increases with angle.',
+   materials:['Rectangular glass slab','Pins (4)','White paper','Protractor and ruler','Soft board'],
+   steps:['Place glass slab on paper. Trace its outline with pencil.','Place two pins (P1, P2) to define the incident ray at ~40° to normal.','Look through the other side — align two more pins (P3, P4) with the images of P1 and P2.','Remove slab. Join P3-P4, extend inside slab outline — this is the refracted ray.','Measure angles i and r. Check if sin i / sin r ≈ 1.5.','Measure lateral displacement (perpendicular distance between incident and emergent rays).'],
+   simId:'refraction-slab',
+   buddy:'Optical fibres use total internal reflection — a related phenomenon. When light hits glass-air boundary at angles beyond the critical angle (~42° for glass), 100% of light reflects back inside. This is how your internet travels as light pulses through glass fibres thousands of km long.'},
+
+  /* Class 10 — Magnetic field mapping (Ch 13: Magnetic Effects) */
+  ,{id:'c10-s10',title:'Map Magnetic Field Lines',subject:'Science',classes:['10'],icon:'🧲',
+   bgGrad:'linear-gradient(135deg,rgba(77,150,255,.18),rgba(0,50,200,.1))',
+   desc:'Use a compass needle to trace the magnetic field around a bar magnet. Plot field lines and understand field strength.',
+   ncert:'NCERT Science Class 10 – Ch 13: Magnetic Effects of Electric Current',
+   why:'Magnetic field lines show the direction a free north pole would move. They emerge from the north pole and enter the south pole. Lines are closest (most dense) where the field is strongest — near the poles. A compass needle aligns tangentially to the field line at its position.',
+   materials:['Bar magnet','Small compass needle','White paper (A4)','Pencil'],
+   steps:['Place bar magnet at centre of paper. Trace its outline.','Place compass near north pole. Mark two dots: where needle points from and to.','Move compass to second dot. Mark new dot ahead. Repeat.','Connect dots — this traces one complete field line.','Repeat from different starting positions to get 8–10 field lines.','Observe: lines are curved, never cross, and are densest at poles.'],
+   simId:'magnetic-field-map',
+   buddy:'Earth is a giant magnet — its field extends 65,000 km into space, deflecting harmful solar wind particles. Without it, solar radiation would strip away our atmosphere over millions of years, as happened to Mars. The compass you hold is responding to the Earth\'s molten iron outer core.'},
+
+
+  /* Class 9 — Simple Pendulum (Ch 10: Gravitation) */
+  ,{id:'c9-s11',title:'Simple Pendulum — Measure g',subject:'Science',classes:['9'],icon:'⏱️',
+   bgGrad:'linear-gradient(135deg,rgba(255,107,107,.18),rgba(100,0,100,.1))',
+   desc:'Measure the time period of a pendulum for different lengths. Plot T² vs L to find the value of g experimentally.',
+   ncert:'NCERT Science Class 9 – Ch 10: Gravitation',
+   why:'For a simple pendulum: T = 2π√(L/g). Squaring: T² = 4π²L/g. So a graph of T² (y-axis) vs L (x-axis) gives a straight line with slope = 4π²/g. Measure the slope to calculate g experimentally. Expected: g ≈ 9.8 m/s².',
+   materials:['String (1.2m)','Metal nut or bob','Stopwatch','Ruler','Retort stand or fixed support','Protractor'],
+   steps:['Tie nut to string. Clamp string to fixed support.','Set length L = 20cm (from pivot to centre of bob).','Displace bob < 10° from rest. Release. Start stopwatch.','Count 20 complete oscillations. Record total time.','Calculate T = total time / 20.','Repeat for L = 40, 60, 80, 100cm.','Plot T² vs L on graph paper. Draw best-fit line. Slope = 4π²/g. Calculate g.'],
+   simId:'pendulum',
+   buddy:'Galileo discovered pendulum isochronism in 1602 by timing his own pulse against a swinging chandelier in Pisa Cathedral. He realised the period didn\'t depend on the swing size — only on the length. This led to the first accurate clocks, which enabled precise sea navigation.'},
+
+  /* Class 10 — Ohm's Law (Ch 12: Electricity) */
+  ,{id:'c10-s11',title:"Verify Ohm's Law",subject:'Science',classes:['10'],icon:'⚡',
+   bgGrad:'linear-gradient(135deg,rgba(255,107,107,.18),rgba(255,150,0,.1))',
+   desc:'Build a circuit with a resistor, ammeter and voltmeter. Vary voltage and plot V vs I to verify Ohm\'s Law.',
+   ncert:'NCERT Science Class 10 – Ch 12: Electricity',
+   why:'Ohm\'s Law: V = IR. For a conductor at constant temperature, current is directly proportional to voltage. Plot V (y) vs I (x) — you get a straight line through the origin. Slope = resistance R. If the line curves, the component is non-ohmic (e.g. LED, diode).',
+   materials:['1.5V cells (3)','Resistor (10Ω or 100Ω)','Ammeter (0–1A)','Voltmeter (0–5V)','Connecting wires','Rheostat (variable resistor)','Switch'],
+   steps:['Connect: battery → switch → rheostat → resistor → ammeter → back to battery.','Connect voltmeter across the resistor (in parallel).','Close switch. Adjust rheostat to minimum. Record V and I.','Increase rheostat step by step. Record V and I at each step (6 readings).','Plot V vs I graph. Draw best-fit line.','Calculate slope = V/I = R. Compare with resistor\'s marked value.'],
+   simId:'ohms-law',
+   buddy:'Georg Ohm published his law in 1827 and was initially ridiculed — scientists called it "a web of naked fancies." He lost his professorship over it. Within 10 years it became the foundation of all electrical engineering. Today every circuit you use is designed using V = IR.'},
+
+
+
+  /* Moved from data-1-5.js */
+  ,{id:'c2-s1',title:'Magnetic Attraction',subject:'Science',classes:['6'],icon:'🧲',bgGrad:'rgba(255,107,107,.18)',desc:'Test which objects are attracted to a magnet. Discover magnetic materials.',ncert:'NCERT Science Class 6 – Ch 13: Fun with Magnets',why:'Magnets attract iron and steel. Plastic, wood, and rubber are not magnetic. Magnets have two poles: north and south. Opposites attract, same poles repel.',materials:['A magnet (fridge magnet works)','10 objects: paper clip, coin, rubber, pencil, pin, foil, stone, key, paper'],steps:['Make a prediction table: Magnetic / Not Magnetic.','Test each object with the magnet.','Record your results.','Were any results surprising?','Find 5 magnetic things in your home.'],simId:'magnet-sim',buddy:"Earth itself is a giant magnet! That's why compass needles always point north. Birds, bees, and even some fish use Earth's magnetic field to navigate."}
+
+
+  /* Moved from data-1-5.js */
+  ,{id:'c2-s5',title:'Sound Vibrations',subject:'Science',classes:['8'],icon:'🔊',bgGrad:'rgba(255,107,107,.18)',desc:'Feel sound vibrations. Make a simple string telephone!',ncert:'NCERT Science Class 8 – Ch 13: Sound',why:'Sound is a vibration that travels through matter. In a string telephone, vibrations travel through the string — so sound is much clearer even at a distance.',materials:['2 paper cups','A long piece of string (3–5 metres)','A pin'],steps:['Pierce a small hole in the bottom of each cup.','Thread the string through — knot each end inside the cup.','You and a friend each hold a cup.','Pull the string taut. One speaks, one listens.','Try without the string — any difference?'],simId:'sound-vibration',buddy:'Sound travels 4x faster in water than in air, and 15x faster in steel! That\'s why you can hear a train coming by placing your ear on the rail.'}
+
+
+  /* Moved from data-1-5.js */
+  ,{id:'c3-s3',title:'Simple Electric Circuit',subject:'Science',classes:['6'],icon:'⚡',bgGrad:'rgba(255,107,107,.18)',desc:'Build a simple circuit with a battery, wire, and bulb. Learn circuit basics safely.',ncert:'NCERT Science Class 6 – Ch 12: Electricity and Circuits',why:'Electricity flows in a closed loop called a circuit. A switch breaks the loop to stop the flow. Conductors (metals) allow flow; insulators (rubber, plastic) stop it.',materials:['1.5V battery','Small torch bulb','2 wires with clips','Small switch'],steps:['Connect wire from battery + to bulb.','Connect from bulb back to battery −.','Does the bulb light? You made a circuit!','Disconnect one wire — bulb goes off.','Try inserting different materials in the gap — which conduct?'],simId:'circuit-sim',buddy:'Your brain runs on electricity! Neurons fire electrical signals to send messages. Your entire nervous system is a biological electrical network.'}
+
+
+  /* Moved from data-1-5.js */
+  ,{id:'c4-s1',title:'Digestive System Journey',subject:'Science',classes:['7'],icon:'🫃',bgGrad:'rgba(255,107,107,.18)',desc:'Trace food from mouth to toilet. Model digestion with simple materials.',ncert:'NCERT Science Class 7 – Ch 2: Nutrition in Animals',why:'Digestion breaks food into tiny molecules the blood can carry. Mouth → Oesophagus → Stomach → Small intestine (absorbs nutrients) → Large intestine (absorbs water) → Excretion.',materials:['A zip-lock bag (stomach)','Orange juice (acid)','Crackers','Tights (intestine)'],steps:['Put crackers in the bag. Add a splash of juice. Squeeze (chewing!).','Pour into a tights leg — squeeze down (intestine!).','Collect the "absorbed" liquid.','Map out the path on paper.','Which organ absorbs most nutrients?'],simId:'digestion-sim',buddy:'Your small intestine is 6–7 metres long but coiled inside your belly! If you spread out all its tiny projections (villi), its surface area equals a tennis court.'}
+
+
+  /* Moved from data-1-5.js */
+  ,{id:'c4-s2',title:'Electricity Conductors Test',subject:'Science',classes:['6'],icon:'💡',bgGrad:'rgba(255,107,107,.18)',desc:'Build a circuit tester and find which materials conduct electricity.',ncert:'NCERT Science Class 6 – Ch 12: Electricity and Circuits',why:'Conductors allow free electrons to move through them. Metals have loosely-bound electrons — they conduct well. Non-metals have tightly-bound electrons — they insulate.',materials:['9V battery','LED or small bulb','3 wires with alligator clips','Various test objects'],steps:['Build circuit: battery − LED − wire with gap in it.','Connect objects in the gap one at a time.','LED lights up = conductor. Stays off = insulator.','Test: coin, pencil, rubber, foil, plastic, key, wood, water.','Create a results table.'],simId:'conductor-test',buddy:'Graphite (pencil lead) is a non-metal that conducts! Carbon atoms in graphite have one free electron each. This is used in pencil-drawn circuits and touchscreens.'}
+
+
+  /* Moved from data-1-5.js */
+  ,{id:'c5-s4',title:'Acid or Base?',subject:'Science',classes:['7'],icon:'🧪',bgGrad:'rgba(255,107,107,.18)',desc:'Make a natural pH indicator from red cabbage. Test common liquids.',ncert:'NCERT Science Class 7 – Ch 5: Acids, Bases and Salts',why:'Red cabbage contains anthocyanin — a natural pH indicator. It turns red in acids, green/yellow in bases, and stays purple at neutral.',materials:['Red cabbage','Water','Glasses','Lemon juice, baking soda, vinegar, milk, soap'],steps:['Boil red cabbage in water. Strain — keep the purple liquid.','Pour into several glasses.','Add test liquids one per glass.','Record colour change.','Classify as acid, base, or neutral.'],simId:'ph-indicator',buddy:'Your stomach acid (pH 1.5–3.5) is strong enough to dissolve metal! Luckily, your stomach lining renews itself every 4 days to protect itself.'}
+
+
+  /* Moved: correct NCERT class */
+  ,{id:'c3-s5',title:'Lung Capacity Balloon',subject:'Science',classes:['7'],icon:'🫁',bgGrad:'rgba(255,107,107,.18)',desc:'Measure your lung capacity using a balloon. Compare between classmates.',ncert:'NCERT Science Class 3 – Breathing',why:'Lung capacity is the maximum air your lungs can hold. Average adult lungs hold about 6 litres. Exercise increases lung capacity over time.',materials:['A balloon per person','Ruler','Paper to record'],steps:['Take the deepest breath you can.','Blow it all into the balloon in one breath.','Pinch it shut quickly.','Measure the widest diameter of the balloon.','Compare with 3 others — who has biggest capacity?'],simId:'lung-capacity',buddy:'Trained swimmers and singers have much larger lung capacity. Singers practice breathing exercises daily. Your lungs can be strengthened just like muscles!'}
+
+
+  /* Moved: correct NCERT class */
+  ,{id:'c4-s4',title:'Sound and Pitch',subject:'Science',classes:['8'],icon:'🎵',bgGrad:'rgba(255,107,107,.18)',desc:'Make a musical scale with water glasses. Understand pitch and frequency.',ncert:'NCERT Science Class 4 – Sound',why:'Pitch depends on frequency — how fast air vibrates. More water = shorter air column = faster vibration = higher pitch. Less water = lower pitch.',materials:['6–8 identical glasses','Water','A metal spoon'],steps:['Line up glasses.','Fill each with different amounts of water (from empty to full).','Tap each gently with the spoon.','Listen — which gives the highest/lowest pitch?','Can you play a simple tune like "Do Re Mi"?'],simId:'sound-pitch',buddy:'A guitar string vibrating 440 times per second makes the note A. That\'s 440 Hz! Higher strings vibrate faster, producing higher notes.'}
+
+
+  /* Moved: correct NCERT class */
+  ,{id:'c4-s5',title:'Reflection and Mirrors',subject:'Science',classes:['6'],icon:'🪞',bgGrad:'rgba(255,107,107,.18)',desc:'Explore how mirrors reflect light. Build a simple periscope!',ncert:'NCERT Science Class 4 – Light',why:'Reflection law: the angle of incidence equals the angle of reflection. Mirrors are flat, polished surfaces that reflect nearly all light hitting them.',materials:['2 small mirrors','Cardboard tube or box','Tape','A torch'],steps:['Shine a torch at a mirror — see where the beam goes.','Angle the mirror differently — observe the reflected beam.','Build a periscope: 2 mirrors at 45° in a tall box.','Look through the bottom — you can see over obstacles!','Why do ambulances have reversed writing?'],simId:'reflection-sim',buddy:'Fun house mirrors distort your reflection because they\'re curved, not flat. Concave mirrors focus light (telescopes); convex mirrors widen the view (car side mirrors).'}
+
+
+  /* Moved: correct NCERT class */
+  ,{id:'c5-s3',title:'Photosynthesis in a Leaf',subject:'Science',classes:['7'],icon:'🍃',bgGrad:'rgba(255,107,107,.18)',desc:'Test for starch in leaves to prove photosynthesis happened.',ncert:'NCERT Science Class 5 – Photosynthesis',why:'Leaves produce glucose via photosynthesis, stored as starch. Iodine turns dark blue/black in the presence of starch — proving photosynthesis happened.',materials:['A leaf (kept in sunlight and one kept in dark)','Iodine solution','Boiling water (adult help)','Alcohol'],steps:['Boil the leaf in water 2 min to soften.','Place in alcohol 5 min to remove chlorophyll.','Wash leaf. Place flat on white paper.','Add drops of iodine.','Which leaf turns dark? Why?'],simId:'photosynthesis-test',buddy:'A single large tree produces enough oxygen for 4 people per day. And one tree can absorb up to 22 kg of CO₂ per year. That\'s why deforestation is an oxygen problem.'}
+
+
+  /* Moved: correct NCERT class */
+  ,{id:'c5-s5',title:'Gravity and Projectiles',subject:'Science',classes:['9'],icon:'🏀',bgGrad:'rgba(255,107,107,.18)',desc:'Drop a ball and throw one horizontally. Do they land at the same time?',ncert:'NCERT Science Class 5 – Force and Motion',why:'Gravity acts equally on all objects regardless of horizontal motion. A ball thrown horizontally and one dropped from the same height hit the ground simultaneously.',materials:['Two identical small balls','A table','Tape to mark starting point'],steps:['Hold both balls at the same height at the table edge.','Drop one straight down. Simultaneously roll the other off the table.','Listen carefully — do they land at the same time?','Try from different heights.','What do you notice?'],simId:'projectile-sim',buddy:'This is why a bullet fired horizontally and one dropped from the same height hit the ground at the same time! Galileo proved this in 1590 — and people refused to believe him.'}
+];
