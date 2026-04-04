@@ -6,44 +6,30 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Only one deployment at a time; don't cancel in-progress — let it finish
-concurrency:
-  group: pages
-  cancel-in-progress: false
+  contents: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Bump service worker version in-place (no git push)
+      - name: Bump service worker version
         run: |
           VERSION="v$(date +'%Y.%m.%d.%H%M')"
           echo "Deploying: $VERSION"
           sed -i "s/const VERSION = '[^']*'/const VERSION = '$VERSION'/" sw.js
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Ensure .nojekyll exists
+      - name: Create .nojekyll
         run: touch .nojekyll
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload site artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          cname: bodhanika.in
+          exclude_assets: '.github,node_modules'
