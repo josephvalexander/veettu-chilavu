@@ -213,13 +213,12 @@
       .bottom-nav .sidebar-footer{ }
 
       /* Tabs — CSS class controls visibility, not inline styles */
-      .tab-content        { display:none  !important; }
+      .tab-content        { display:none  !important; width:auto !important; }
       .tab-content.tab-active {
         display:block !important;
-        width:100%;
+        width:auto;
         min-height:0;
         height:auto;
-        /* Content height drives scroll — no viewport clamping */
       }
 
       /* ── Desktop scroll: explicit scroll container ─────────
@@ -247,7 +246,7 @@
         box-sizing: border-box !important;
       }
       .tab-content.tab-active {
-        min-height: 100% !important;
+        min-height: 0 !important;
         height: auto !important;
         overflow: visible !important;
       }
@@ -727,6 +726,8 @@
     .modal-overlay.open{display:flex;}
     .modal-sheet{width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);border-radius:14px 14px 0 0;padding:1.4rem 1.2rem 2rem;max-height:88vh;overflow-y:auto;animation:slideUp .22s ease;}
     @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+    .input-error{border-color:var(--danger) !important;animation:shake .35s ease;}
     .modal-handle{width:48px;height:5px;border-radius:3px;background:var(--border);margin:0 auto 1.1rem;cursor:grab;padding:12px 0;background-clip:content-box;}
     .modal-title{font-family:'Fraunces',Georgia,serif;font-size:1.2rem;margin-bottom:.9rem;color:var(--text);}
     .currency-btn{display:flex;align-items:center;gap:.75rem;width:100%;padding:.85rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:background .12s;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text) !important;}
@@ -2463,26 +2464,21 @@ async function saveExpense() {
   const note      = document.getElementById('note-input').value.trim();
   const payThrough= state.selectedPayment;
 
+  function flashError(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('input-error');
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    setTimeout(() => el.classList.remove('input-error'), 1200);
+  }
   if (!amount || amount <= 0) {
     showToast('Enter a valid amount', 'error');
-    const amtEl = document.getElementById('amount-input');
-    if (amtEl) {
-      amtEl.style.borderColor = 'var(--danger)';
-      amtEl.style.outline = 'none';
-      amtEl.scrollIntoView({behavior:'smooth', block:'center'});
-      setTimeout(() => { amtEl.style.borderColor = ''; }, 2000);
-    }
+    flashError('amount-input');
     return;
   }
   if (!desc) {
     showToast('Add a description', 'error');
-    const descEl = document.getElementById('desc-input');
-    if (descEl) {
-      descEl.style.borderColor = 'var(--danger)';
-      descEl.style.outline = 'none';
-      descEl.scrollIntoView({behavior:'smooth', block:'center'});
-      setTimeout(() => { descEl.style.borderColor = ''; }, 2000);
-    }
+    flashError('desc-input');
     return;
   }
   if (!isoDate) {
