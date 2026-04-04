@@ -1,7 +1,4 @@
 # .github/workflows/deploy.yml
-# Deploys Bodhanika to GitHub Pages on every push to main.
-# Bumps SW version so all PWA clients auto-update.
-
 name: Deploy Bodhanika
 
 on:
@@ -9,13 +6,14 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
+# Only one deployment at a time; don't cancel in-progress — let it finish
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -27,28 +25,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Bump service worker version
+      - name: Bump service worker version in-place (no git push)
         run: |
           VERSION="v$(date +'%Y.%m.%d.%H%M')"
-          echo "Deploying version: $VERSION"
+          echo "Deploying: $VERSION"
           sed -i "s/const VERSION = '[^']*'/const VERSION = '$VERSION'/" sw.js
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Commit updated sw.js
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add sw.js
-          git diff --staged --quiet || git commit -m "chore: deploy ${{ env.VERSION }}"
-          git push
+      - name: Ensure .nojekyll exists
+        run: touch .nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload site to Pages
+      - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
