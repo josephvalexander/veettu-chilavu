@@ -1069,8 +1069,9 @@
   </button>
 
   <!-- Sidebar footer — desktop only -->
-  <div class="sidebar-footer">
+  <div class="sidebar-footer" style="flex-direction:column;align-items:flex-start;gap:.5rem;">
     <button class="sidebar-theme" id="sidebar-theme-btn" onclick="cycleTheme()" title="Toggle theme">🌙</button>
+    <a href="privacy.html" style="font-size:.72rem;color:var(--muted);text-decoration:underline;opacity:.7;padding-left:.1rem;">Privacy Policy</a>
   </div>
 </nav>
 
@@ -3080,10 +3081,10 @@ function switchHelpTab(tab) {
 }
 
 </script>
-<!-- Privacy link: static, always in DOM for Google crawler -->
+<!-- Privacy link for crawler — visually hidden, always in DOM -->
 <a href="https://josephvalexander.github.io/veettu-chilavu/privacy.html"
-   style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);font-size:11px;color:#aaa;text-decoration:underline;z-index:50;white-space:nowrap;pointer-events:auto;"
-   id="privacy-link-static">Privacy Policy</a>
+   style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;"
+   aria-hidden="true">Privacy Policy</a>
 
 
 </body>
