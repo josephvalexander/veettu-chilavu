@@ -10,9 +10,31 @@
   h2{font-size:1.1rem;margin-top:2rem;}
   .sub{color:#666;font-size:.9rem;margin-bottom:2rem;}
   a{color:#1a6b5c;}
+  #back-btn{
+    display:inline-flex;align-items:center;gap:.4rem;
+    margin-bottom:1.5rem;
+    padding:.5rem 1rem;
+    background:#1a4a44;color:#f5c842;
+    border-radius:8px;font-size:.88rem;font-weight:600;
+    text-decoration:none;
+    transition:opacity .15s;
+  }
+  #back-btn:hover{opacity:.85;}
 </style>
+<script>
+function goBack(e) {
+  // In PWA (no browser chrome), use history.back() if there's history,
+  // otherwise navigate to the app root
+  if (window.history.length > 1) {
+    e.preventDefault();
+    window.history.back();
+  }
+  // else let the href="index.html" handle it naturally
+}
+</script>
 </head>
 <body>
+<a href="index.html" id="back-btn" onclick="goBack(event)">← Back to App</a>
 <h1>Privacy Policy</h1>
 <p class="sub">Veettu Chilavu · Last updated: April 2026</p>
 
@@ -41,8 +63,6 @@
 <p>You can revoke this app's access to your Google account at any time by visiting <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a> and removing "Veettu Chilavu".</p>
 
 <h2>Contact</h2>
-<p>For questions about this privacy policy, contact: <a href="mailto:josephvalexanderr@gmail.com">josephvalexanderr@gmail.com</a></p>
+<p>For questions about this privacy policy, contact: <a href="/cdn-cgi/l/email-protection#4b2124382e3b233d2a272e332a252f2e39390b2c262a222765282426"><span class="__cf_email__" data-cfemail="5832372b3d28302e39343d2039363c3d2a2a183f35393134763b3735">[email&#160;protected]</span></a></p>
 
-<p style="margin-top:3rem;color:#999;font-size:.82rem;">Veettu Chilavu is open source. <a href="https://github.com/josephvalexander/veettu-chilavu">View source on GitHub</a>.</p>
-</body>
-</html>
+<p style="margin-top:3rem;color:#999;font-si
