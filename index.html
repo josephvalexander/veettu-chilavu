@@ -245,6 +245,7 @@
         align-items:start;
         max-width:1100px;
         margin:0 auto;
+        overflow:visible;
       }
       /* Full-width rows */
       .dash-content > .period-nav   { grid-column:1/-1; }
@@ -488,7 +489,7 @@
     /* ══════════════════════════════════════
        DASHBOARD COMPONENTS
     ══════════════════════════════════════ */
-    .dash-content{padding:1.1rem;display:flex;flex-direction:column;gap:1.1rem;width:100%;box-sizing:border-box;overflow-x:hidden;}
+    .dash-content{padding:1.1rem;display:flex;flex-direction:column;gap:1.1rem;width:100%;box-sizing:border-box;overflow-x:hidden;overflow-y:visible;}
     .period-nav{display:flex;align-items:center;gap:.6rem;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:.55rem .7rem;width:100%;box-sizing:border-box;min-width:0;overflow:hidden;}
     .period-toggle{display:flex;background:var(--surface);border-radius:8px;padding:.2rem;gap:.1rem;flex-shrink:0;}
     .period-btn{padding:.28rem .65rem;border-radius:6px;border:none;font-family:'DM Sans',sans-serif;font-size:.74rem;font-weight:600;cursor:pointer;background:none;color:var(--muted);transition:all .15s;}
@@ -2445,21 +2446,25 @@ async function saveExpense() {
   const payThrough= state.selectedPayment;
 
   if (!amount || amount <= 0) {
+    document.getElementById('btn-save-expense')?.blur();
     showToast('Enter a valid amount', 'error');
     const el = document.getElementById('amount-input');
-    el?.focus(); el?.scrollIntoView({behavior:'smooth', block:'center'});
+    if (el) { el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); el.style.borderColor='var(--danger)'; setTimeout(()=>el.style.borderColor='',2000); }
     return;
   }
   if (!desc) {
+    document.getElementById('btn-save-expense')?.blur();
     showToast('Add a description', 'error');
     const el = document.getElementById('desc-input');
-    el?.focus(); el?.scrollIntoView({behavior:'smooth', block:'center'});
+    if (el) { el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); el.style.borderColor='var(--danger)'; setTimeout(()=>el.style.borderColor='',2000); }
     return;
   }
   if (!isoDate) {
     showToast('Pick a date', 'error');
     const el = document.getElementById('date-input');
-    el?.focus(); el?.scrollIntoView({behavior:'smooth', block:'center'});
+    // Don't call focus() on date input — opens native calendar picker (the "bubble")
+    el?.scrollIntoView({behavior:'smooth', block:'center'});
+    if (el) { el.style.borderColor='var(--danger)'; setTimeout(()=>el.style.borderColor='',2000); }
     return;
   }
 
@@ -3121,30 +3126,5 @@ function switchHelpTab(tab) {
 
 
 
-<script id="debug-scroll">
-(function(){
-  // Log scroll events to find the actual scroll container
-  ['wheel','scroll'].forEach(evt => {
-    document.addEventListener(evt, function(e){
-      const t = e.target;
-      const id = t.id || t.className?.toString().substring(0,30) || t.tagName;
-      console.log('[Scroll]', evt, 'target:', id,
-        'scrollable:', t.scrollHeight > t.clientHeight,
-        'overflow:', getComputedStyle(t).overflow,
-        'overflowY:', getComputedStyle(t).overflowY
-      );
-    }, {passive:true, once:false, capture:true});
-  });
-
-  // Log focus events to find what gets the bubble
-  document.addEventListener('focusin', function(e){
-    const t = e.target;
-    console.log('[Focus]', t.tagName, t.id || t.className?.toString().substring(0,40),
-      'outline:', getComputedStyle(t).outline,
-      'w:', t.offsetWidth, 'h:', t.offsetHeight
-    );
-  }, true);
-})();
-</script>
 
 </body>
