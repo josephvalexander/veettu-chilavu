@@ -150,7 +150,7 @@
       /* Screens */
       .screen{ min-height:0; height:auto; }
       .screen.active{ display:block !important; }
-      #screen-app.active{ display:block !important; width:100%; }
+      #screen-app.active{ display:block !important; }
 
       /* Sidebar: fixed left */
       .bottom-nav{
@@ -221,13 +221,7 @@
         height:auto;
         /* Content height drives scroll — no viewport clamping */
       }
-      /* screen-app: height driven by content, not viewport */
-      #screen-app {
-        width:100%;
-        min-height:0;
-        height:auto;
-        overflow:visible;
-      }
+
       /* ── Desktop scroll: explicit scroll container ─────────
          html/body are locked to viewport (mobile Safari compat).
          On desktop, make #screen-app the scroll container,
@@ -246,10 +240,11 @@
         left: 240px !important;
         right: 0 !important;
         bottom: 0 !important;
-        height: auto !important;
+        /* width is implicit: right:0 + left:240px = 100vw-240px, no conflict */
+        height: 100% !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
-        padding-left: 0 !important;
+        box-sizing: border-box !important;
       }
       .tab-content.tab-active {
         min-height: 100% !important;
@@ -334,13 +329,17 @@
       }
       .modal-handle{ display:none; }
 
-      /* Toast: top right, rectangular */
+      /* Toast: top right, compact */
       .toast{
         bottom:auto; top:1.25rem;
         left:auto;   right:1.75rem;
         transform:translateX(12px);
-        max-width:320px;
+        max-width:220px;
         border-radius:8px;
+        white-space:normal;
+        text-align:left;
+        font-size:.82rem;
+        padding:.55rem .85rem;
       }
       .toast.show{ transform:translateX(0); }
       ::-webkit-scrollbar{ width:6px; }
@@ -740,7 +739,7 @@
     /* ══════════════════════════════════════
        TOAST
     ══════════════════════════════════════ */
-    .toast{position:fixed;bottom:100px;left:50%;transform:translate(-50%, 20px);background:var(--card);border:1px solid var(--border);padding:.72rem 1.2rem;border-radius:10px;font-size:.86rem;font-weight:500;z-index:300;opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
+    .toast{position:fixed;bottom:100px;left:50%;transform:translate(-50%, 20px);background:var(--card);border:1px solid var(--border);padding:.6rem 1rem;border-radius:10px;font-size:.84rem;font-weight:500;z-index:300;opacity:0;pointer-events:none;transition:all .3s;white-space:normal;max-width:260px;text-align:center;line-height:1.4;color:var(--text);}
     .toast.show{opacity:1;transform:translate(-50%, 0);pointer-events:auto;}
     .toast.success{border-color:var(--success);color:var(--success);}
     .toast.error{border-color:var(--danger);color:var(--danger);}
