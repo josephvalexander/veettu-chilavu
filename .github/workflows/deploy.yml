@@ -70,8 +70,17 @@ jobs:
 
           # Copy favicon if present
           [ -f "${APP_DIR}/favicon.ico" ] && cp "${APP_DIR}/favicon.ico" dist/ || true
+          [ -f "${APP_DIR}/favicon.png" ] && cp "${APP_DIR}/favicon.png" dist/ || true
           # Copy icons folder if present, otherwise generate below
           [ -d "${APP_DIR}/icons" ] && cp -r "${APP_DIR}/icons" dist/ || true
+          # Copy all other HTML files (privacy policy, help pages etc.)
+          for f in "${APP_DIR}"/*.html; do
+            fname=$(basename "$f")
+            if [ "$fname" != "index.html" ]; then
+              cp "$f" dist/
+              echo "✅ Copied $fname"
+            fi
+          done
 
       # ── 3b. Generate all PWA icons using Python/Pillow ───────────
       - name: Generate PWA icons
