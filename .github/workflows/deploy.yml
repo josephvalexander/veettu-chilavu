@@ -1,175 +1,58 @@
-name: Deploy FamilyLedger to GitHub Pages
+# .github/workflows/deploy.yml
+# Deploys Bodhanika to GitHub Pages on every push to main.
+# Bumps SW version so all PWA clients auto-update.
+
+name: Deploy Bodhanika
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:   # allow manual trigger from GitHub UI
+    branches: [ main ]
 
-# Allow writing to GitHub Pages
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
-# Only one deployment at a time
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      # ── 1. Checkout ──────────────────────────────────────
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      # ── 2. Generate version strings ──────────────────────
-      - name: Generate version and build time
-        id: version
+      - name: Bump service worker version
         run: |
-          GIT_TAG=$(git describe --tags --exact-match 2>/dev/null || echo "")
-          SHORT_SHA=$(git rev-parse --short HEAD)
-          BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%MZ")
+          VERSION="v$(date +'%Y.%m.%d.%H%M')"
+          echo "Deploying version: $VERSION"
+          sed -i "s/const VERSION = '[^']*'/const VERSION = '$VERSION'/" sw.js
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-          if [ -n "$GIT_TAG" ]; then
-            VERSION="${GIT_TAG}-${BUILD_TIME}"
-          else
-            VERSION="${SHORT_SHA}-${BUILD_TIME}"
-          fi
-
-          echo "version=${VERSION}"    >> $GITHUB_OUTPUT
-          echo "build_time=${BUILD_TIME}" >> $GITHUB_OUTPUT
-          echo "✅ Version: ${VERSION}"
-          echo "✅ Build time: ${BUILD_TIME}"
-
-      # ── 3. Auto-detect app files and copy to dist/ ───────
-      - name: Prepare dist folder
+      - name: Commit updated sw.js
         run: |
-          mkdir -p dist
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sw.js
+          git diff --staged --quiet || git commit -m "chore: deploy ${{ env.VERSION }}"
+          git push
 
-          # Find index.html anywhere up to 2 levels deep
-          if [ -f "index.html" ]; then
-            APP_DIR="."
-          else
-            FOUND=$(find . -maxdepth 2 -name "index.html" ! -path "./.git/*" | head -1)
-            if [ -z "$FOUND" ]; then
-              echo "❌ Could not find index.html anywhere in the repo."
-              exit 1
-            fi
-            APP_DIR=$(dirname "$FOUND")
-          fi
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
-          echo "✅ App files found in: ${APP_DIR}"
-
-          # Required files
-          cp "${APP_DIR}/index.html"   dist/
-          cp "${APP_DIR}/sw.js"        dist/
-          cp "${APP_DIR}/manifest.json" dist/
-
-          # Copy favicon if present
-          [ -f "${APP_DIR}/favicon.ico" ] && cp "${APP_DIR}/favicon.ico" dist/ || true
-          [ -f "${APP_DIR}/favicon.png" ] && cp "${APP_DIR}/favicon.png" dist/ || true
-          # Copy icons folder if present, otherwise generate below
-          [ -d "${APP_DIR}/icons" ] && cp -r "${APP_DIR}/icons" dist/ || true
-          # Copy all other HTML files (privacy policy, help pages etc.)
-          for f in "${APP_DIR}"/*.html; do
-            fname=$(basename "$f")
-            if [ "$fname" != "index.html" ]; then
-              cp "$f" dist/
-              echo "✅ Copied $fname"
-            fi
-          done
-
-      # ── 3b. Generate all PWA icons using Python/Pillow ───────────
-      - name: Generate PWA icons
-        run: |
-          pip install Pillow --quiet
-          mkdir -p dist/icons
-          printf '%s\n' \
-            'from PIL import Image, ImageDraw' \
-            'def ic(sz):' \
-            '  im=Image.new("RGBA",(sz,sz),(0,0,0,0));d=ImageDraw.Draw(im)' \
-            '  d.rounded_rectangle([0,0,sz,sz],radius=int(sz*.22),fill=(10,18,24))' \
-            '  ph=max(4,int(sz*.155));pr=ph//2;xr=int(sz*.82);gap=int(sz*.185);y0=int(sz*.265)' \
-            '  ws=[(int(sz*.62),(245,200,66)),(int(sz*.44),(95,196,184)),(int(sz*.26),(232,114,90))]' \
-            '  [d.rounded_rectangle([xr-w,y0+i*gap,xr,y0+i*gap+ph],radius=pr,fill=col) for i,(w,col) in enumerate(ws)]' \
-            '  return im' \
-            'for s in [16,32,48,64,128,192,512]:' \
-            '  ic(s).save(f"dist/icons/icon-{s}.png");print(f"icon-{s}.png ok")' \
-            'imgs=[ic(s) for s in [16,32,48]]' \
-            'imgs[0].save("dist/favicon.ico",format="ICO",sizes=[(16,16),(32,32),(48,48)],append_images=imgs[1:])' \
-            'ic(32).save("dist/icons/favicon.png");ic(32).save("dist/favicon.png")' \
-            'print("done")' \
-            > gen_icons.py
-          python3 gen_icons.py
-          echo "✅ PWA icons generated"
-
-      # ── 4. Inject Google Client ID ────────────────────────
-      #    Add secret: repo → Settings → Secrets → Actions
-      #    Secret name: GOOGLE_CLIENT_ID
-      - name: Inject Google Client ID
-        run: |
-          CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
-          if [ -z "$CLIENT_ID" ]; then
-            echo "⚠️  GOOGLE_CLIENT_ID secret not set — app will show setup modal"
-            CLIENT_ID="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-          fi
-          sed -i "s|__GOOGLE_CLIENT_ID__|${CLIENT_ID}|g" dist/index.html
-          echo "✅ Client ID injected: ${CLIENT_ID:0:12}..."
-
-      # ── 5. Inject Google Sheet ID ─────────────────────────
-      #    Add secret: repo → Settings → Secrets → Actions
-      #    Secret name: GOOGLE_SHEET_ID
-      #    Value: the long ID from your Google Sheet URL
-      #    e.g. https://docs.google.com/spreadsheets/d/[THIS PART]/edit
-      - name: Inject Google Sheet ID
-        run: |
-          SHEET_ID="${{ secrets.GOOGLE_SHEET_ID }}"
-          if [ -z "$SHEET_ID" ]; then
-            echo "⚠️  GOOGLE_SHEET_ID secret not set — users will be asked to enter Sheet ID manually"
-            SHEET_ID="__SHEET_ID_NOT_CONFIGURED__"
-          fi
-          sed -i "s|__GOOGLE_SHEET_ID__|${SHEET_ID}|g" dist/index.html
-          echo "✅ Sheet ID injected: ${SHEET_ID:0:12}..."
-
-      # ── 6. Inject SW version + build time ────────────────
-      - name: Inject SW version and build time
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          BUILD_TIME="${{ steps.version.outputs.build_time }}"
-          sed -i "s|__SW_VERSION__|${VERSION}|g"    dist/sw.js
-          sed -i "s|__BUILD_TIME__|${BUILD_TIME}|g" dist/sw.js
-          echo "✅ SW version injected: ${VERSION}"
-          # Write version.json for update polling
-          echo "{\"version\":\"${VERSION}\",\"buildTime\":\"${BUILD_TIME}\"}" > dist/version.json
-
-      # ── 7. Verify build ───────────────────────────────────
-      - name: Verify dist contents
-        run: |
-          echo "📦 Files in dist/:"
-          ls -la dist/
-          echo ""
-          # Make sure no uninjected placeholders remain
-          if grep -q "__GOOGLE_CLIENT_ID__\|__GOOGLE_SHEET_ID__\|__SW_VERSION__\|__BUILD_TIME__" dist/index.html dist/sw.js 2>/dev/null; then
-            echo "⚠️  WARNING: Some placeholders were not replaced."
-            echo "   Check that all GitHub Secrets are set correctly."
-            grep -n "__GOOGLE_CLIENT_ID__\|__GOOGLE_SHEET_ID__\|__SW_VERSION__\|__BUILD_TIME__" dist/index.html dist/sw.js || true
-          else
-            echo "✅ All placeholders successfully replaced"
-          fi
-
-      # ── 8. Upload to GitHub Pages ─────────────────────────
-      - name: Upload Pages artifact
+      - name: Upload site to Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/
+          path: '.'
 
-      # ── 9. Deploy ─────────────────────────────────────────
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-      - name: Print deployed URL
-        run: echo "🚀 Deployed to ${{ steps.deployment.outputs.page_url }}"
