@@ -220,14 +220,21 @@
         min-height:calc(100vh - 40px);
         /* Let body scroll — no overflow here */
       }
-      /* screen-app scrolls with the page naturally */
+      /* screen-app: natural flow, no scroll trapping */
       #screen-app {
         width:100%;
         min-height:100vh;
+        height:auto;
         overflow:visible;
       }
-      /* html+body are the scroll container on desktop */
-      html, body { overflow-y:auto; height:auto; }
+      /* Desktop scroll: html/body contain everything, scroll naturally */
+      html { overflow-y:auto; }
+      body { overflow-y:auto; height:auto; min-height:100vh; }
+      /* Prevent any child from trapping wheel events */
+      #app, #screen-app, .tab-content.tab-active {
+        overflow:visible !important;
+        height:auto !important;
+      }
 
       /* Dashboard: responsive layout */
       .dash-content{
@@ -348,13 +355,18 @@
     ::-webkit-scrollbar-track{background:transparent;}
     ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important;}}
-    :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-    /* Suppress browser's giant oval focus ring on chip/button elements */
-    .cat-chip:focus-visible,
-    .pay-chip:focus-visible,
-    .btn:focus-visible,
-    .nav-item:focus-visible,
-    .nav-arrow:focus-visible{ outline:none; box-shadow:0 0 0 2px var(--accent); }
+    /* :focus-visible handled per-element below to avoid giant ovals on buttons */
+    /* Suppress browser's giant oval focus ring on ALL interactive elements */
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    a:focus-visible { outline:none; }
+    /* Only show focus ring for keyboard navigation (tab key) */
+    button:focus-visible { box-shadow:0 0 0 2px var(--accent); }
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible { box-shadow:0 0 0 2px var(--accent); }
 
     /* ══════════════════════════════════════
        LOGIN SCREEN
