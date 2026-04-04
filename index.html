@@ -63,7 +63,7 @@
     ══════════════════════════════════════ */
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html,body{overflow-x:hidden;width:100%;max-width:100%;}
-    html{font-size:16px;scroll-behavior:smooth;height:-webkit-fill-available;}
+    html{font-size:16px;scroll-behavior:smooth;height:-webkit-fill-available;} /* mobile only */
     body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:-webkit-fill-available;overscroll-behavior:none;transition:background .25s,color .25s;margin:0;padding:0;}
     body::before{
       content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -228,11 +228,35 @@
         height:auto;
         overflow:visible;
       }
-      /* Desktop scroll: let body grow with content */
-      html { overflow-y:scroll; height:auto; min-height:100%; }
-      body { overflow-y:visible; height:auto; min-height:0; }
-      #app { min-height:0; height:auto; overflow:visible; }
-      #screen-app, .tab-content.tab-active { min-height:0; height:auto; overflow:visible; }
+      /* ── Desktop scroll: DEFINITIVE fix ────────────────────
+         html/body must NOT be pinned to viewport height.
+         html{height:-webkit-fill-available} is mobile-only.
+         Here we reset everything and let content drive height. */
+      html {
+        height: auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+      }
+      body {
+        height: auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+      }
+      #app {
+        min-height: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      #screen-app {
+        min-height: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      .tab-content.tab-active {
+        min-height: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
 
       /* Dashboard: responsive layout */
       .dash-content{
@@ -362,7 +386,8 @@
     textarea:focus-visible,
     a:focus-visible { outline:none; }
     /* Only show focus ring for keyboard navigation (tab key) */
-    button:focus-visible { box-shadow:0 0 0 2px var(--accent); }
+    button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    .btn-primary:focus-visible,.btn:focus-visible { outline:none; box-shadow:none; }
     input:focus-visible,
     select:focus-visible,
     textarea:focus-visible { box-shadow:0 0 0 2px var(--accent); }
@@ -615,9 +640,9 @@
        BUTTONS
     ══════════════════════════════════════ */
     .btn{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.88rem 1.5rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.93rem;font-weight:600;border:none;cursor:pointer;transition:all .15s;}
-    .btn-primary{background:var(--accent);color:var(--text-inv);box-shadow:0 4px 16px rgba(245,200,66,.25);}
-    .btn-primary:focus,.btn-primary:active{box-shadow:none;outline:none;}
-    .btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px);}
+    .btn-primary{background:var(--accent);color:var(--text-inv);}
+    .btn-primary:hover{filter:brightness(1.08);}
+    .btn-primary:focus,.btn-primary:active,.btn-primary:focus-visible{box-shadow:none !important;outline:none !important;}
     .btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border);}
     .btn-ghost{background:none;border:none;color:var(--muted);cursor:pointer;font-family:inherit;padding:.4rem 0;}
     .btn-ghost:hover{color:var(--text);}
@@ -1325,17 +1350,8 @@ let state = {
   //   1. Build-time injected value (from GOOGLE_SHEET_ID GitHub Secret) — cleanest, zero config for users
   //   2. localStorage fallback — lets "Connect Different Sheet" in settings still work
   sheetId: (() => {
-    const injected = '__GOOGLE_SHEET_ID__';
-    if (injected && !injected.startsWith('__')) {
-      localStorage.setItem('fl_sheet_id', injected);
-      return injected;
-    }
-    // Also check URL param as a convenience for local dev / testing
-    const urlParam = new URLSearchParams(window.location.search).get('sheet');
-    if (urlParam) {
-      localStorage.setItem('fl_sheet_id', urlParam);
-      return urlParam;
-    }
+    // Each user connects their own sheet — no global injection.
+    // Return from localStorage only (persists across sessions for returning users).
     return localStorage.getItem('fl_sheet_id') || '';
   })(),
   currency: localStorage.getItem('fl_currency') || 'INR',
@@ -1631,9 +1647,9 @@ function onTokenReceived(r) {
 function showStep2() {
   document.getElementById('login-step-1').style.display='none';
   document.getElementById('login-step-2').style.display='block';
-  // Pre-fill manual entry if they already have a sheet ID
+  // Never pre-fill — each user should connect/create their own sheet
   const existing = document.getElementById('sheet-id-input');
-  if (existing && state.sheetId) existing.value = state.sheetId;
+  if (existing) existing.value = '';
 }
 
 function toggleManualEntry() {
