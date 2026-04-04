@@ -833,6 +833,9 @@
       </div>
     </div>
     <p class="login-note">✦ No servers. No subscriptions. Data in your Google Drive.</p>
+    <p class="login-note" style="margin-top:.5rem">
+      <a href="privacy.html" style="color:var(--muted);font-size:.72rem;text-decoration:underline;opacity:.7">Privacy Policy</a>
+    </p>
   </div>
 
   <!-- ══ MAIN APP ══ -->
@@ -1030,7 +1033,7 @@
             <span class="settings-arrow">›</span>
           </div>
         </div>
-        <p style="font-size:.73rem;color:var(--muted);text-align:center;padding:.5rem">വീട്ടു ചിലവ് v1.2 · Data stored in your Google Drive</p>
+        <p style="font-size:.73rem;color:var(--muted);text-align:center;padding:.5rem">വീട്ടു ചിലവ് v1.2 · Data stored in your Google Drive · <a href="privacy.html" style="color:var(--muted);text-decoration:underline">Privacy Policy</a></p>
       </div>
     </div>
 
@@ -1135,21 +1138,62 @@ function cacheCategories(cats) {
   localStorage.setItem('fl_categories', JSON.stringify(cats));
 }
 
+async function ensureCategoriesTab() {
+  // Create the Categories sheet tab if it doesn't exist (400 = tab missing)
+  try {
+    const meta = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}?fields=sheets.properties.title`,
+      { headers: { Authorization: 'Bearer ' + state.token } }
+    );
+    const json = await meta.json();
+    const tabs = (json.sheets || []).map(s => s.properties.title);
+    if (tabs.includes('Categories')) return; // already exists
+
+    console.log('[Cats] Categories tab missing — creating it');
+    await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}:batchUpdate`,
+      {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + state.token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requests: [{ addSheet: { properties: { title: 'Categories' } } }]
+        }),
+      }
+    );
+    console.log('[Cats] Categories tab created');
+  } catch(e) {
+    console.warn('[Cats] Could not create Categories tab:', e.message);
+  }
+}
+
 async function loadCategoriesFromSheet() {
   if (state.token === 'DEMO') return;
   try {
-    // Step 1: always read data range first — this is the source of truth
-    const data = await sheetsGet(CATS_SHEET_RANGE);
+    // Step 1: try to read categories — if 400, tab doesn't exist yet
+    let data;
+    try {
+      data = await sheetsGet(CATS_SHEET_RANGE);
+    } catch(e) {
+      if (e.message.includes('400') || e.message.includes('Unable to parse range')) {
+        // Categories tab doesn't exist — create it first
+        console.log('[Cats] Tab missing (400), creating...');
+        await ensureCategoriesTab();
+        data = { values: [] }; // treat as empty after creation
+      } else {
+        throw e; // re-throw other errors
+      }
+    }
+
     const rows = data?.values || [];
 
     if (rows.length === 0) {
-      // Sheet has no category data — write header + all defaults (first run)
+      // Tab exists but empty — write header + defaults
       await sheetsPutCats(CATS_SHEET_HEADER, [CATS_HEADER_ROW]);
       await sheetsPutCats(CATS_SHEET_RANGE, DEFAULT_CATS.map(c=>[c.id,c.label,c.emoji,c.color]));
       CATEGORIES = [...DEFAULT_CATS];
-      console.log('[Cats] First run — wrote', CATEGORIES.length, 'defaults to sheet');
+      console.log('[Cats] Initialised with', CATEGORIES.length, 'defaults');
     } else {
-      // Parse what's in the sheet
+      // Parse sheet data
       const fromSheet = rows.map(row => ({
         id:    (row[0]||'').trim(),
         label: (row[1]||'').trim(),
@@ -1161,40 +1205,38 @@ async function loadCategoriesFromSheet() {
       const renamed = fromSheet.map(c =>
         c.id === 'transport' ? {...c, id:'travel', label:'Travel', emoji:'✈️'} : c);
 
-      // Merge any DEFAULT_CATS missing from sheet (new defaults added to app)
+      // Merge any DEFAULT_CATS missing from sheet
       const sheetIds = new Set(renamed.map(c => c.id));
       const toAdd = DEFAULT_CATS.filter(c => !sheetIds.has(c.id));
-      const merged = [...renamed, ...toAdd];
-
-      CATEGORIES = merged;
+      CATEGORIES = [...renamed, ...toAdd];
 
       // Write back if anything changed
       if (toAdd.length > 0 || fromSheet.some(c => c.id === 'transport')) {
         await sheetsPutCats(CATS_SHEET_RANGE, CATEGORIES.map(c=>[c.id,c.label,c.emoji,c.color]));
-        console.log('[Cats] Merged', toAdd.length, 'new defaults, saved back');
+        console.log('[Cats] Merged', toAdd.length, 'new defaults');
       }
-      console.log('[Cats] Loaded', CATEGORIES.length, 'cats from sheet');
+      console.log('[Cats] Loaded', CATEGORIES.length, 'categories');
     }
+
     cacheCategories(CATEGORIES);
     buildCategoryGrid(); buildFilterRow(); updateCatCount();
+
     // Load shared budget from Categories!E1
     try {
       const bdata = await sheetsGet('Categories!E1');
       const rawVal = bdata?.values?.[0]?.[0];
-      console.log('[Budget] Raw value from sheet:', rawVal);
       const bval = parseFloat(rawVal || '0');
       if (!isNaN(bval) && bval > 0) {
         state.budgetLimit = bval;
         localStorage.setItem('fl_budget', String(bval));
         syncBudgetInputUI();
-        console.log('[Budget] Loaded from sheet:', bval);
-        renderDashboard(); // re-render so bar appears
-      } else {
-        console.log('[Budget] No budget set in sheet (value:', rawVal, ')');
+        renderDashboard();
+        console.log('[Budget] Loaded:', bval);
       }
-    } catch(e) { console.warn('[Budget] Could not load from sheet:', e.message); }
+    } catch(e) { console.warn('[Budget] Could not load:', e.message); }
+
   } catch(e) {
-    console.warn('[Cats] Could not load from sheet, using cache:', e.message);
+    console.warn('[Cats] Error loading from sheet, using cache:', e.message);
   }
 }
 
@@ -1809,7 +1851,24 @@ async function sheetsAppend(values) {
 async function ensureHeader() {
   if (state.token==='DEMO') return;
   try {
-    const d=await sheetsGet(CONFIG.SHEET_RANGE_HEADER);
+    let d;
+    try {
+      d = await sheetsGet(CONFIG.SHEET_RANGE_HEADER);
+    } catch(e) {
+      if (e.message.includes('400') || e.message.includes('Unable to parse range')) {
+        // Expenses tab doesn't exist — create it
+        console.log('[App] Expenses tab missing, creating...');
+        await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}:batchUpdate`,
+          {
+            method: 'POST',
+            headers: { Authorization: 'Bearer ' + state.token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requests: [{ addSheet: { properties: { title: 'Expenses' } } }] }),
+          }
+        );
+        d = { values: [] };
+      } else { throw e; }
+    }
     if (d.values&&d.values[0]&&d.values[0][0]==='Date') return;
     const url=`https://sheets.googleapis.com/v4/spreadsheets/${state.sheetId}/values/${encodeURIComponent(CONFIG.SHEET_RANGE_HEADER)}?valueInputOption=USER_ENTERED`;
     await fetch(url,{method:'PUT',headers:{Authorization:`Bearer ${state.token}`,'Content-Type':'application/json'},body:JSON.stringify({values:[CONFIG.HEADER_ROW]})});
