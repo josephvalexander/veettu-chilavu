@@ -3120,4 +3120,31 @@ function switchHelpTab(tab) {
    aria-hidden="true">Privacy Policy</a>
 
 
+
+<script id="debug-scroll">
+(function(){
+  // Log scroll events to find the actual scroll container
+  ['wheel','scroll'].forEach(evt => {
+    document.addEventListener(evt, function(e){
+      const t = e.target;
+      const id = t.id || t.className?.toString().substring(0,30) || t.tagName;
+      console.log('[Scroll]', evt, 'target:', id,
+        'scrollable:', t.scrollHeight > t.clientHeight,
+        'overflow:', getComputedStyle(t).overflow,
+        'overflowY:', getComputedStyle(t).overflowY
+      );
+    }, {passive:true, once:false, capture:true});
+  });
+
+  // Log focus events to find what gets the bubble
+  document.addEventListener('focusin', function(e){
+    const t = e.target;
+    console.log('[Focus]', t.tagName, t.id || t.className?.toString().substring(0,40),
+      'outline:', getComputedStyle(t).outline,
+      'w:', t.offsetWidth, 'h:', t.offsetHeight
+    );
+  }, true);
+})();
+</script>
+
 </body>
